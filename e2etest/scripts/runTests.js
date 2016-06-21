@@ -29,7 +29,7 @@ var loginWindowWaitTime = 20 /* seconds */ * 1000 /* milli seconds */,
             emailInputSelector: '[name=email]',
             emailSubmitSelector: undefined,
             passwordInputSelector: '[name=pass]',
-            passwordSubmitSelector: '[type=submit]'
+            passwordSubmitSelector: '[value="Log In"]'
         },
         google: {
             titleSelector: 'google',
