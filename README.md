@@ -157,7 +157,7 @@ Some of the missing features are:
 - purge
 - cancellability of push and pull
 - automatically triggering a push when a pull is performed
-- custom page size when performing a pull
+- advanced querying functions like indexOf, etc do not work on the local store
 - closing a database without having to close the app
 - callback to allow changing how records are sent to the server during a push
 - configurable ID column. Currently ID column has to be named 'id'.

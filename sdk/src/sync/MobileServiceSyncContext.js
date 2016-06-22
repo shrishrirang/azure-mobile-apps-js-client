@@ -197,16 +197,17 @@ function MobileServiceSyncContext(client) {
      * 
      * @param query Query specifying which records to pull
      * @param queryId A unique string ID for an incremental pull query OR null for a vanilla pull query.
+     * @param [settings] An object that defines various pull settings. 
      * 
      * @returns A promise that is fulfilled when all records are pulled OR is rejected if the pull fails or is cancelled.  
      */
-    this.pull = function (query, queryId) { //FIXME: SyncTable should have a pull API 
+    this.pull = function (query, queryId, settings) { //FIXME: SyncTable should have a pull API 
         //TODO: Implement cancel
         //TODO: Perform push before pulling
         return syncTaskRunner.run(function() {
             validateInitialization();
             
-            return pullManager.pull(query, queryId);
+            return pullManager.pull(query, queryId, settings);
         });
     };
     
