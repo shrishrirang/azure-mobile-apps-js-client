@@ -29,6 +29,9 @@ var testTableName = storeTestHelper.testTableName,
     currentId,
     syncContext,
     filter,
+    textPrefix, // unique guid per test that is used to prefix generated text. 
+                // This helps us pull only the records that are relevant for the current test and ignore past records. 
+    pullPageSize, // page size to use while pulling records
     id,
     store;
 
@@ -47,10 +50,7 @@ $testGroup('offline functional tests')
                 }
             });
         }).then(function() {
-            serverValue = clientValue = filter = currentId = undefined;
-            
             client = new MobileServiceClient(serverUrl);
-            
             client = client.withFilter(function(req, next, callback) {
                 if (filter) {
                     filter(req, next, callback);
@@ -59,9 +59,14 @@ $testGroup('offline functional tests')
                 }
             });
             
+            serverValue = clientValue = filter = currentId = pullPageSize = undefined;
             syncContext = new MobileServiceSyncContext(client);
             table = client.getTable(testTableName);
-            query = new Query(testTableName);
+            textPrefix = generateGuid();
+
+            query = new Query(testTableName).where(function(textPrefix) {
+                return this.text.indexOf(textPrefix) === 0;
+            }, textPrefix);
             
             return syncContext.initialize(store);
         });
@@ -127,25 +132,34 @@ $testGroup('offline functional tests')
         return performActions(actions);
     }),
     
+    $test('Vanilla pull - default page size')
+    .checkAsync(function () {
+        // If we are not explicitly defining pullPageSize, the default page size will be used
+        return performPull(60, 'vanillapull');
+    }),
+
     $test('Vanilla pull - zero records')
     .checkAsync(function () {
+        pullPageSize = 4;
         return performPull(0, 'vanillapull');
     }),
 
     $test('Vanilla pull - single page')
     .checkAsync(function () {
-        return performPull(5, 'vanillapull');
+        pullPageSize = 4;
+        return performPull(2, 'vanillapull');
     }),
 
     $test('Vanilla pull - record count exactly matches page size')
     .checkAsync(function () {
-        // FIXME: Hardcoding 50 with an implicit assumption that it is the page size is not good. Fix it!
-        return performPull(50, 'vanillapull'); 
+        pullPageSize = 4;
+        return performPull(4, 'vanillapull'); 
     }),
 
     $test('Vanilla pull - multiple pages')
     .checkAsync(function () {
-        return performPull(60, 'vanillapull');
+        pullPageSize = 2;
+        return performPull(4, 'vanillapull');
     }),
 
     $test('Incremental pull - zero records')
@@ -153,20 +167,28 @@ $testGroup('offline functional tests')
         return performPull(0, 'incrementalpull');
     }),
 
+    $test('Incremental pull - default page size')
+    .checkAsync(function () {
+        // If we are not explicitly defining pullPageSize, the default page size will be used
+        return performPull(60, 'incrementalpull');
+    }),
+
     $test('Incremental pull - single page')
     .checkAsync(function () {
-        return performPull(5, 'incrementalpull');
+        pullPageSize = 4;
+        return performPull(2, 'incrementalpull');
     }),
 
     $test('Incremental pull - record count exactly matches page size')
     .checkAsync(function () {
-        // FIXME: Hardcoding 50 with an implicit assumption that it is the page size is not good. Fix it!
-        return performPull(50, 'incrementalpull'); 
+        pullPageSize = 4;
+        return performPull(4, 'incrementalpull'); 
     }),
 
     $test('Incremental pull - multiple pages')
     .checkAsync(function () {
-        return performPull(60, 'incrementalpull');
+        pullPageSize = 2;
+        return performPull(4, 'incrementalpull');
     }),
 
     $test('Push with response 409 - conflict not handled')
@@ -724,13 +746,13 @@ function performAction (chain, action) {
             case 'serverlookup':
                 return table.lookup(currentId);
             case 'serverread':
-                return table.read(new Query(testTableName));
+                return table.read(query);
             case 'push':
                 return syncContext.push();
             case 'vanillapull':
-                return syncContext.pull(query);
+                return syncContext.pull(query, null /* queryId */, {pageSize: pullPageSize});
             case 'incrementalpull':
-                return syncContext.pull(query, 'queryId');
+                return syncContext.pull(query, 'queryId', {pageSize: pullPageSize});
             default:
                 throw new Error('Unsupported action : ' + action);
         }
@@ -747,12 +769,7 @@ function performAction (chain, action) {
 
 // pullType is either 'vanillapull' or 'incrementalpull'
 function performPull(recordCount, pullType) {
-    var textPrefix = generateGuid(),
-        numServerRequests = 0;
-
-    query = query.where(function(textPrefix) {
-        return this.text.indexOf(textPrefix) === 0;
-    }, textPrefix);
+    var numServerRequests = 0;
 
     var actions = [
         function() {
@@ -795,10 +812,10 @@ function insertRecord(chain, record) {
     });
 }
 
-function generateRecord(textPrefix) {
+function generateRecord(text) {
     return {
         id: currentId,
-        text: generateText(textPrefix),
+        text: generateText(textPrefix + text),
         complete: false
     };
 }

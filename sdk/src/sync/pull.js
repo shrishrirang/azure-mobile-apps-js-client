@@ -14,7 +14,7 @@ var Validate = require('../Utilities/Validate'),
     tableConstants = require('../constants').table,
     _ = require('../Utilities/Extensions');
     
-var pageSize = 50,
+var defaultPageSize = 50,
     idPropertyName = tableConstants.idPropertyName,
     pulltimeTableName = tableConstants.pulltimeTableName,
     sysProps = tableConstants.sysProps;
@@ -23,6 +23,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
     // Task runner for running pull tasks. We want only one pull to run at a time. 
     var pullTaskRunner = taskRunner(),
         mobileServiceTable,
+        pageSize,
         lastKnownUpdatedAt, // get the largest known value of the updatedAt column 
         tablePullQuery, // the query specified by the user for pulling the table 
         pagePullQuery, // query for fetching a single page
@@ -53,20 +54,32 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
      * 
      * @param query Query specifying which records to pull
      * @param pullQueryId A unique string ID for an incremental pull query OR null for a vanilla pull query.
+     * @param [settings] An object that defines the various pull settings - currently only pageSize
      * 
      * @returns A promise that is fulfilled when all records are pulled OR is rejected if the pull fails or is cancelled.  
      */
-    function pull(query, queryId) {
+    function pull(query, queryId, settings) {
         //TODO: support pullQueryId
         //TODO: page size should be configurable
         
         return pullTaskRunner.run(function() {
-            validateQuery(query);
-            Validate.isString(queryId); // non-null string or null - both are valid
+            validateQuery(query, 'query');
+            Validate.isString(queryId, 'queryId'); // non-null string or null - both are valid
+            Validate.isObject(settings, 'settings');
+
+            settings = settings || {};
+            if (_.isNull(settings.pageSize)) {
+                pageSize = defaultPageSize;
+            } else if (_.isInteger(settings.pageSize) && settings.pageSize > 0) {
+                pageSize = settings.pageSize;
+            } else {
+                throw new Error('Page size must be a positive integer. Page size ' + settings.pageSize + ' is invalid.');
+            }
 
             // Make a copy of the query as we will be modifying it
             tablePullQuery = copyQuery(query);            
 
+            mobileServiceTable = client.getTable(tablePullQuery.getComponents().table);
             pullQueryId = queryId;
 
             // Set up the query for initiating a pull and then pull all pages          
@@ -85,8 +98,6 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
 
     // Pulls all pages from the server table, one page at a time.
     function pullAllPages() {
-        mobileServiceTable = client.getTable(tablePullQuery.getComponents().table);
-        
         // 1. Pull one page
         // 2. Check if Pull is complete
         // 3. If it is complete, go to 5. If not, update the query to fetch the next page.
