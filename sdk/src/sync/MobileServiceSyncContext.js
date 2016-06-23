@@ -78,11 +78,7 @@ function MobileServiceSyncContext(client) {
             }
 
             // Delegate parameter validation to upsertWithLogging
-            return upsertWithLogging(tableName, instance, 'insert', function(existingRecord) { // precondition validator
-                if (!_.isNull(existingRecord)) {
-                    throw new Error('Cannot perform insert as a record with ID ' + existingRecord.id + ' already exists in the table ' + tableName);
-                }
-            });
+            return upsertWithLogging(tableName, instance, 'insert');
         });
     };
 
@@ -100,11 +96,7 @@ function MobileServiceSyncContext(client) {
             validateInitialization();
             
             // Delegate parameter validation to upsertWithLogging
-            return upsertWithLogging(tableName, instance, 'update', function(existingRecord) { // precondition validator
-                if (_.isNull(existingRecord)) {
-                    throw new Error('Cannot update record with ID ' + existingRecord.id + ' as it does not exist the table ' + tableName);
-                }
-            });
+            return upsertWithLogging(tableName, instance, 'update', true /* shouldOverwrite */);
         });
     };
 
@@ -240,7 +232,7 @@ function MobileServiceSyncContext(client) {
     
     // Performs upsert and logs the action in the operation table
     // Validates parameters. Callers can skip validation
-    function upsertWithLogging(tableName, instance, action, preconditionValidator) {
+    function upsertWithLogging(tableName, instance, action, shouldOverwrite) {
         Validate.isString(tableName, 'tableName');
         Validate.notNullOrEmpty(tableName, 'tableName');
 
@@ -252,7 +244,9 @@ function MobileServiceSyncContext(client) {
         }
         
         return store.lookup(tableName, instance.id, true /* suppressRecordNotFoundError */).then(function(existingRecord) {
-            return preconditionValidator(existingRecord);
+            if (existingRecord && !shouldOverwrite) {
+                throw new Error('Record with ID ' + existingRecord.id + ' already exists in the table ' + tableName);
+            }
         }).then(function() {
             return operationTableManager.getLoggingOperation(tableName, action, instance.id);
         }).then(function(loggingOperation) {
