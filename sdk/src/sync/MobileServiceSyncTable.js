@@ -88,6 +88,19 @@ function MobileServiceSyncTable(tableName, client) {
     this.del = function (instance) {
         return client.getSyncContext().del(tableName, instance);
     };
+
+    /**
+     * Pulls changes from the server table into the local store.
+     * 
+     * @param query Query specifying which records to pull
+     * @param [queryId] A unique string ID for an incremental pull query OR null for a vanilla pull query.
+     * @param [settings] An object that defines various pull settings. 
+     * 
+     * @returns A promise that is fulfilled when all records are pulled OR is rejected if the pull fails or is cancelled.  
+     */
+    this.pull = function (query, queryId, settings) {
+        return client.getSyncContext().pull(query, queryId, settings);
+    } 
 }
 
 // Define query operators

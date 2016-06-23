@@ -78,5 +78,27 @@ $testGroup('MobileServiceSyncTable tests')
             $assert.areEqual(result[2], record3);
             $assert.areEqual(result[3], record4);
         });
+    }),
+    
+    $test('table.pull')
+    .description('Tests that the pull API simply calls MobileServiceSyncContext.pull() and returns whatever it returns')
+    .check(function () {
+
+        // The pull params defined below have invalid values, but that does not matter
+        // as all we want to test is that pull acts as a passthrough function.
+        var query = 'query',
+            queryId = 'queryId',
+            settings = 'settings',
+            result = 'result';
+
+        client.getSyncContext().pull = function(queryParam, queryIdParam, settingsParam, more) {
+            $assert.areEqual(queryParam, query);
+            $assert.areEqual(queryIdParam, queryId);
+            $assert.areEqual(settingsParam, settings);
+            $assert.isNull(more);
+            return result;
+        };
+
+        $assert.areEqual(table.pull(query, queryId, settings, 'fourth_param_just_in_case_pull_starts_taking_more_params_in_the_future'), result);
     })
 );
