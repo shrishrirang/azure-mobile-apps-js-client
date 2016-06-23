@@ -115,7 +115,10 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
     
     // Check if the pull is complete or if there are more records left to be pulled
     function isPullComplete(pulledRecords) {
-        return pulledRecords.length < pageSize; // Pull is complete when the number of fetched records is less than page size
+         // Pull is NOT complete when the number of fetched records is less than page size as the server's page size
+         // can cause the result set to be smaller than the requested page size.
+         // We consider the pull to be complete only when the result contains 0 records.
+        return pulledRecords.length === 0;
     }
     
     // Pull the page as described by the query
@@ -216,10 +219,6 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
                 throw new Error('Something is wrong. pulledRecords cannot be null at this point');
             }
 
-            if (pulledRecords.length <= 0) {
-                throw new Error('Something is wrong. pulledRecords should contain at least one record at this point');
-            }
-
             var lastRecord = pulledRecords[ pulledRecords.length - 1];
 
             if (!lastRecord) {
@@ -232,7 +231,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
                 throw new Error('Property ' + tableConstants.sysProps.updatedAtColumnName + ' of the last record should be a valid date');
             }
 
-            if (lastRecordTime === lastKnownUpdatedAt) {
+            if (lastRecordTime.getTime() === lastKnownUpdatedAt.getTime()) {
                 pagePullQuery.skip(pagePullQuery.getComponents().skip + pulledRecords.length);
             } else {
                 buildQueryFromLastKnownUpdateAt(lastRecordTime);

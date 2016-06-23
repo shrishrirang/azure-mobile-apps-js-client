@@ -138,6 +138,12 @@ $testGroup('offline functional tests')
         return performPull(60, 'vanillapull');
     }),
 
+    $test('Vanilla pull - tiny page size')
+    .checkAsync(function () {
+        pullPageSize = 1;
+        return performPull(5, 'vanillapull');
+    }),
+
     $test('Vanilla pull - zero records')
     .checkAsync(function () {
         pullPageSize = 4;
@@ -162,15 +168,21 @@ $testGroup('offline functional tests')
         return performPull(4, 'vanillapull');
     }),
 
-    $test('Incremental pull - zero records')
-    .checkAsync(function () {
-        return performPull(0, 'incrementalpull');
-    }),
-
     $test('Incremental pull - default page size')
     .checkAsync(function () {
         // If we are not explicitly defining pullPageSize, the default page size will be used
         return performPull(60, 'incrementalpull');
+    }),
+
+    $test('Incremental pull - tiny page size')
+    .checkAsync(function () {
+        pullPageSize = 1;
+        return performPull(5, 'incrementalpull');
+    }),
+
+    $test('Incremental pull - zero records')
+    .checkAsync(function () {
+        return performPull(0, 'incrementalpull');
     }),
 
     $test('Incremental pull - single page')
