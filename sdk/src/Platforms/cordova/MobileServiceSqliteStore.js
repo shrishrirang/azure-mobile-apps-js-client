@@ -249,53 +249,57 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
      * 
      * @param tableName Name of the local table in which lookup is to be performed
      * @param id ID of the object to be looked up
+     * @param {boolean} [suppressRecordNotFoundError] If set to true, lookup will return an undefined object if the record is not found.
+     *                                                Otherwise, lookup will fail. 
+     *                                                This flag is useful to distinguish between a lookup failure due to the record not being present in the table
+     *                                                versus a genuine failure in performing the lookup operation
      * 
      * @returns Promise that will be resolved with the looked up object when the operation completes successfully OR 
      * rejected with the error if it fials. 
      */
-    this.lookup = Platform.async(function (tableName, id) {
+    this.lookup = function (tableName, id, suppressRecordNotFoundError) {
 
-        // Extract the callback argument added by Platform.async and redefine the function arguments
-        var callback = Array.prototype.pop.apply(arguments);
-        tableName = arguments[0];
-        id = arguments[1];
+        return Platform.async(function(callback) {
+            // Validate the arguments
+            Validate.isString(tableName, 'tableName');
+            Validate.notNullOrEmpty(tableName, 'tableName');
+            Validate.isValidId(id, 'id');
+            
+            var tableDefinition = this._tableDefinitions[tableName];
+            Validate.notNull(tableDefinition, 'tableDefinition for ' + tableName);
+            Validate.isObject(tableDefinition, 'tableDefinition for ' + tableName);
 
-        // Validate the arguments
-        Validate.isFunction(callback, 'callback');
-        Validate.isString(tableName, 'tableName');
-        Validate.notNullOrEmpty(tableName, 'tableName');
-        Validate.isValidId(id, 'id');
-        
-        var tableDefinition = this._tableDefinitions[tableName];
-        Validate.notNull(tableDefinition, 'tableDefinition');
-        Validate.isObject(tableDefinition, 'tableDefinition');
+            var columnDefinitions = tableDefinition.columnDefinitions;
+            Validate.notNull(columnDefinitions, 'columnDefinitions for ' + tableName);
+            Validate.isObject(columnDefinitions, 'columnDefinitions for ' + tableName);
 
-        var columnDefinitions = tableDefinition.columnDefinitions;
-        Validate.notNull(columnDefinitions, 'columnDefinitions');
-        Validate.isObject(columnDefinitions, 'columnDefinitions');
+            var lookupStatement = _.format("SELECT * FROM [{0}] WHERE {1} = ? COLLATE NOCASE", tableName, idPropertyName);
 
-        var lookupStatement = _.format("SELECT * FROM [{0}] WHERE {1} = ? COLLATE NOCASE", tableName, idPropertyName);
+            this._db.executeSql(lookupStatement, [id], function (result) {
 
-        this._db.executeSql(lookupStatement, [id], function (result) {
+                try {
+                    var record;
+                    if (result.rows.length !== 0) {
+                        record = result.rows.item(0);
+                    }
 
-            try {
-                var record;
-                if (result.rows.length !== 0) {
-                    record = result.rows.item(0);
+                    if (record) {
+                        // Deserialize the record read from the SQLite store into its original form.
+                        record = sqliteSerializer.deserialize(record, columnDefinitions);
+                        callback(null, record);
+                    } else if (suppressRecordNotFoundError) {
+                        callback();
+                    } else {
+                        callback(new Error('Item with id "' + id + '" does not exist.'));
+                    }
+                } catch (err) {
+                    callback(err);
                 }
-
-                // Deserialize the record read from the SQLite store into its original form.
-                if (record) {
-                    record = sqliteSerializer.deserialize(record, columnDefinitions);
-                }
-                callback(null, record);
-            } catch (err) {
+            }, function (err) {
                 callback(err);
-            }
-        }, function (err) {
-            callback(err);
-        });
-    });
+            });
+        }.bind(this))();
+    };
 
     /**
      * Deletes one or more records from the local table

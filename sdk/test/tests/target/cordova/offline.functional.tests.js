@@ -121,10 +121,10 @@ $testGroup('offline functional tests')
             'serverdelete', 'vanillapull', 'clientlookup',
             {
                 success: function(result) {
-                    $assert.isNull(result);
+                    $assert.fail('client lookup should have failed');
                 },
                 fail: function(error) {
-                    $assert.fail(error);
+                    // error expected
                 }
             }
         ];
@@ -442,8 +442,13 @@ $testGroup('offline functional tests')
                 $assert.areEqual(conflicts.length, 0);
             },
             'clientlookup',
-            function(result) {
-                $assert.isNull(result);
+            {
+                success: function(result) {
+                    $assert.fail('client lookup should have failed');
+                },
+                fail: function(error) {
+                    // error expected
+                }
             },
             'serverlookup',
             function (result) {
@@ -624,8 +629,13 @@ $testGroup('offline functional tests')
             },
 
             'clientlookup',
-            function(result) {
-                $assert.isNull(result);
+            {
+                success: function(result) {
+                    $assert.fail('client lookup should have failed');
+                },
+                fail: function(error) {
+                    // error expected
+                }
             },
 
             'serverlookup',
@@ -660,8 +670,13 @@ $testGroup('offline functional tests')
             },
 
             'clientlookup',
-            function(result) {
-                $assert.isNull(result);
+            {
+                success: function(result) {
+                    $assert.fail('client lookup should have failed');
+                },
+                fail: function(error) {
+                    // error expected
+                }
             },
 
             'serverlookup',

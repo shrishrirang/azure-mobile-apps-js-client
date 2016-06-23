@@ -226,7 +226,7 @@ function createOperationTableManager(store) {
             }
             
             // Find the data record associated with the log record. 
-            return store.lookup(logRecord.tableName, logRecord.itemId).then(function(data) {
+            return store.lookup(logRecord.tableName, logRecord.itemId, true /* suppressRecordNotFoundError */).then(function(data) {
                 if (data) { // Return the log record and the data record.
                     return {
                         logRecord: logRecord,

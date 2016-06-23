@@ -56,11 +56,16 @@ function MobileServiceSyncTable(tableName, client) {
     /**
      * Gets an object with the specified ID from the local table
      * @param id ID of the object to get from the local table
+     * @param {boolean} [suppressRecordNotFoundError] If set to true, lookup will return an undefined object if the record is not found.
+     *                                                Otherwise, lookup will fail. 
+     *                                                This flag is useful to distinguish between a lookup failure due to the record not being present in the table
+     *                                                versus a genuine failure in performing the lookup operation
+     * 
      * @returns A promise that is resolved with the looked up object when the operation is completed successfully.
      *          If the operation fails, the promise is rejected.
      */
-    this.lookup = function (id) {
-        return client.getSyncContext().lookup(tableName, id);
+    this.lookup = function (id, suppressRecordNotFoundError) {
+        return client.getSyncContext().lookup(tableName, id, suppressRecordNotFoundError);
     };
 
     /**
