@@ -60,11 +60,7 @@ function getTableDefinition(tableDefinitions, tableName) {
     Validate.isString(tableName);
     Validate.notNullOrEmpty(tableName);
 
-    var tableDefinition = tableDefinitions[tableName.toLowerCase()];
-
-    if (tableDefinition) {
-        return tableDefinition;
-    }
+    return tableDefinitions[tableName.toLowerCase()];
 }
 
 /**

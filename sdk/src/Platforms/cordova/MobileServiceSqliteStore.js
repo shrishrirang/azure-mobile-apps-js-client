@@ -66,7 +66,7 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
         Validate.isFunction(callback, 'callback');
         storeHelper.validateTableDefinition(tableDefinition);
 
-        tableDefinition = JSON.parse( JSON.stringify( tableDefinition ) ); // clone the table definition as we will need it later
+        tableDefinition = JSON.parse(JSON.stringify(tableDefinition)); // clone the table definition as we will need it later
 
         this._db.transaction(function(transaction) {
 
