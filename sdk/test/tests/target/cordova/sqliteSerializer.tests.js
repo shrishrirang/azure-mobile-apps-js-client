@@ -575,6 +575,12 @@ $testGroup('sqliteSerializer tests').tests(
         }
     }),
 
+    $test('Serialize property when column definitions defined it with a different case')
+    .check(function () {
+        $assert.areEqual(sqliteSerializer.serialize({iD: 1, valUE: 2}, {Id: 'integer', Value: 'integer'}),
+                                                     {iD: 1, valUE: 2});
+    }),
+
     $test('Deserialize property of type object into columns of different types')
     .check(function () {
         var value = { val: { a: 1 } },
@@ -854,6 +860,14 @@ $testGroup('sqliteSerializer tests').tests(
 
             $assert.areEqual(sqliteSerializer.deserialize(value, columnDefinitions), {val: null});
         }
+    }),
+
+    $test('Deserialize property when columnDefinitions has a different case')
+    .check(function () {
+        var value = { val: 1 },
+            columnDefinitions = {VAL: 'integer'};
+
+        $assert.areEqual(sqliteSerializer.deserialize(value, columnDefinitions), {VAL: 1});
     }),
 
     $test('Deserialize Attempting to deserialize to an unsupported column should fail')
