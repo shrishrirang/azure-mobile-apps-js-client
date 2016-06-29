@@ -105,7 +105,7 @@ function MobileServiceSyncTable(tableName, client) {
      */
     this.pull = function (query, queryId, settings) {
         return client.getSyncContext().pull(query, queryId, settings);
-    } 
+    }; 
 }
 
 // Define query operators
