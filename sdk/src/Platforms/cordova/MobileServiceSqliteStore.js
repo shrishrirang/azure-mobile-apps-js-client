@@ -34,10 +34,72 @@ var MobileServiceSqliteStore = function (dbName) {
         dbName = defaultDbName;
     }
 
-    this._db = window.sqlitePlugin.openDatabase({ name: dbName, location: 'default' });
-
     var tableDefinitions = {},
         runner = taskRunner();
+
+    /**
+     * Initializes the store
+     * A handle to the underlying sqlite store will be opened as part of initialization.
+     * 
+     * @returns A promise that is resolved when the initialization is complete OR rejected if it fails
+     */
+    this.init = function() {
+        return runner.run(function() {
+            return this._init();
+        }.bind(this));
+    };
+
+    this._init = function() {
+        var self = this;
+        return Platform.async(function(callback) {
+            if (self._db) {
+                return callback(); // already initialized.
+            }
+
+            var db = window.sqlitePlugin.openDatabase(
+                { name: dbName, location: 'default' },
+                function successcb() {
+                    try {
+                        self._db = db; // openDatabase is complete, set self._db
+                        callback();
+                    } catch(error) {
+                        callback(error);
+                    }
+                },
+                function errorcb(error) {
+                    callback(error);
+                }
+            );
+        })();
+    };
+
+    /**
+     * Uninitializes the store
+     * The handle to the underlying sqlite store will be closed as part of uninitialization.
+     * 
+     * @returns A promise that is resolved when the uninitialization is complete OR rejected if it fails.
+     */
+    this.uninit = function() {
+        var self = this;
+        return runner.run(function() {
+            if (!self._db) {
+                return; // nothing to uninitialize
+            }
+
+            return Platform.async(function(callback) {
+                self._db.close(function successcb() {
+                        try {
+                            self._db = undefined;
+                            callback();
+                        } catch(error) {
+                            callback(error);
+                        }
+                }, function errorcb(error) {
+                    callback(error);
+                });
+            })();
+        });
+    };
 
     /**
      * Defines the schema of the SQLite table
@@ -65,48 +127,52 @@ var MobileServiceSqliteStore = function (dbName) {
 
             tableDefinition = JSON.parse(JSON.stringify(tableDefinition)); // clone the table definition as we will need it later
 
+            // Initialize the store before defining the table
+            // If the store is already initialized, calling init() will have no effect. 
+            return self._init().then(function() {
+                return Platform.async(function(callback) {
+                    self._db.transaction(function(transaction) {
 
-            return Platform.async(function(callback) {
-                self._db.transaction(function(transaction) {
+                        // Get the table information
+                        var pragmaStatement = _.format("PRAGMA table_info({0});", tableDefinition.name);
+                        transaction.executeSql(pragmaStatement, [], function (transaction, result) {
 
-                    // Get the table information
-                    var pragmaStatement = _.format("PRAGMA table_info({0});", tableDefinition.name);
-                    transaction.executeSql(pragmaStatement, [], function (transaction, result) {
+                            // Check if a table with the specified name exists 
+                            if (result.rows.length > 0) { // table already exists, add missing columns.
 
-                        // Check if a table with the specified name exists 
-                        if (result.rows.length > 0) { // table already exists, add missing columns.
+                                // Get a list of columns present in the SQLite table
+                                var existingColumns = {};
+                                for (var i = 0; i < result.rows.length; i++) {
+                                    var column = result.rows.item(i);
+                                    existingColumns[column.name.toLowerCase()] = true;
+                                }
 
-                            // Get a list of columns present in the SQLite table
-                            var existingColumns = {};
-                            for (var i = 0; i < result.rows.length; i++) {
-                                var column = result.rows.item(i);
-                                existingColumns[column.name.toLowerCase()] = true;
+                                addMissingColumns(transaction, tableDefinition, existingColumns);
+                                
+                            } else { // table does not exist, create it.
+                                createTable(transaction, tableDefinition);
                             }
+                        });
 
-                            addMissingColumns(transaction, tableDefinition, existingColumns);
-                            
-                        } else { // table does not exist, create it.
-                            createTable(transaction, tableDefinition);
+                    }, function (error) {
+                        callback(error);
+                    }, function(result) {
+                        // Table definition is successful, update the in-memory list of table definitions. 
+                        try {
+                            storeHelper.addTableDefinition(tableDefinitions, tableDefinition);
+                            callback();
+                        } catch (error) {
+                            callback(error);
                         }
                     });
-
-                }, function (error) {
-                    callback(error);
-                }, function(result) {
-                    // Table definition is successful, update the in-memory list of table definitions. 
-                    try {
-                        storeHelper.addTableDefinition(tableDefinitions, tableDefinition);
-                        callback();
-                    } catch (error) {
-                        callback(error);
-                    }
-                });
-            })();
+                })();
+            });
         });
     };
 
     /**
      * Updates or inserts one or more objects in the local table
+     * If a property does not have a corresponding definition in tableDefinition, it will not be upserted into the table.
      * 
      * @param tableName Name of the local table in which data is to be upserted.
      * @param data A single object OR an array of objects to be inserted/updated in the table
