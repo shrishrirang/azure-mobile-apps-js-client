@@ -78,11 +78,7 @@ function MobileServiceSyncContext(client) {
             }
 
             // Delegate parameter validation to upsertWithLogging
-            return upsertWithLogging(tableName, instance, 'insert', function(existingRecord) { // precondition validator
-                if (!_.isNull(existingRecord)) {
-                    throw new Error('Cannot perform insert as a record with ID ' + existingRecord.id + ' already exists in the table ' + tableName);
-                }
-            });
+            return upsertWithLogging(tableName, instance, 'insert');
         });
     };
 
@@ -100,11 +96,7 @@ function MobileServiceSyncContext(client) {
             validateInitialization();
             
             // Delegate parameter validation to upsertWithLogging
-            return upsertWithLogging(tableName, instance, 'update', function(existingRecord) { // precondition validator
-                if (_.isNull(existingRecord)) {
-                    throw new Error('Cannot update record with ID ' + existingRecord.id + ' as it does not exist the table ' + tableName);
-                }
-            });
+            return upsertWithLogging(tableName, instance, 'update', true /* shouldOverwrite */);
         });
     };
 
@@ -113,11 +105,15 @@ function MobileServiceSyncContext(client) {
      * 
      * @param tableName Name of the local table to be used for performing the object lookup
      * @param id ID of the object to get from the table.
+     * @param {boolean} [suppressRecordNotFoundError] If set to true, lookup will return an undefined object if the record is not found.
+     *                                                Otherwise, lookup will fail. 
+     *                                                This flag is useful to distinguish between a lookup failure due to the record not being present in the table
+     *                                                versus a genuine failure in performing the lookup operation
      * 
      * @returns A promise that is resolved with the looked up object when the operation is completed successfully.
      * If the operation fails, the promise is rejected.
      */
-    this.lookup = function (tableName, id) {
+    this.lookup = function (tableName, id, suppressRecordNotFoundError) {
         
         return Platform.async(function(callback) {
             validateInitialization();
@@ -133,7 +129,7 @@ function MobileServiceSyncContext(client) {
             
             callback();
         })().then(function() {
-            return store.lookup(tableName, id);
+            return store.lookup(tableName, id, suppressRecordNotFoundError);
         });
     };
 
@@ -193,15 +189,15 @@ function MobileServiceSyncContext(client) {
     };
     
     /**
-     * Pulls changes from the server tables into the local store.
+     * Pulls changes from the server table into the local store.
      * 
      * @param query Query specifying which records to pull
-     * @param queryId A unique string ID for an incremental pull query OR null for a vanilla pull query.
+     * @param [queryId] A unique string ID for an incremental pull query OR null for a vanilla pull query.
      * @param [settings] An object that defines various pull settings. 
      * 
      * @returns A promise that is fulfilled when all records are pulled OR is rejected if the pull fails or is cancelled.  
      */
-    this.pull = function (query, queryId, settings) { //FIXME: SyncTable should have a pull API 
+    this.pull = function (query, queryId, settings) { 
         //TODO: Implement cancel
         //TODO: Perform push before pulling
         return syncTaskRunner.run(function() {
@@ -236,7 +232,7 @@ function MobileServiceSyncContext(client) {
     
     // Performs upsert and logs the action in the operation table
     // Validates parameters. Callers can skip validation
-    function upsertWithLogging(tableName, instance, action, preconditionValidator) {
+    function upsertWithLogging(tableName, instance, action, shouldOverwrite) {
         Validate.isString(tableName, 'tableName');
         Validate.notNullOrEmpty(tableName, 'tableName');
 
@@ -247,8 +243,10 @@ function MobileServiceSyncContext(client) {
             throw new Error('MobileServiceSyncContext not initialized');
         }
         
-        return store.lookup(tableName, instance.id).then(function(existingRecord) {
-            return preconditionValidator(existingRecord);
+        return store.lookup(tableName, instance.id, true /* suppressRecordNotFoundError */).then(function(existingRecord) {
+            if (existingRecord && !shouldOverwrite) {
+                throw new Error('Record with ID ' + existingRecord.id + ' already exists in the table ' + tableName);
+            }
         }).then(function() {
             return operationTableManager.getLoggingOperation(tableName, action, instance.id);
         }).then(function(loggingOperation) {

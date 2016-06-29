@@ -151,6 +151,24 @@ $testGroup('SQLiteStore - lookup tests')
         }).then(function () {
             return store.lookup(storeTestHelper.testTableName, 'someid');
         }).then(function (result) {
+            $assert.fail('lookup should have failed');
+        }, function (error) {
+            // NOP - failure expected
+        });
+    }),
+
+    $test('Suppress lookup failure')
+    .description('Check that promise returned by lookup is either resolved or rejected even when invoked with extra parameters')
+    .checkAsync(function () {
+        return store.defineTable({
+            name: storeTestHelper.testTableName,
+            columnDefinitions: {
+                id: MobileServiceSqliteStore.ColumnType.Integer,
+                price: MobileServiceSqliteStore.ColumnType.Real
+            }
+        }).then(function () {
+            return store.lookup(storeTestHelper.testTableName, 'some id that does not exist', true /* suppressRecordNotFoundError */);
+        }).then(function (result) {
             $assert.isNull(result);
         }, function (error) {
             $assert.fail(error);
@@ -167,10 +185,11 @@ $testGroup('SQLiteStore - lookup tests')
                 price: MobileServiceSqliteStore.ColumnType.Real
             }
         }).then(function () {
-            return store.lookup(storeTestHelper.testTableName, 'some id', 'extra param');
+            return store.lookup(storeTestHelper.testTableName, 'some id', false /* suppressRecordNotFoundError */, 'extra param');
         }).then(function (result) {
+            $assert.fail('should have failed');
         }, function (error) {
-            $assert.fail(error);
+            // NOP - failure expected
         });
     }),
 

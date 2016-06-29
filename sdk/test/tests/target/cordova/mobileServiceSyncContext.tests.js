@@ -176,9 +176,49 @@ $testGroup('MobileServiceSyncContext tests')
         });
     }),
 
+    $test('Insert should fail iff object with same id already exists')
+    .checkAsync(function () {
+
+        var syncContext;
+        return getSyncContext().then(function(context) {
+            syncContext = context;
+            return syncContext.insert(storeTestHelper.testTableName, {id: testId});
+        }).then(function() {
+            // NOP - success expected
+        }, function(error) {
+            $assert.fail(error);
+        }).then(function(context) {
+            return syncContext.insert(storeTestHelper.testTableName, {id: testId});
+        }).then(function() {
+            $assert.fail('should have failed to insert as a record with same id already exists');
+        }, function(error) {
+            // NOP - failure expected
+        });
+    }),
+
+    $test('Update should work even if record with same id already exists')
+    .checkAsync(function () {
+
+        var syncContext;
+        return getSyncContext().then(function(context) {
+            syncContext = context;
+            return syncContext.update(storeTestHelper.testTableName, {id: testId});
+        }).then(function() {
+            // NOP - success expected
+        }, function(error) {
+            $assert.fail(error);
+        }).then(function(context) {
+            return syncContext.update(storeTestHelper.testTableName, {id: testId});
+        }).then(function() {
+            // NOP - success expected
+        }, function(error) {
+            $assert.fail(error);
+        });
+    }),
+
     $test('Inserting object without ID should auto-generate ID')
     .checkAsync(function () {
-        
+
         store.executeBatch = function(operationBatch) {
             $assert.isNotNull(operationBatch);
             $assert.areEqual(operationBatch.length, 2);
@@ -289,12 +329,19 @@ $testGroup('MobileServiceSyncContext tests')
     })
 );
 
-function performActionWithCustomLogging(id, action) {
+function getSyncContext() {
     var syncContext = new MobileServiceSyncContext(new MobileServiceClient('someurl'));
-
     return syncContext.initialize(store).then(function() {
         return defineTestTable();
     }).then(function() {
+        return syncContext;
+    });
+}
+
+function performActionWithCustomLogging(id, action) {
+    var syncContext;
+    return getSyncContext().then(function(context) {
+        syncContext = context;
         syncContext._getOperationTableManager().getLoggingOperation = function(tableName, action, itemId) {
             return Platform.async(function(callback) {
                 callback();

@@ -193,7 +193,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
         })().then(function() {
             
             if (pullQueryId) { // read lastKnownUpdatedAt from the store
-                return store.lookup(pulltimeTableName, pullQueryId);
+                return store.lookup(pulltimeTableName, pullQueryId, true /* suppressRecordNotFoundError */);
             }
 
         }).then(function(result) {
