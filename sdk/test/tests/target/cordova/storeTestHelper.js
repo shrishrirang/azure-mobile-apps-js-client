@@ -19,12 +19,16 @@ var Platform = require('Platforms/Platform'),
 // Method need not be async, but defining it async to be consistent with createEmptyStore    
 function createStore() {
     return Platform.async(function(callback) {
+        callback();
+    })().then(function() {
         if (!store) {
             store = new MobileServiceSqliteStore(testDbFile);
         }
 
-        callback(null, Object.create(store));
-    })();
+        return store.init(); 
+    }).then(function() {
+        return Object.create(store);
+    });
 }
 
 function resetStore(store) {
