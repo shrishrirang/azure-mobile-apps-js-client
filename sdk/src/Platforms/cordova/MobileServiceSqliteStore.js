@@ -13,6 +13,7 @@ var Platform = require('Platforms/Platform'),
     queryHelper = require('azure-mobile-apps/src/query'),
     ColumnType = require('../../sync/ColumnType'),
     sqliteSerializer = require('./sqliteSerializer'),
+    storeHelper = require('./storeHelper'),
     Query = require('query.js').Query,
     formatSql = require('azure-odata-sql').format,
     idPropertyName = "id", // TODO: Add support for case insensitive ID and custom ID column
@@ -34,7 +35,7 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
     }
 
     this._db = window.sqlitePlugin.openDatabase({ name: dbName, location: 'default' });
-    this._tableDefinitions = {};
+    var tableDefinitions = {};
 
     /**
      * Defines the schema of the SQLite table
@@ -63,21 +64,9 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
 
         // Validate the function arguments
         Validate.isFunction(callback, 'callback');
-        Validate.notNull(tableDefinition, 'tableDefinition');
-        Validate.isObject(tableDefinition, 'tableDefinition');
-        
-        // Do basic table name validation and leave the rest to SQLite
-        Validate.isString(tableDefinition.name, 'tableDefinition.name');
-        Validate.notNullOrEmpty(tableDefinition.name, 'tableDefinition.name');
+        storeHelper.validateTableDefinition(tableDefinition);
 
-        // Validate the specified column types
-        var columnDefinitions = tableDefinition.columnDefinitions;
-        for (var columnName in columnDefinitions) {
-            Validate.isString(columnDefinitions[columnName], 'columnType');
-            Validate.notNullOrEmpty(columnDefinitions[columnName], 'columnType');
-        }
-        
-        Validate.notNull(columnDefinitions[idPropertyName]);
+        tableDefinition = JSON.parse(JSON.stringify(tableDefinition)); // clone the table definition as we will need it later
 
         this._db.transaction(function(transaction) {
 
@@ -92,7 +81,7 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
                     var existingColumns = {};
                     for (var i = 0; i < result.rows.length; i++) {
                         var column = result.rows.item(i);
-                        existingColumns[column.name] = true;
+                        existingColumns[column.name.toLowerCase()] = true;
                     }
 
                     addMissingColumns(transaction, tableDefinition, existingColumns);
@@ -106,8 +95,12 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
             callback(error);
         }, function(result) {
             // Table definition is successful, update the in-memory list of table definitions. 
-            this._tableDefinitions[tableDefinition.name] = tableDefinition;
-            callback();
+            try {
+                storeHelper.addTableDefinition(tableDefinitions, tableDefinition);
+                callback();
+            } catch (error) {
+                callback(error);
+            }
         }.bind(this));
     });
 
@@ -146,13 +139,10 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
         Validate.isString(tableName, 'tableName');
         Validate.notNullOrEmpty(tableName, 'tableName');
 
-        var tableDefinition = this._tableDefinitions[tableName];
-        Validate.notNull(tableDefinition, 'tableDefinition');
-        Validate.isObject(tableDefinition, 'tableDefinition');
-
-        var columnDefinitions = tableDefinition.columnDefinitions;
-        Validate.notNull(columnDefinitions, 'columnDefinitions');
-        Validate.isObject(columnDefinitions, 'columnDefinitions');
+        var tableDefinition = storeHelper.getTableDefinition(tableDefinitions, tableName);
+        if (_.isNull(tableDefinition)) {
+            throw new Error('Definition not found for table "' + tableName + '"');
+        }
 
         // If no data is provided, there is nothing more to be done.
         if (_.isNull(data)) {
@@ -173,15 +163,16 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
         for (var i = 0; i < records.length; i++) {
             // Skip null or undefined record objects
             if (!_.isNull(records[i])) {
-                Validate.isValidId(records[i][idPropertyName], 'records[' + i + '].' + idPropertyName);
-                records[i] = sqliteSerializer.serialize(records[i], columnDefinitions);
+                Validate.isValidId(storeHelper.getId(records[i]), 'records[' + i + '].' + idPropertyName);
+                records[i] = sqliteSerializer.serialize(records[i], tableDefinition.columnDefinitions);
             }
         }
+
 
         // Note: The default maximum number of parameters allowed by sqlite is 999
         // Refer http://www.sqlite.org/limits.html#max_variable_number
         // TODO: Add support for tables with more than 999 columns
-        if (columnDefinitions.length > 999) {
+        if (tableDefinition.columnDefinitions.length > 999) {
             throw new Error("Number of table columns cannot be more than 999");
         }
 
@@ -216,7 +207,7 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
                 insertParams.push('?');
                 insertValues.push(record[property]);
                 
-                if (property !== idPropertyName) {
+                if (!storeHelper.isId(property)) {
                     updateColumnNames.push(property);
                     updateExpressions.push(property + ' = ?');
                     updateValues.push(record[property]);
@@ -230,7 +221,7 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
             // If there is any property other than id that needs to be upserted, update the record.
             if (updateValues.length > 0) {
                 statements.push(_.format("UPDATE {0} SET {1} WHERE {2} = ?", tableName, updateExpressions.join(), idPropertyName));
-                updateValues.push(record[idPropertyName]); // Add value of record ID as the last parameter.. for the WHERE clause in the statement.
+                updateValues.push(storeHelper.getId(record)); // Add value of record ID as the last parameter.. for the WHERE clause in the statement.
                 parameters.push(updateValues);
             }
         }
@@ -265,13 +256,10 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
             Validate.notNullOrEmpty(tableName, 'tableName');
             Validate.isValidId(id, 'id');
             
-            var tableDefinition = this._tableDefinitions[tableName];
-            Validate.notNull(tableDefinition, 'tableDefinition for ' + tableName);
-            Validate.isObject(tableDefinition, 'tableDefinition for ' + tableName);
-
-            var columnDefinitions = tableDefinition.columnDefinitions;
-            Validate.notNull(columnDefinitions, 'columnDefinitions for ' + tableName);
-            Validate.isObject(columnDefinitions, 'columnDefinitions for ' + tableName);
+            var tableDefinition = storeHelper.getTableDefinition(tableDefinitions, tableName);
+            if (_.isNull(tableDefinition)) {
+                throw new Error('Definition not found for table "' + tableName + '"');
+            }
 
             var lookupStatement = _.format("SELECT * FROM [{0}] WHERE {1} = ? COLLATE NOCASE", tableName, idPropertyName);
 
@@ -285,7 +273,7 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
 
                     if (record) {
                         // Deserialize the record read from the SQLite store into its original form.
-                        record = sqliteSerializer.deserialize(record, columnDefinitions);
+                        record = sqliteSerializer.deserialize(record, tableDefinition.columnDefinitions);
                         callback(null, record);
                     } else if (suppressRecordNotFoundError) {
                         callback();
@@ -451,13 +439,10 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
         Validate.notNull(query, 'query');
         Validate.isObject(query, 'query');
 
-        var tableDefinition = this._tableDefinitions[query.getComponents().table];
-        Validate.notNull(tableDefinition, 'tableDefinition');
-        Validate.isObject(tableDefinition, 'tableDefinition');
-
-        var columnDefinitions = tableDefinition.columnDefinitions;
-        Validate.notNull(columnDefinitions, 'columnDefinitions');
-        Validate.isObject(columnDefinitions, 'columnDefinitions');
+        var tableDefinition = storeHelper.getTableDefinition(tableDefinitions, query.getComponents().table);
+        if (_.isNull(tableDefinition)) {
+            throw new Error('Definition not found for table "' + query.getComponents().table + '"');
+        }
 
         var count,
             result = [],
@@ -476,7 +461,7 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
                 var record;
                 for (var j = 0; j < res.rows.length; j++) {
                     // Deserialize the record read from the SQLite store into its original form.
-                    record = sqliteSerializer.deserialize(res.rows.item(j), columnDefinitions);
+                    record = sqliteSerializer.deserialize(res.rows.item(j), tableDefinition.columnDefinitions);
                     result.push(record);
                 }
             });
@@ -562,6 +547,8 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
             callback();
         });
     });
+
+    
 };
 
 // Converts the QueryJS object into equivalent SQLite statements
@@ -596,11 +583,11 @@ function createTable(transaction, tableDefinition) {
     var columnDefinitionClauses = [];
 
     for (var columnName in columnDefinitions) {
-        var columnType = columnDefinitions[columnName];
+        var columnType = storeHelper.getColumnType(columnDefinitions, columnName);
 
         var columnDefinitionClause = _.format("[{0}] {1}", columnName, sqliteSerializer.getSqliteType(columnType));
 
-        if (columnName === idPropertyName) {
+        if (storeHelper.isId(columnName)) {
             columnDefinitionClause += " PRIMARY KEY";
         }
 
@@ -621,8 +608,8 @@ function addMissingColumns(transaction, tableDefinition, existingColumns) {
 
         // If this column does not already exist, we need to create it.
         // SQLite does not support adding multiple columns using a single statement. Add one column at a time.
-        if (!existingColumns[columnName]) {
-            var alterStatement = _.format("ALTER TABLE {0} ADD COLUMN {1} {2}", tableDefinition.name, columnName, columnDefinitions[columnName]);
+        if (!existingColumns[columnName.toLowerCase()]) {
+            var alterStatement = _.format("ALTER TABLE {0} ADD COLUMN {1} {2}", tableDefinition.name, columnName, storeHelper.getColumnType(columnDefinitions, columnName));
             transaction.executeSql(alterStatement);
         }
     }

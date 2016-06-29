@@ -9,6 +9,7 @@
 var Platform = require('Platforms/Platform'),
     Query = require('query.js').Query,
     storeTestHelper = require('./storeTestHelper'),
+    testHelper = require('../../shared/testHelper'),
     MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore'),
     store;
 
@@ -146,6 +147,61 @@ $testGroup('SQLiteStore - miscellaneous tests')
         }, function (err) {
             $assert.fail(err);
         });
+    }),
+
+    $test('ID column case insensitivity')
+    .checkAsync(function () {
+        var tableDefinition = {
+                name: storeTestHelper.testTableName,
+                columnDefinitions: {
+                    Id: MobileServiceSqliteStore.ColumnType.Integer,
+                    somecolumn: MobileServiceSqliteStore.ColumnType.Integer
+                }
+            };
+
+        return testHelper.runActions([
+            [store, store.defineTable, tableDefinition],
+            [store, store.upsert, storeTestHelper.testTableName, {ID: 101, somecolumn: 51}],
+            [store, store.lookup, storeTestHelper.testTableName, 101],
+            function(result) {
+                $assert.areEqual(result, {Id: 101, somecolumn: 51});
+            },
+            [store, store.upsert, storeTestHelper.testTableName, {iD: 101, somecolumn: 71}],
+            [store, store.read, new Query(storeTestHelper.testTableName).where(function() { return this.iD === 101; })],
+            function(result) {
+                $assert.areEqual(result, [ {Id: 101, somecolumn: 71} ]);
+            },
+            [store, store.del, storeTestHelper.testTableName, 101],
+            [store, store.read, new Query(storeTestHelper.testTableName)],
+            function(result) {
+                $assert.areEqual(result, []);
+            }
+        ]);
+    }),
+
+    $test('Non-ID column case insensitivity')
+    .checkAsync(function () {
+        var tableDefinition = {
+                name: storeTestHelper.testTableName,
+                columnDefinitions: {
+                    id: MobileServiceSqliteStore.ColumnType.Integer,
+                    someCOLUMN: MobileServiceSqliteStore.ColumnType.Integer
+                }
+            };
+
+        return testHelper.runActions([
+            [store, store.defineTable, tableDefinition],
+            [store, store.upsert, storeTestHelper.testTableName, {id: 101, SOMEcolumn: 51}],
+            [store, store.lookup, storeTestHelper.testTableName, 101],
+            function(result) {
+                $assert.areEqual(result, {id: 101, someCOLUMN: 51});
+            },
+            [store, store.upsert, storeTestHelper.testTableName, {id: 101, SoMeCoLuMn: 71}],
+            [store, store.read, new Query(storeTestHelper.testTableName).where(function() { return this.somECOlumN === 71; })],
+            function(result) {
+                $assert.areEqual(result, [ {id: 101, someCOLUMN: 71} ]);
+            }
+        ]);
     }),
 
     $test('Verify MobileServiceSqliteStore initialization works as expected with the new operator')

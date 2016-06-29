@@ -12,6 +12,7 @@ var Platform = require('Platforms/Platform'),
     Validate = require('../../Utilities/Validate'),
     _ = require('../../Utilities/Extensions'),
     ColumnType = require('../../sync/ColumnType'),
+    storeHelper = require('./storeHelper'),
     verror = require('verror'),
     typeConverter = require('./typeConverter');
 
@@ -147,7 +148,8 @@ function serialize (value, columnDefinitions) {
         Validate.isObject(value);
 
         for (var property in value) {
-            var columnType = columnDefinitions[property];
+
+            var columnType = storeHelper.getColumnType(columnDefinitions, property);
             // Skip properties that don't match any column in the table 
             if (!_.isNull(columnType)) {
                 serializedValue[property] = serializeMember(value[property], columnType);
@@ -176,7 +178,8 @@ function deserialize (value, columnDefinitions) {
         Validate.isObject(value);
 
         for (var property in value) {
-            deserializedValue[property] = deserializeMember(value[property], columnDefinitions[property]);
+            var columnName = storeHelper.getColumnName(columnDefinitions, property); // this helps us deserialize with proper case for the property name
+            deserializedValue[columnName] = deserializeMember(value[property], storeHelper.getColumnType(columnDefinitions, property));
         }
         
     } catch (error) {

@@ -9,7 +9,8 @@
 var Platform = require('Platforms/Platform'),
     Query = require('query.js').Query,
     MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore'),
-    storeTestHelper = require('./storeTestHelper');
+    storeTestHelper = require('./storeTestHelper'),
+    testHelper = require('../../shared/testHelper');
     
 var store;
 
@@ -43,6 +44,64 @@ $testGroup('SQLiteStore - defineTable tests')
         });
     }),
 
+    $test('table name case insensitivity')
+    .checkAsync(function () {
+        var row = { id: 101, price: 51.5 };
+
+        $assert.isTrue(storeTestHelper.testTableName.length > 2);
+        var originalTableName = '';
+        for (var i = 0; i < storeTestHelper.testTableName.length; i++) {
+            if (i % 2 === 0) {
+                originalTableName += storeTestHelper.testTableName[i].toLowerCase();
+            } else {
+                originalTableName += storeTestHelper.testTableName[i].toUpperCase();
+            }
+        }
+
+        return testHelper.runActions([
+            [null, runCrudCaseTest, originalTableName, originalTableName],
+            [null, runCrudCaseTest, originalTableName, originalTableName.toLowerCase()],
+            [null, runCrudCaseTest, originalTableName, originalTableName.toUpperCase()]
+        ]);
+
+        function runCrudCaseTest (creationTableName, crudTableName) {
+            return testHelper.runActions(
+                [
+                    [
+                        store, store.defineTable, {
+                            name: creationTableName,
+                            columnDefinitions: {
+                                id: MobileServiceSqliteStore.ColumnType.Integer,
+                                price: MobileServiceSqliteStore.ColumnType.Real
+                            }
+                        }
+                    ],
+                    [ store, store.upsert, crudTableName, row ],
+                    [ store, store.lookup, crudTableName, row.id ],
+                    function(result) {
+                        $assert.areEqual(result, row);
+                        return store.read(new Query(crudTableName));
+                    },
+                    function (result) {
+                        $assert.areEqual(result, [row]);
+                        return store.del(crudTableName, row.id);
+                    },
+                    function (result) {
+                        return store.read(new Query(crudTableName));
+                    },
+                    {
+                        success: function (result) {
+                            $assert.areEqual(result, []);
+                        },
+                        fail: function (error) {
+                            $assert.fail(error);
+                        }
+                    }
+                ]
+            );
+        }
+    }),
+    
     $test('table definition containing a single column')
     .checkAsync(function () {
         var row = { id: 101 };
@@ -116,6 +175,42 @@ $testGroup('SQLiteStore - defineTable tests')
         }, function (error) {
             $assert.fail(error);
         });
+    }),
+
+    $test('Redefining table with changed table and column name case should work as expected')
+    .checkAsync(function () {
+        var row = { id: 101, flag: 51 },
+            expectedResult = {iD: 101, fLaG: 51},
+            oldDefinition = {
+                name: storeTestHelper.testTableName.toLowerCase(),
+                columnDefinitions: {
+                    iD: 'integer',
+                    fLaG: 'integer'
+                }
+            },
+            newDefinition = {
+                name: storeTestHelper.testTableName.toUpperCase(),
+                columnDefinitions: {
+                    iD: 'integer',
+                    flAG: 'integer'
+                }
+            };
+
+        return testHelper.runActions([
+            [store, store.defineTable, oldDefinition], 
+            [store, store.upsert, oldDefinition.name, row],
+            [store, store.lookup, oldDefinition.name, row.id],
+            function(result) {
+                $assert.areEqual(result, {iD: 101, fLaG: 51});
+            },
+            // Redefinition with different case
+            [store, store.defineTable, newDefinition], 
+            [store, store.upsert, newDefinition.name, row],
+            [store, store.lookup, newDefinition.name, row.id],
+            function(result) {
+                $assert.areEqual(result, {iD: 101, flAG: 51});
+            }
+        ]);
     }),
 
     $test('table definition without table name')
