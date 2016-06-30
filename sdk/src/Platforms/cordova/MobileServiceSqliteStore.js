@@ -59,44 +59,32 @@ var MobileServiceSqliteStore = function (dbName) {
             var db = window.sqlitePlugin.openDatabase(
                 { name: dbName, location: 'default' },
                 function successcb() {
-                    try {
-                        self._db = db; // openDatabase is complete, set self._db
-                        callback();
-                    } catch(error) {
-                        callback(error);
-                    }
+                    self._db = db; // openDatabase is complete, set self._db
+                    callback();
                 },
-                function errorcb(error) {
-                    callback(error);
-                }
+                callback
             );
         })();
     };
 
     /**
-     * Uninitializes the store
-     * The handle to the underlying sqlite store will be closed as part of uninitialization.
+     * Closes the handle to the underlying sqlite store.
      * 
-     * @returns A promise that is resolved when the uninitialization is complete OR rejected if it fails.
+     * @returns A promise that is resolved when the sqlite store is closed successfully OR rejected if it fails.
      */
-    this.uninit = function() {
+    this.close = function() {
         var self = this;
         return runner.run(function() {
             if (!self._db) {
-                return; // nothing to uninitialize
+                return; // nothing to close
             }
 
             return Platform.async(function(callback) {
                 self._db.close(function successcb() {
-                        try {
-                            self._db = undefined;
-                            callback();
-                        } catch(error) {
-                            callback(error);
-                        }
-                }, function errorcb(error) {
-                    callback(error);
-                });
+                    self._db = undefined;
+                    callback();
+                },
+                callback);
             })();
         });
     };
@@ -154,16 +142,17 @@ var MobileServiceSqliteStore = function (dbName) {
                             }
                         });
 
-                    }, function (error) {
-                        callback(error);
-                    }, function(result) {
-                        // Table definition is successful, update the in-memory list of table definitions. 
+                    },
+                    callback,
+                    function(result) {
+                        // Table definition is successful, update the in-memory list of table definitions.
+                        var error; 
                         try {
                             storeHelper.addTableDefinition(tableDefinitions, tableDefinition);
-                            callback();
-                        } catch (error) {
-                            callback(error);
+                        } catch (err) {
+                            error = err;
                         }
+                        callback(error);
                     });
                 })();
             });
@@ -185,11 +174,9 @@ var MobileServiceSqliteStore = function (dbName) {
             return Platform.async(function(callback) {
                 self._db.transaction(function(transaction) {
                     self._upsert(transaction, tableName, data);
-                }, function (error) {
-                    callback(error);
-                }, function () {
-                    callback();
-                });
+                },
+                callback,
+                callback);
             })();
         });
     };
@@ -329,8 +316,9 @@ var MobileServiceSqliteStore = function (dbName) {
 
             return Platform.async(function(callback) {
                 self._db.executeSql(lookupStatement, [id], function (result) {
+                    var error,
+                        record;
                     try {
-                        var record;
                         if (result.rows.length !== 0) {
                             record = result.rows.item(0);
                         }
@@ -338,18 +326,20 @@ var MobileServiceSqliteStore = function (dbName) {
                         if (record) {
                             // Deserialize the record read from the SQLite store into its original form.
                             record = sqliteSerializer.deserialize(record, tableDefinition.columnDefinitions);
-                            callback(null, record);
-                        } else if (suppressRecordNotFoundError) {
-                            callback();
-                        } else {
-                            callback(new Error('Item with id "' + id + '" does not exist.'));
+                        } else if (!suppressRecordNotFoundError) {
+                            throw new Error('Item with id "' + id + '" does not exist.');
                         }
                     } catch (err) {
-                        callback(err);
+                        error = err;
                     }
-                }, function (err) {
-                    callback(err);
-                });
+
+                    if (error) {
+                        callback(error);
+                    } else {
+                        callback(null, record);
+                    }
+                },
+                callback);
             })();
         });
     };
@@ -387,11 +377,9 @@ var MobileServiceSqliteStore = function (dbName) {
                             }
                         }
                         self._deleteIds(transaction, tableNameOrQuery /* table name */, ids);
-                    }, function (error) {
-                        callback(error);
-                    }, function () {
-                        callback();
-                    });
+                    },
+                    callback,
+                    callback);
 
                 } else if (_.isObject(tableNameOrQuery)) { // tableNameOrQuery is a query, delete all records specified by the query.
                     self._deleteUsingQuery(tableNameOrQuery /* query */, callback);
@@ -416,7 +404,7 @@ var MobileServiceSqliteStore = function (dbName) {
         }
 
         // Run the query and get the list of records to be deleted
-        self.read(query).then(function (result) {
+        self._read(query).then(function (result) {
             try {
                 if (!_.isArray(result)) { // This can happen if the query used to read contains includeCount()
                     result = result.result;
@@ -436,18 +424,15 @@ var MobileServiceSqliteStore = function (dbName) {
                 // Delete the records returned by read.
                 self._db.transaction(function(transaction) {
                     self._deleteIds(transaction, tableName, ids);
-                }, function(error) {
-                    callback(error);
-                }, function() {
-                    callback();
-                });
+                },
+                callback,
+                callback);
 
             } catch (error) {
                 callback(error);
             }
-        }, function (error) {
-            callback(error);
-        });
+        },
+        callback);
     };
 
     // Delete records from the table that match the specified IDs.
@@ -520,9 +505,9 @@ var MobileServiceSqliteStore = function (dbName) {
                         count = res.rows.item(0).count;
                     });
                 }
-            }, function (error) {
-                callback(error);
-            }, function () {
+            },
+            callback,
+            function () {
                 // If we fetched the record count, combine the records and the count into an object.
                 if (count !== undefined) {
                     result = {
@@ -586,11 +571,9 @@ var MobileServiceSqliteStore = function (dbName) {
                             throw new Error(_.format("Operation '{0}' is not supported", operation.action));
                         }
                     }
-                }, function (error) {
-                    callback(error);
-                }, function () {
-                    callback();
-                });
+                },
+                callback,
+                callback);
             })();
         });
     };
