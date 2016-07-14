@@ -147,7 +147,7 @@ $testGroup('MobileServiceSyncTable tests')
         $assert.areEqual(table.del(testRecord), testResult);
     }),
     
-    $test('table.pull')
+    $test('pull - query specified')
     .description('Tests that the pull API simply calls MobileServiceSyncContext.pull() and returns whatever it returns')
     .check(function () {
 
@@ -169,6 +169,28 @@ $testGroup('MobileServiceSyncTable tests')
         $assert.areEqual(table.pull(query, queryId, settings, 'fourth_param_just_in_case_pull_starts_taking_more_params_in_the_future'), result);
     }),
 
+    $test('pull - query not specified')
+    .description('Tests that the pull API simply calls MobileServiceSyncContext.pull() and returns whatever it returns')
+    .check(function () {
+
+        // The pull params defined below have invalid values, but that does not matter
+        // as all we want to test is that pull acts as a passthrough function.
+        var queryId = 'queryId',
+            settings = 'settings',
+            result = 'result';
+
+        client.getSyncContext().pull = function(queryParam, queryIdParam, settingsParam) {
+            $assert.isNotNull(queryParam);
+            $assert.areEqual(queryParam.getComponents().table, storeTestHelper.testTableName);
+            $assert.areEqual(queryIdParam, queryId);
+            $assert.areEqual(settingsParam, settings);
+            $assert.areEqual(arguments.length, 3);
+            return result;
+        };
+
+        $assert.areEqual(table.pull(null, queryId, settings, 'fourth_param_just_in_case_pull_starts_taking_more_params_in_the_future'), result);
+    }),
+
     $test('purge - query specified')
     .description('Tests that the purge API simply calls MobileServiceSyncContext.purge() and returns whatever it returns')
     .check(function () {
@@ -184,7 +206,7 @@ $testGroup('MobileServiceSyncTable tests')
         $assert.areEqual(table.purge({dummykey: 'dummyvalue'}, true), 'result');
     }),
 
-    $test('purge - query not specified')
+    $test('purge - query specified')
     .description('Tests that the purge API simply calls MobileServiceSyncContext.purge() and returns whatever it returns')
     .check(function () {
 

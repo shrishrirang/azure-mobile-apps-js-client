@@ -97,13 +97,18 @@ function MobileServiceSyncTable(tableName, client) {
     /**
      * Pulls changes from the server table into the local store.
      * 
-     * @param query Query specifying which records to pull
+     * @param [query] Query specifying which records to pull
+     *                If no query is specified, the entire table will be pulled.
      * @param [queryId] A unique string ID for an incremental pull query OR null for a vanilla pull query.
      * @param [settings] An object that defines various pull settings. 
      * 
      * @returns A promise that is fulfilled when all records are pulled OR is rejected if the pull fails or is cancelled.  
      */
     this.pull = function (query, queryId, settings) {
+        if (!query) {
+            query = new Query(tableName);
+        }
+        
         return client.getSyncContext().pull(query, queryId, settings);
     };
 
