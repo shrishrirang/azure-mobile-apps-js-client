@@ -8,6 +8,7 @@ var Validate = require('../Utilities/Validate'),
     taskRunner = require('../Utilities/taskRunner'),
     createPullManager = require('./pull').createPullManager,
     createPushManager = require('./push').createPushManager,
+    createPurgeManager = require('./purge').createPurgeManager,
     uuid = require('node-uuid'),
     _ = require('../Utilities/Extensions');
 
@@ -51,6 +52,7 @@ function MobileServiceSyncContext(client) {
             store = localStore;
             pullManager = createPullManager(client, store, storeTaskRunner, operationTableManager);
             pushManager = createPushManager(client, store, storeTaskRunner, operationTableManager);
+            purgeManager = createPurgeManager(store, storeTaskRunner);
         }).then(function() {
             return pullManager.initialize();
         }).then(function() {
@@ -225,10 +227,38 @@ function MobileServiceSyncContext(client) {
         }.bind(this));
     };
     
+    /**
+     * Purges data, pending operations and incremental sync state associated with a local table
+     * A regular purge, would fail if there are any pending operations for the table being purged.
+     * A forced purge will proceed even if pending operations for the table being purged exist in the operation table. In addition,
+     * it will also delete the table's pending operations.
+     * 
+     * @param query Query object that specifies what records are to be purged
+     * @param [forcePurge] An optional boolean, which if set to true, will perform a forced purge.
+     * 
+     * @returns A promise that is fulfilled when purge is complete OR is rejected if it fails.  
+     */
+    this.purge = function (query, forcePurge) {
+        return syncTaskRunner.run(function() {
+            Validate.isObject(query, 'query');
+            Validate.notNull(query, 'query');
+            if (!_.isNull(forcePurge)) {
+                Validate.isBool(forcePurge, 'forcePurge');
+            }
+
+            validateInitialization();
+
+            return purgeManager.purge(query, forcePurge);
+        }.bind(this));
+    };
+    
     // Unit test purposes only
     this._getOperationTableManager = function () {
         return operationTableManager;
     };
+    this._getPurgeManager = function() {
+        return purgeManager;
+    }
     
     // Performs upsert and logs the action in the operation table
     // Validates parameters. Callers can skip validation
@@ -266,7 +296,7 @@ function MobileServiceSyncContext(client) {
     // Throws an error if the sync context is not initialized
     function validateInitialization() {
         if (!isInitialized) {
-            throw new Error ('MobileServiceClient is being used before it is initialized');
+            throw new Error ('MobileServiceSyncContext is being used before it is initialized');
         }
     }
 }

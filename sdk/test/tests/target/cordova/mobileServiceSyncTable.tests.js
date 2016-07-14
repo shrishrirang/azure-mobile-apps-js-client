@@ -167,6 +167,35 @@ $testGroup('MobileServiceSyncTable tests')
         };
 
         $assert.areEqual(table.pull(query, queryId, settings, 'fourth_param_just_in_case_pull_starts_taking_more_params_in_the_future'), result);
+    }),
+
+    $test('purge - query specified')
+    .description('Tests that the purge API simply calls MobileServiceSyncContext.purge() and returns whatever it returns')
+    .check(function () {
+
+        client.getSyncContext().purge = function (query, forcePurge) {
+            $assert.areEqual(query, {dummykey: 'dummyvalue'});
+            $assert.areEqual(forcePurge, true)
+            return 'result';
+        };
+
+        // The purge params have invalid values, but that does not matter
+        // as all we want to test is that purge acts as a passthrough function.
+        $assert.areEqual(table.purge({dummykey: 'dummyvalue'}, true), 'result');
+    }),
+
+    $test('purge - query not specified')
+    .description('Tests that the purge API simply calls MobileServiceSyncContext.purge() and returns whatever it returns')
+    .check(function () {
+
+        client.getSyncContext().purge = function (query, forcePurge) {
+            $assert.isNotNull(query);
+            $assert.areEqual(query.getComponents().table, storeTestHelper.testTableName);
+            $assert.areEqual(forcePurge, true)
+            return 'result';
+        };
+
+        $assert.areEqual(table.purge(null, true), 'result');
     })
 );
 
