@@ -7,7 +7,7 @@
  */
 
 var Platform = require('Platforms/Platform'),
-    Query = require('query.js').Query,
+    Query = require('azure-query-js').Query,
     operations = require('../../../../src/sync/operations'),
     tableConstants = require('../../../../src/constants').table,
     MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore'),

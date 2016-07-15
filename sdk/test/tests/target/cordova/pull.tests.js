@@ -9,7 +9,7 @@
  */
 
 var Platform = require('Platforms/Platform'),
-    Query = require('query.js').Query,
+    Query = require('azure-query-js').Query,
     createPullManager = require('../../../../src/sync/pull').createPullManager,
     tableConstants = require('../../../../src/constants').table,
     MobileServiceClient = require('../../../../src/MobileServiceClient'),

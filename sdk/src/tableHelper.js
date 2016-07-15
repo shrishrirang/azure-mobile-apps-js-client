@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-var Query = require('query.js/lib/Query').Query,
+var Query = require('azure-query-js').Query,
     Platform = require('Platforms/Platform');
 
 // Copy select Query operators to the table so queries can be created

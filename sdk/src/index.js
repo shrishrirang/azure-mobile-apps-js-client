@@ -10,7 +10,7 @@ var api = {
     MobileServiceLogin: require('./MobileServiceLogin'),
     MobileServiceSyncTable: require('./sync/MobileServiceSyncTable'),
     MobileServiceTable: require('./MobileServiceTable'),
-    Query: require('query.js').Query
+    Query: require('azure-query-js').Query
 };
 
 // Target (i.e. Cordova / Browser / etc) specific definitions that need to be exposed outside the SDK

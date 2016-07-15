@@ -7,7 +7,7 @@
  */
 
 var Platform = require('Platforms/Platform'),
-    Query = require('query.js').Query,
+    Query = require('azure-query-js').Query,
     storeTestHelper = require('./storeTestHelper'),
     testHelper = require('../../shared/testHelper'),
     MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore'),
