@@ -13,7 +13,7 @@ var Validate = require('../Utilities/Validate'),
     taskRunner = require('../Utilities/taskRunner'),
     tableConstants = require('../constants').table,
     _ = require('../Utilities/Extensions'),
-    Query = require('query.js').Query;
+    Query = require('azure-query-js').Query;
 
 var operationTableName = tableConstants.operationTableName;
     

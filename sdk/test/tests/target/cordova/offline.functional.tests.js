@@ -10,7 +10,7 @@
 // matching storeTestHelper.testTableName
 
 var Platform = require('Platforms/Platform'),
-    Query = require('query.js').Query,
+    Query = require('azure-query-js').Query,
     pullManager = require('../../../../src/sync/pull'),
     _ = require('../../../../src/Utilities/Extensions'),
     MobileServiceSyncContext = require('../../../../src/sync/MobileServiceSyncContext'),

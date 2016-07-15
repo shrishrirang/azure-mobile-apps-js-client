@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 
 var Validate = require('../Utilities/Validate'),
-    Query = require('Query.js').Query,
+    Query = require('azure-query-js').Query,
     _ = require('../Utilities/Extensions'),
     tableHelper = require('../tableHelper'),
     Platform = require('Platforms/Platform');

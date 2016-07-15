@@ -10,11 +10,10 @@
 var Platform = require('Platforms/Platform'),
     Validate = require('../../Utilities/Validate'),
     _ = require('../../Utilities/Extensions'),
-    queryHelper = require('azure-mobile-apps/src/query'),
     ColumnType = require('../../sync/ColumnType'),
     sqliteSerializer = require('./sqliteSerializer'),
     storeHelper = require('./storeHelper'),
-    Query = require('query.js').Query,
+    Query = require('azure-query-js').Query,
     formatSql = require('azure-odata-sql').format,
     idPropertyName = "id", // TODO: Add support for case insensitive ID and custom ID column
     defaultDbName = 'mobileapps.db';
@@ -538,7 +537,7 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
 function getSqlStatementsFromQuery(query) {
     
     // Convert QueryJS object to an OData query string
-    var odataQuery = queryHelper.toOData(query);
+    var odataQuery = Query.Providers.OData.toOData(query);
     
     // Convert the OData query string into equivalent SQLite statements
     var statements = formatSql(odataQuery, { flavor: 'sqlite' });

@@ -7,7 +7,7 @@
  */
 
 var Validate = require('../Utilities/Validate'),
-    Query = require('query.js').Query,
+    Query = require('azure-query-js').Query,
     verror = require('verror'),
     Platform = require('Platforms/Platform'),
     taskRunner = require('../Utilities/taskRunner'),
