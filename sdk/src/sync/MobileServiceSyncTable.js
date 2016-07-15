@@ -97,15 +97,40 @@ function MobileServiceSyncTable(tableName, client) {
     /**
      * Pulls changes from the server table into the local store.
      * 
-     * @param query Query specifying which records to pull
+     * @param [query] Query specifying which records to pull
+     *                If no query is specified, the entire table will be pulled.
      * @param [queryId] A unique string ID for an incremental pull query OR null for a vanilla pull query.
      * @param [settings] An object that defines various pull settings. 
      * 
      * @returns A promise that is fulfilled when all records are pulled OR is rejected if the pull fails or is cancelled.  
      */
     this.pull = function (query, queryId, settings) {
+        if (!query) {
+            query = new Query(tableName);
+        }
+        
         return client.getSyncContext().pull(query, queryId, settings);
-    }; 
+    };
+
+    /**
+     * Purges data, pending operations and incremental sync state associated with the local table
+     * A regular purge, would fail if there are any pending operations for the table being purged.
+     * A forced purge will proceed even if pending operations for the table being purged exist in the operation table. In addition,
+     * it will also delete the table's pending operations.
+     * 
+     * @param [query] Query object that specifies what records are to be purged.
+     *                If no query is specified, the entire table will be purged.
+     * @param [forcePurge] An optional boolean, which if set to true, will perform a forced purge.
+     * 
+     * @returns A promise that is fulfilled when purge is complete OR is rejected if it fails.  
+     */
+    this.purge = function (query, forcePurge) {
+        if (!query) {
+            query = new Query(tableName);
+        }
+
+        return client.getSyncContext().purge(query, forcePurge);
+    };
 }
 
 // Define query operators

@@ -675,6 +675,30 @@ $testGroup('SQLiteStore - delete tests')
         });
     }),
 
+    $test('argument is a query matching record with null / undefined properties')
+    .checkAsync(function () {
+        var row = { id: 'someid', prop1: undefined, prop2: null };
+
+        return store.defineTable({
+            name: storeTestHelper.testTableName,
+            columnDefinitions: {
+                id: MobileServiceSqliteStore.ColumnType.String,
+                prop1: MobileServiceSqliteStore.ColumnType.String,
+                prop2: MobileServiceSqliteStore.ColumnType.Real
+            }
+        }).then(function () {
+            return store.upsert(storeTestHelper.testTableName, row);
+        }).then(function () {
+            return store.del(new Query(storeTestHelper.testTableName));
+        }).then(function () {
+            return store.read(new Query(storeTestHelper.testTableName));
+        }).then(function (result) {
+            $assert.areEqual(result, []);
+        }, function (error) {
+            $assert.fail(error);
+        });
+    }),
+
     $test('invoked with query and extra parameters')
     .description('Check that promise returned by upsert is either resolved or rejected even when invoked with extra parameters')
     .checkAsync(function () {

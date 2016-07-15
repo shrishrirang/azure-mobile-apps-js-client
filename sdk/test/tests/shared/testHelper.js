@@ -32,20 +32,24 @@ function runActions(actions) {
 
 function runAction(chain, action) {
     return chain.then(function(result) {
-        if (action && action.success) {
-            return action.success(result);
-        }
-        
         if (_.isFunction(action)) {
             return action(result);
         }
-
+        
         if (_.isArray(action)) {
             var self = action[0];
             var func = action[1];
 
             if (_.isFunction(func)) {
                 return func.apply(self, action.slice(2));
+            }
+        }
+
+        if (_.isObject(action)) {
+            if (action.success) {
+                return action.success(result);
+            } else {
+                $assert.fail('Expected failure while running action ' + action);
             }
         }
         
@@ -56,7 +60,6 @@ function runAction(chain, action) {
         } else {
             $assert.fail('Unexpected failure while running action : ' + action);
             $assert.fail(error);
-            throw error;
         }
     });
 }

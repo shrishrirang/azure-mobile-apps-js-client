@@ -341,66 +341,49 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
     
     // Deletes the records selected by the specified query and notifies the callback.
     this._deleteUsingQuery = function (query, callback) {
-        
-            // The query can have a 'select' clause that queries only specific columns. However, we need to know values of all the columns
-            // to avoid deleting wrong records. So we explicitly remove selection from the query, if any.
-            var components = query.getComponents();
-            if (components.selections && components.selections.length > 0) {
-                components.selections = [];
-                query.setComponents(components);
-            }
 
-            // Run the query and get the list of records to be deleted
-            this.read(query).then(function (result) {
-                try {
-                    if (!_.isArray(result)) {
-                        result = result.result;
-                        Validate.isArray(result);
-                    }
-
-                    var tableName = query.getComponents().table;
-                    Validate.isString(tableName);
-                    Validate.notNullOrEmpty(tableName);
-
-                    this._deleteRecords(tableName, result, callback);
-                } catch (error) {
-                    callback(error);
-                }
-            }.bind(this), function (error) {
-                callback(error);
-            });
-    };
-
-    // Delete the specified records from the table.
-    // If multiple rows match any of the specified records, all will be deleted.
-    this._deleteRecords = function (tableName, records, callback) {
-
-        // Compute the SQL DELETE statements and parameters corresponding to each record we want to delete from the table.
-        var deleteStatements = [],
-            deleteParams = [];
-        for (var i = 0; i < records.length; i++) {
-
-            var record = records[i],
-                whereClauses = [],
-                whereParams = [];
-            for (var propertyName in record) {
-                whereClauses.push(_.format('{0} = ?', propertyName));
-                whereParams.push(record[propertyName]);
-            }
-
-            deleteStatements.push(_.format('DELETE FROM {0} WHERE {1}', tableName, whereClauses.join(' AND ')));
-            deleteParams.push(whereParams);
+        var self = this;
+    
+        // The query can have a 'select' clause that queries only specific columns. However, we need to know the ID value
+        // to be able to delete records. So we explicitly remove selection from the query, if any.
+        var components = query.getComponents();
+        if (components.selections && components.selections.length > 0) {
+            components.selections = [];
+            query.setComponents(components);
         }
 
-        // Execute the DELETE statements
-        this._db.transaction(function (transaction) {
-            for (var i = 0; i < deleteStatements.length; i++) {
-                transaction.executeSql(deleteStatements[i], deleteParams[i]);
+        // Run the query and get the list of records to be deleted
+        self.read(query).then(function (result) {
+            try {
+                if (!_.isArray(result)) { // This can happen if the query used to read contains includeCount()
+                    result = result.result;
+                    Validate.isArray(result);
+                }
+
+                var tableName = query.getComponents().table;
+                Validate.isString(tableName);
+                Validate.notNullOrEmpty(tableName);
+
+                // Get list of IDs from the records returned by read.
+                var ids = [];
+                result.forEach(function(record) {
+                    ids.push(record[idPropertyName]);
+                });
+
+                // Delete the records returned by read.
+                self._db.transaction(function(transaction) {
+                    self._deleteIds(transaction, tableName, ids);
+                }, function(error) {
+                    callback(error);
+                }, function() {
+                    callback();
+                });
+
+            } catch (error) {
+                callback(error);
             }
-        }.bind(this), function (error) {
+        }, function (error) {
             callback(error);
-        }, function () {
-            callback();
         });
     };
 

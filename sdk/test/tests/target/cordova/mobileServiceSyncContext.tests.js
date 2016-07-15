@@ -326,6 +326,24 @@ $testGroup('MobileServiceSyncContext tests')
         }, function(error) {
             $assert.fail(error);
         });
+    }),
+
+    $test('purge')
+    .description('Tests that the purge API simply calls pullManager.purge() and returns whatever it returns')
+    .checkAsync(function () {
+        var syncContext;
+        return getSyncContext().then(function(result) {
+            syncContext = result;
+            syncContext._getPurgeManager().purge = function (query, forcePurge) {
+                $assert.areEqual(query, {dummykey: 'dummyvalue'});
+                $assert.areEqual(forcePurge, true)
+                return 'result';
+            };
+        }).then(function() {
+            return syncContext.purge({dummykey: 'dummyvalue'}, true);
+        }).then(function(result) {
+            $assert.areEqual(result, 'result');
+        });
     })
 );
 

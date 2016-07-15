@@ -43,6 +43,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
                 name: pulltimeTableName,
                 columnDefinitions: {
                     id: 'string', // column for storing queryId
+                    tableName: 'string', // column for storing table name 
                     value: 'date' // column for storing lastKnownUpdatedAt
                 }
             });
@@ -264,6 +265,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
         if (pullQueryId) {
             return store.upsert(pulltimeTableName, {
                 id: pullQueryId,
+                tableName: pagePullQuery.getComponents().table,
                 value: lastKnownUpdatedAt
             });
         }
