@@ -258,7 +258,7 @@ function MobileServiceSyncContext(client) {
     };
     this._getPurgeManager = function() {
         return purgeManager;
-    }
+    };
     
     // Performs upsert and logs the action in the operation table
     // Validates parameters. Callers can skip validation

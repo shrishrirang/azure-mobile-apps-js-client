@@ -197,7 +197,7 @@ $testGroup('MobileServiceSyncTable tests')
 
         client.getSyncContext().purge = function (query, forcePurge) {
             $assert.areEqual(query, {dummykey: 'dummyvalue'});
-            $assert.areEqual(forcePurge, true)
+            $assert.areEqual(forcePurge, true);
             return 'result';
         };
 
@@ -213,7 +213,7 @@ $testGroup('MobileServiceSyncTable tests')
         client.getSyncContext().purge = function (query, forcePurge) {
             $assert.isNotNull(query);
             $assert.areEqual(query.getComponents().table, storeTestHelper.testTableName);
-            $assert.areEqual(forcePurge, true)
+            $assert.areEqual(forcePurge, true);
             return 'result';
         };
 
