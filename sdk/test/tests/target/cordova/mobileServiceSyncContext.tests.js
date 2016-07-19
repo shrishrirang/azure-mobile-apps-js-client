@@ -336,7 +336,7 @@ $testGroup('MobileServiceSyncContext tests')
             syncContext = result;
             syncContext._getPurgeManager().purge = function (query, forcePurge) {
                 $assert.areEqual(query, {dummykey: 'dummyvalue'});
-                $assert.areEqual(forcePurge, true)
+                $assert.areEqual(forcePurge, true);
                 return 'result';
             };
         }).then(function() {
