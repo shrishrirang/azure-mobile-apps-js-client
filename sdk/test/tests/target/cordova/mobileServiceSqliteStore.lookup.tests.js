@@ -140,7 +140,7 @@ $testGroup('SQLiteStore - lookup tests')
         });
     }),
 
-    $test('record not found')
+    $test('record not found - suppressRecordNotFoundError === false')
     .checkAsync(function () {
         return store.defineTable({
             name: storeTestHelper.testTableName,
@@ -157,7 +157,7 @@ $testGroup('SQLiteStore - lookup tests')
         });
     }),
 
-    $test('Suppress lookup failure')
+    $test('record not found - suppressRecordNotFoundError === true')
     .description('Check that promise returned by lookup is either resolved or rejected even when invoked with extra parameters')
     .checkAsync(function () {
         return store.defineTable({

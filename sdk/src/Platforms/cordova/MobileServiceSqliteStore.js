@@ -15,26 +15,79 @@ var Platform = require('Platforms/Platform'),
     storeHelper = require('./storeHelper'),
     Query = require('azure-query-js').Query,
     formatSql = require('azure-odata-sql').format,
+    taskRunner = require('../../Utilities/taskRunner'),
     idPropertyName = "id", // TODO: Add support for case insensitive ID and custom ID column
     defaultDbName = 'mobileapps.db';
 
 /**
  * Initializes a new instance of MobileServiceSqliteStore
  */
-var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
+var MobileServiceSqliteStore = function (dbName) {
 
     // Guard against initialization without the new operator
     "use strict";
     if ( !(this instanceof MobileServiceSqliteStore) ) {
         return new MobileServiceSqliteStore(dbName);
     }
-    
+
     if ( _.isNull(dbName) ) {
         dbName = defaultDbName;
     }
 
-    this._db = window.sqlitePlugin.openDatabase({ name: dbName, location: 'default' });
-    var tableDefinitions = {};
+    var tableDefinitions = {},
+        runner = taskRunner();
+
+    /**
+     * Initializes the store
+     * A handle to the underlying sqlite store will be opened as part of initialization.
+     * 
+     * @returns A promise that is resolved when the initialization is complete OR rejected if it fails
+     */
+    this.init = function() {
+        return runner.run(function() {
+            return this._init();
+        }.bind(this));
+    };
+
+    this._init = function() {
+        var self = this;
+        return Platform.async(function(callback) {
+            if (self._db) {
+                return callback(); // already initialized.
+            }
+
+            var db = window.sqlitePlugin.openDatabase(
+                { name: dbName, location: 'default' },
+                function successcb() {
+                    self._db = db; // openDatabase is complete, set self._db
+                    callback();
+                },
+                callback
+            );
+        })();
+    };
+
+    /**
+     * Closes the handle to the underlying sqlite store.
+     * 
+     * @returns A promise that is resolved when the sqlite store is closed successfully OR rejected if it fails.
+     */
+    this.close = function() {
+        var self = this;
+        return runner.run(function() {
+            if (!self._db) {
+                return; // nothing to close
+            }
+
+            return Platform.async(function(callback) {
+                self._db.close(function successcb() {
+                    self._db = undefined;
+                    callback();
+                },
+                callback);
+            })();
+        });
+    };
 
     /**
      * Defines the schema of the SQLite table
@@ -55,79 +108,78 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
      *
      * @returns A promise that is resolved when the operation is completed successfully OR rejected with the error if it fails.
      */
-    this.defineTable = Platform.async(function (tableDefinition) {
+    this.defineTable = function (tableDefinition) {
+        var self = this;
+        return runner.run(function() {
+            storeHelper.validateTableDefinition(tableDefinition);
 
-        // Extract the callback argument added by Platform.async and redefine the function arguments
-        var callback = Array.prototype.pop.apply(arguments);
-        tableDefinition = arguments[0];
+            tableDefinition = JSON.parse(JSON.stringify(tableDefinition)); // clone the table definition as we will need it later
 
-        // Validate the function arguments
-        Validate.isFunction(callback, 'callback');
-        storeHelper.validateTableDefinition(tableDefinition);
+            // Initialize the store before defining the table
+            // If the store is already initialized, calling init() will have no effect. 
+            return self._init().then(function() {
+                return Platform.async(function(callback) {
+                    self._db.transaction(function(transaction) {
 
-        tableDefinition = JSON.parse(JSON.stringify(tableDefinition)); // clone the table definition as we will need it later
+                        // Get the table information
+                        var pragmaStatement = _.format("PRAGMA table_info({0});", tableDefinition.name);
+                        transaction.executeSql(pragmaStatement, [], function (transaction, result) {
 
-        this._db.transaction(function(transaction) {
+                            // Check if a table with the specified name exists 
+                            if (result.rows.length > 0) { // table already exists, add missing columns.
 
-            // Get the table information
-            var pragmaStatement = _.format("PRAGMA table_info({0});", tableDefinition.name);
-            transaction.executeSql(pragmaStatement, [], function (transaction, result) {
+                                // Get a list of columns present in the SQLite table
+                                var existingColumns = {};
+                                for (var i = 0; i < result.rows.length; i++) {
+                                    var column = result.rows.item(i);
+                                    existingColumns[column.name.toLowerCase()] = true;
+                                }
 
-                // Check if a table with the specified name exists 
-                if (result.rows.length > 0) { // table already exists, add missing columns.
+                                addMissingColumns(transaction, tableDefinition, existingColumns);
+                                
+                            } else { // table does not exist, create it.
+                                createTable(transaction, tableDefinition);
+                            }
+                        });
 
-                    // Get a list of columns present in the SQLite table
-                    var existingColumns = {};
-                    for (var i = 0; i < result.rows.length; i++) {
-                        var column = result.rows.item(i);
-                        existingColumns[column.name.toLowerCase()] = true;
-                    }
-
-                    addMissingColumns(transaction, tableDefinition, existingColumns);
-                    
-                } else { // table does not exist, create it.
-                    createTable(transaction, tableDefinition);
-                }
+                    },
+                    callback,
+                    function(result) {
+                        // Table definition is successful, update the in-memory list of table definitions.
+                        var error; 
+                        try {
+                            storeHelper.addTableDefinition(tableDefinitions, tableDefinition);
+                        } catch (err) {
+                            error = err;
+                        }
+                        callback(error);
+                    });
+                })();
             });
-
-        }, function (error) {
-            callback(error);
-        }, function(result) {
-            // Table definition is successful, update the in-memory list of table definitions. 
-            try {
-                storeHelper.addTableDefinition(tableDefinitions, tableDefinition);
-                callback();
-            } catch (error) {
-                callback(error);
-            }
-        }.bind(this));
-    });
+        });
+    };
 
     /**
      * Updates or inserts one or more objects in the local table
+     * If a property does not have a corresponding definition in tableDefinition, it will not be upserted into the table.
      * 
      * @param tableName Name of the local table in which data is to be upserted.
      * @param data A single object OR an array of objects to be inserted/updated in the table
      * 
      * @returns A promise that is resolved when the operation is completed successfully OR rejected with the error if it fails.
      */
-    this.upsert = Platform.async(function (tableName, data) {
-        // Extract the callback argument added by Platform.async and redefine the function arguments
-        var callback = Array.prototype.pop.apply(arguments);
-        tableName = arguments[0];
-        data = arguments[1];
-
-        // Validate the arguments
-        Validate.isFunction(callback);
-        
-        this._db.transaction(function(transaction) {
-            this._upsert(transaction, tableName, data);
-        }.bind(this), function (error) {
-            callback(error);
-        }, function () {
-            callback();
+    this.upsert = function (tableName, data) {
+        var self = this;
+        return runner.run(function() {
+            return Platform.async(function(callback) {
+                self._db.transaction(function(transaction) {
+                    self._upsert(transaction, tableName, data);
+                },
+                callback,
+                callback);
+            })();
         });
-    });
+    };
     
     // Performs the upsert operation.
     // This method validates all arguments, callers can skip validation. 
@@ -248,8 +300,8 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
      * rejected with the error if it fials. 
      */
     this.lookup = function (tableName, id, suppressRecordNotFoundError) {
-
-        return Platform.async(function(callback) {
+        var self = this;
+        return runner.run(function() {
             // Validate the arguments
             Validate.isString(tableName, 'tableName');
             Validate.notNullOrEmpty(tableName, 'tableName');
@@ -262,30 +314,34 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
 
             var lookupStatement = _.format("SELECT * FROM [{0}] WHERE {1} = ? COLLATE NOCASE", tableName, idPropertyName);
 
-            this._db.executeSql(lookupStatement, [id], function (result) {
+            return Platform.async(function(callback) {
+                self._db.executeSql(lookupStatement, [id], function (result) {
+                    var error,
+                        record;
+                    try {
+                        if (result.rows.length !== 0) {
+                            record = result.rows.item(0);
+                        }
 
-                try {
-                    var record;
-                    if (result.rows.length !== 0) {
-                        record = result.rows.item(0);
+                        if (record) {
+                            // Deserialize the record read from the SQLite store into its original form.
+                            record = sqliteSerializer.deserialize(record, tableDefinition.columnDefinitions);
+                        } else if (!suppressRecordNotFoundError) {
+                            throw new Error('Item with id "' + id + '" does not exist.');
+                        }
+                    } catch (err) {
+                        error = err;
                     }
 
-                    if (record) {
-                        // Deserialize the record read from the SQLite store into its original form.
-                        record = sqliteSerializer.deserialize(record, tableDefinition.columnDefinitions);
-                        callback(null, record);
-                    } else if (suppressRecordNotFoundError) {
-                        callback();
+                    if (error) {
+                        callback(error);
                     } else {
-                        callback(new Error('Item with id "' + id + '" does not exist.'));
+                        callback(null, record);
                     }
-                } catch (err) {
-                    callback(err);
-                }
-            }, function (err) {
-                callback(err);
-            });
-        }.bind(this))();
+                },
+                callback);
+            })();
+        });
     };
 
     /**
@@ -298,45 +354,41 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
      * 
      * @returns Promise that is resolved when the operation completes successfully or rejected with the error if it fails.
      */
-    this.del = Platform.async(function (tableNameOrQuery, ids) {
+    this.del = function (tableNameOrQuery, ids) {
+        var self = this;
+        return runner.run(function() {
+            return Platform.async(function(callback) {
+                // Validate parameters
+                Validate.notNull(tableNameOrQuery);
 
-        // Extract the callback argument added by Platform.async and redefine the function arguments
-        var callback = Array.prototype.pop.apply(arguments);
-        tableNameOrQuery = arguments[0];
-        ids = arguments[1];
+                if (_.isString(tableNameOrQuery)) { // tableNameOrQuery is table name, delete records with specified IDs.
+                    Validate.notNullOrEmpty(tableNameOrQuery, 'tableNameOrQuery');
 
-        // Validate parameters
-        Validate.isFunction(callback);
-        Validate.notNull(tableNameOrQuery);
-
-        if (_.isString(tableNameOrQuery)) { // tableNameOrQuery is table name, delete records with specified IDs.
-            Validate.notNullOrEmpty(tableNameOrQuery, 'tableNameOrQuery');
-
-            // If a single id is specified, convert it to an array and proceed.
-            // Detailed validation of individual IDs in the array will be taken care of later.
-            if (!_.isArray(ids)) {
-                ids = [ids];
-            }
-            
-            this._db.transaction(function(transaction) {
-                for (var i in ids) {
-                    if (! _.isNull(ids[i])) {
-                        Validate.isValidId(ids[i]);
+                    // If a single id is specified, convert it to an array and proceed.
+                    // Detailed validation of individual IDs in the array will be taken care of later.
+                    if (!_.isArray(ids)) {
+                        ids = [ids];
                     }
-                }
-                this._deleteIds(transaction, tableNameOrQuery /* table name */, ids);
-            }.bind(this), function (error) {
-                callback(error);
-            }, function () {
-                callback();
-            });
+                    
+                    self._db.transaction(function(transaction) {
+                        for (var i in ids) {
+                            if (! _.isNull(ids[i])) {
+                                Validate.isValidId(ids[i]);
+                            }
+                        }
+                        self._deleteIds(transaction, tableNameOrQuery /* table name */, ids);
+                    },
+                    callback,
+                    callback);
 
-        } else if (_.isObject(tableNameOrQuery)) { // tableNameOrQuery is a query, delete all records specified by the query.
-            this._deleteUsingQuery(tableNameOrQuery /* query */, callback);
-        } else { // error
-            throw _.format(Platform.getResourceString("TypeCheckError"), 'tableNameOrQuery', 'Object or String', typeof tableNameOrQuery);
-        }
-    });
+                } else if (_.isObject(tableNameOrQuery)) { // tableNameOrQuery is a query, delete all records specified by the query.
+                    self._deleteUsingQuery(tableNameOrQuery /* query */, callback);
+                } else { // error
+                    throw _.format(Platform.getResourceString("TypeCheckError"), 'tableNameOrQuery', 'Object or String', typeof tableNameOrQuery);
+                }
+            })();
+        });
+    };
     
     // Deletes the records selected by the specified query and notifies the callback.
     this._deleteUsingQuery = function (query, callback) {
@@ -352,7 +404,7 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
         }
 
         // Run the query and get the list of records to be deleted
-        self.read(query).then(function (result) {
+        self._read(query).then(function (result) {
             try {
                 if (!_.isArray(result)) { // This can happen if the query used to read contains includeCount()
                     result = result.result;
@@ -372,18 +424,15 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
                 // Delete the records returned by read.
                 self._db.transaction(function(transaction) {
                     self._deleteIds(transaction, tableName, ids);
-                }, function(error) {
-                    callback(error);
-                }, function() {
-                    callback();
-                });
+                },
+                callback,
+                callback);
 
             } catch (error) {
                 callback(error);
             }
-        }, function (error) {
-            callback(error);
-        });
+        },
+        callback);
     };
 
     // Delete records from the table that match the specified IDs.
@@ -411,62 +460,65 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
      * @returns A promise that is resolved with the read results when the operation is completed successfully or rejected with
      *          the error if it fails.
      */
-    this.read = Platform.async(function (query) {
+    this.read = function (query) {
+        return runner.run(function() {
+            Validate.notNull(query, 'query');
+            Validate.isObject(query, 'query');
 
-        // Extract the callback argument added by Platform.async and redefine the function arguments
-        var callback = Array.prototype.pop.apply(arguments);
-        query = arguments[0];
+            return this._read(query);
+        }.bind(this));
+    };
 
-        Validate.isFunction(callback, 'callback');
-        Validate.notNull(query, 'query');
-        Validate.isObject(query, 'query');
+    this._read = function (query) {
+        return Platform.async(function(callback) {
 
-        var tableDefinition = storeHelper.getTableDefinition(tableDefinitions, query.getComponents().table);
-        if (_.isNull(tableDefinition)) {
-            throw new Error('Definition not found for table "' + query.getComponents().table + '"');
-        }
-
-        var count,
-            result = [],
-            statements = getSqlStatementsFromQuery(query);
-
-        this._db.transaction(function (transaction) {
-
-            // If the query requests the result count we expect 2 SQLite statements. Else, we expect a single statement.
-            if (statements.length < 1 || statements.length > 2) {
-                throw Platform.getResourceString("MobileServiceSqliteStore_UnexptedNumberOfStatements");
+            var tableDefinition = storeHelper.getTableDefinition(tableDefinitions, query.getComponents().table);
+            if (_.isNull(tableDefinition)) {
+                throw new Error('Definition not found for table "' + query.getComponents().table + '"');
             }
 
-            // The first statement gets the query results. Execute it.
-            // TODO: Figure out a better way to determine what the statements in the array correspond to.    
-            transaction.executeSql(statements[0].sql, getStatementParameters(statements[0]), function (transaction, res) {
-                var record;
-                for (var j = 0; j < res.rows.length; j++) {
-                    // Deserialize the record read from the SQLite store into its original form.
-                    record = sqliteSerializer.deserialize(res.rows.item(j), tableDefinition.columnDefinitions);
-                    result.push(record);
+            var count,
+                result = [],
+                statements = getSqlStatementsFromQuery(query);
+
+            this._db.transaction(function (transaction) {
+
+                // If the query requests the result count we expect 2 SQLite statements. Else, we expect a single statement.
+                if (statements.length < 1 || statements.length > 2) {
+                    throw Platform.getResourceString("MobileServiceSqliteStore_UnexptedNumberOfStatements");
                 }
-            });
 
-            // Check if there are multiple statements. If yes, the second is for the result count.
-            if (statements.length === 2) {
-                transaction.executeSql(statements[1].sql, getStatementParameters(statements[1]), function (transaction, res) {
-                    count = res.rows.item(0).count;
+                // The first statement gets the query results. Execute it.
+                // TODO: Figure out a better way to determine what the statements in the array correspond to.    
+                transaction.executeSql(statements[0].sql, getStatementParameters(statements[0]), function (transaction, res) {
+                    var record;
+                    for (var j = 0; j < res.rows.length; j++) {
+                        // Deserialize the record read from the SQLite store into its original form.
+                        record = sqliteSerializer.deserialize(res.rows.item(j), tableDefinition.columnDefinitions);
+                        result.push(record);
+                    }
                 });
-            }
-        }, function (error) {
-            callback(error);
-        }, function () {
-            // If we fetched the record count, combine the records and the count into an object.
-            if (count !== undefined) {
-                result = {
-                    result: result,
-                    count: count
-                };
-            }
-            callback(null, result);
-        });
-    });
+
+                // Check if there are multiple statements. If yes, the second is for the result count.
+                if (statements.length === 2) {
+                    transaction.executeSql(statements[1].sql, getStatementParameters(statements[1]), function (transaction, res) {
+                        count = res.rows.item(0).count;
+                    });
+                }
+            },
+            callback,
+            function () {
+                // If we fetched the record count, combine the records and the count into an object.
+                if (count !== undefined) {
+                    result = {
+                        result: result,
+                        count: count
+                    };
+                }
+                callback(null, result);
+            });
+        }.bind(this))();
+    };
     
     /**
      * Executes the specified operations as part of a single SQL transaction.
@@ -488,49 +540,43 @@ var MobileServiceSqliteStore = function (dbName) { //TODO: allow null dbName
      * 
      * @returns A promise that is resolved when the operations are completed successfully OR rejected with the error if they fail.
      */
-    this.executeBatch = Platform.async(function (operations) {
+    this.executeBatch = function (operations) {
+        var self = this;
+        return runner.run(function() {
+            Validate.isArray(operations);
 
-        // Extract the callback argument added by Platform.async and redefine the function arguments
-        var callback = Array.prototype.pop.apply(arguments);
-        operations = arguments[0];
+            return Platform.async(function(callback) {
+                self._db.transaction(function(transaction) {
+                    for (var i in operations) {
+                        var operation = operations[i];
+                        
+                        if (_.isNull(operation)) {
+                            continue;
+                        }
+                        
+                        Validate.isString(operation.action);
+                        Validate.notNullOrEmpty(operation.action);
 
-        // Validate the function arguments
-        Validate.isFunction(callback, 'callback');
-        Validate.isArray(operations);
-        
-        this._db.transaction(function(transaction) {
-            for (var i in operations) {
-                var operation = operations[i];
-                
-                if (_.isNull(operation)) {
-                    continue;
-                }
-                
-                Validate.isString(operation.action);
-                Validate.notNullOrEmpty(operation.action);
-
-                Validate.isString(operation.tableName);
-                Validate.notNullOrEmpty(operation.tableName);
-                
-                if (operation.action.toLowerCase() === 'upsert') {
-                    this._upsert(transaction, operation.tableName, operation.data);
-                } else if (operation.action.toLowerCase() === 'delete') {
-                    if ( ! _.isNull(operation.id) ) {
-                        Validate.isValidId(operation.id);
-                        this._deleteIds(transaction, operation.tableName, [operation.id]);
+                        Validate.isString(operation.tableName);
+                        Validate.notNullOrEmpty(operation.tableName);
+                        
+                        if (operation.action.toLowerCase() === 'upsert') {
+                            self._upsert(transaction, operation.tableName, operation.data);
+                        } else if (operation.action.toLowerCase() === 'delete') {
+                            if ( ! _.isNull(operation.id) ) {
+                                Validate.isValidId(operation.id);
+                                self._deleteIds(transaction, operation.tableName, [operation.id]);
+                            }
+                        } else {
+                            throw new Error(_.format("Operation '{0}' is not supported", operation.action));
+                        }
                     }
-                } else {
-                    throw new Error(_.format("Operation '{0}' is not supported", operation.action));
-                }
-            }
-        }.bind(this), function (error) {
-            callback(error);
-        }, function () {
-            callback();
+                },
+                callback,
+                callback);
+            })();
         });
-    });
-
-    
+    };
 };
 
 // Converts the QueryJS object into equivalent SQLite statements

@@ -207,25 +207,25 @@ $testGroup('SQLiteStore - miscellaneous tests')
     $test('Verify MobileServiceSqliteStore initialization works as expected with the new operator')
     .check(function () {
         var store = new MobileServiceSqliteStore('somedbname');
-        $assert.isNotNull(store._db);
+        $assert.isNotNull(store.upsert);
     }),
     
     $test('Verify MobileServiceSqliteStore initialization works as expected without the new operator')
     .check(function () {
         var store = MobileServiceSqliteStore('somedbname');
         $assert.isNotNull(store, 'somedbname');
-        $assert.isNotNull(store._db);
+        $assert.isNotNull(store.upsert);
     }),
     
     $test('MobileServiceSqliteStore constructor without db name')
     .check(function () {
         var localStore = MobileServiceSqliteStore('somedbname');
-        $assert.isNotNull(localStore._db);
+        $assert.isNotNull(store.upsert);
     }),
     
     $test('MobileServiceSqliteStore constructor with a null db name')
     .check(function () {
         var localStore = MobileServiceSqliteStore('somedbname');
-        $assert.isNotNull(localStore._db);
+        $assert.isNotNull(store.upsert);
     })
 );
