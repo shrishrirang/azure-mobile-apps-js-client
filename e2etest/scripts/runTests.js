@@ -40,9 +40,9 @@ var loginWindowWaitTime = 20 /* seconds */ * 1000 /* milli seconds */,
         },
         twitter: {
             titleSelector: 'twitter',
-            emailInputSelector: '[id=username_or_email]',
+            emailInputSelector: '[type=text]',
             emailSubmitSelector: undefined,
-            passwordInputSelector: '[id=password]',
+            passwordInputSelector: '[type=password]',
             passwordSubmitSelector: '[type=submit]'
         },
         microsoftaccount: {
