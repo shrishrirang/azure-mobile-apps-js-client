@@ -1716,5 +1716,67 @@ $testGroup('MobileServiceTables.js',
         return table.update({ id: 'my id', value: 'A', version: 'test"qu"oteAnd\\"' }).then(function (result) {
             $assert.areEqual(result.version, 'nowrapping"OrEscaped"Quotes');
         });
+    }),
+
+    $test('insert - verify X-ZUMO-FEATURES')
+    .checkAsync(function () {
+        return performOperationAndVerifyFeatures(function(table) {
+            return table.insert({id: '1'});
+        });
+    }),
+
+    $test('update - verify X-ZUMO-FEATURES')
+    .checkAsync(function () {
+        return performOperationAndVerifyFeatures(function(table) {
+            return table.update({id: '1'});
+        });
+    }),
+
+    $test('delete - verify X-ZUMO-FEATURES')
+    .checkAsync(function () {
+        return performOperationAndVerifyFeatures(function(table) {
+            return table.del({id: '1'});
+        });
+    }),
+
+    $test('refresh - verify X-ZUMO-FEATURES')
+    .checkAsync(function () {
+        return performOperationAndVerifyFeatures(function(table) {
+            return table.refresh({id: '1'});
+        });
+    }),
+
+    $test('lookup - verify X-ZUMO-FEATURES')
+    .checkAsync(function () {
+        return performOperationAndVerifyFeatures(function(table) {
+            return table.lookup('1');
+        });
+    }),
+
+    $test('read - verify X-ZUMO-FEATURES')
+    .checkAsync(function () {
+        return performOperationAndVerifyFeatures(function(table) {
+            return table.read();
+        });
     })
 );
+
+function performOperationAndVerifyFeatures(operation) {
+    var client = new MobileServiceClient("http://www.test.com");
+
+    var filterInvoked = false;
+    client = client.withFilter(function (req, next, callback) {
+        $assert.isTrue(req.headers['X-ZUMO-FEATURES'].indexOf('abcdef' > -1));
+        filterInvoked = true;
+        callback('somerror');
+    });
+
+    var table = client.getTable('books');
+    table._features = ['abcdef'];
+
+    return operation(table).then(function (result) {
+        $assert.fail('error expected');
+    }, function(error) {
+        $assert.isTrue(filterInvoked);
+    });
+}

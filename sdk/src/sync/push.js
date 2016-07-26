@@ -12,7 +12,8 @@ var Validate = require('../Utilities/Validate'),
     Platform = require('Platforms/Platform'),
     taskRunner = require('../Utilities/taskRunner'),
     MobileServiceTable = require('../MobileServiceTable'),
-    tableConstants = require('../constants').table,
+    constants = require('../constants'),
+    tableConstants = constants.table,
     sysProps = require('../constants').table.sysProps,
     createPushError = require('./pushError').createPushError,
     handlePushError = require('./pushError').handlePushError,
@@ -145,6 +146,7 @@ function createPushManager(client, store, storeTaskRunner, operationTableManager
             // perform push
 
             var mobileServiceTable = client.getTable(operation.logRecord.tableName);
+            mobileServiceTable._features = [constants.features.OfflineSync];
             switch(operation.logRecord.action) {
                 case 'insert':
                     removeSysProps(operation.data); // We need to remove system properties before we insert in the server table

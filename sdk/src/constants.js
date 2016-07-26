@@ -12,6 +12,8 @@ module.exports = {
         TableRefreshCall: "RF",          // Refresh table call
         TableReadRaw: "TR",              // Table reads where the caller uses a raw query string to determine the items to be returned
         TableReadQuery: "TQ",            // Table reads where the caller uses a function / query OM to determine the items to be returned
+        OfflineSync: "OL",               // Table operations performed as part of offline sync (push and pull)
+        IncrementalPull: "IP"            // Table reads performed as part of an incremental pull 
     },
     apiVersionHeaderName: "ZUMO-API-VERSION",
     apiVersion: "2.0.0",

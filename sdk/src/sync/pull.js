@@ -11,7 +11,8 @@ var Validate = require('../Utilities/Validate'),
     Platform = require('Platforms/Platform'),
     taskRunner = require('../Utilities/taskRunner'),
     MobileServiceTable = require('../MobileServiceTable'),
-    tableConstants = require('../constants').table,
+    constants = require('../constants'),
+    tableConstants = constants.table,
     _ = require('../Utilities/Extensions');
     
 var defaultPageSize = 50,
@@ -81,6 +82,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
             tablePullQuery = copyQuery(query);            
 
             mobileServiceTable = client.getTable(tablePullQuery.getComponents().table);
+            mobileServiceTable._features = queryId ? [constants.features.OfflineSync, constants.features.IncrementalPull] : [constants.features.OfflineSync];
             pullQueryId = queryId;
 
             // Set up the query for initiating a pull and then pull all pages          
