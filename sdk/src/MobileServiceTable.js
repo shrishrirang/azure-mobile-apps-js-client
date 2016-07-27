@@ -61,6 +61,9 @@ function MobileServiceTable(tableName, client) {
         /// </returns>
         return client;
     };
+
+    // Features to associate with all table operations
+    this._features = undefined;
 }
 
 MobileServiceTable.SystemProperties = SystemProperties;
@@ -118,7 +121,7 @@ MobileServiceTable.prototype._read = function (query, parameters, callback) {
     var tableName = this.getTableName();
     var queryString = null;
     var projection = null;
-    var features = [];
+    var features = this._features || [];
     if (_.isString(query)) {
         queryString = query;
         if (!_.isNullOrEmpty(query)) {
@@ -280,7 +283,8 @@ MobileServiceTable.prototype.insert = Platform.async(
             }
         }
 
-        var features = addQueryParametersFeaturesIfApplicable([], parameters);
+        var features = this._features || [];
+        features = addQueryParametersFeaturesIfApplicable(features, parameters);
 
         // Construct the URL
         var urlFragment = _.url.combinePathSegments(tableRouteSeperatorName, this.getTableName());
@@ -327,7 +331,7 @@ MobileServiceTable.prototype.update = Platform.async(
         /// </param>
         var version,
             headers = {},
-            features = [],
+            features = this._features || [],
             serverInstance;
 
         // Account for absent optional arguments
@@ -442,7 +446,8 @@ MobileServiceTable.prototype.refresh = Platform.async(
             urlFragment = _.url.combinePathAndQuery(urlFragment, queryString);
         }
 
-        var features = [constants.features.TableRefreshCall];
+        var features = this._features || [];
+        features.push(constants.features.TableRefreshCall);
         features = addQueryParametersFeaturesIfApplicable(features, parameters);
 
         var headers = { };
@@ -512,7 +517,8 @@ MobileServiceTable.prototype.lookup = Platform.async(
                 this.getTableName(),
                 encodeURIComponent(id.toString()));
 
-        var features = addQueryParametersFeaturesIfApplicable([], parameters);
+        var features = this._features || [];
+        features = addQueryParametersFeaturesIfApplicable(features, parameters);
 
         if (!_.isNull(parameters)) {
             var queryString = _.url.getQueryString(parameters);
@@ -567,7 +573,7 @@ MobileServiceTable.prototype.del = Platform.async(
         Validate.notNull(callback, 'callback');
 
         var headers = {};
-        var features = [];
+        var features = this._features || [];
         if (_.isString(instance[idPropertyName])) {
             if (!_.isNullOrEmpty(instance[MobileServiceSystemColumns.Version])) {
                 headers['If-Match'] = getEtagFromVersion(instance[MobileServiceSystemColumns.Version]);
