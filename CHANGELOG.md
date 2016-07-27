@@ -1,6 +1,6 @@
 # Azure Mobile Apps JavaScript SDK Change Log
 
-### Changes since cordova-2.0.0-beta5
+### cordova-2.0.0-beta6
 - [Issue #135](https://github.com/Azure/azure-mobile-apps-js-client/issues/135) - Pull supports custom page size [ 34b9be5](https://github.com/Azure/azure-mobile-apps-js-client/commit/34b9be55a4432af78501b3028b728790aa89ca0b)
 - [Issue #131](https://github.com/Azure/azure-mobile-apps-js-client/issues/131) - Updated store to be insensitive to table and column name casing [4958927](https://github.com/Azure/azure-mobile-apps-js-client/commit/49589276c6ebdb792455d0e5dd087ac908d30c50)
 - [Issue #128](https://github.com/Azure/azure-mobile-apps-js-client/issues/128) - Added API to close underlying database connection [8347c08](https://github.com/Azure/azure-mobile-apps-js-client/commit/8347c08e3f02ed1aff57c03ac8ea0de4a7065cc7)
