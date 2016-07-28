@@ -8,7 +8,7 @@
 
 ### cordova-2.0.0-beta5 (Cordova SDK)
 - Added support for offline data sync (preview)
-- 
+
 ### 2.0.0-beta5
 - Updated the SDK to be a UMD compliant npm package
 
