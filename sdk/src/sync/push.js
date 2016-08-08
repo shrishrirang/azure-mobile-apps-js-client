@@ -76,7 +76,7 @@ function createPushManager(client, store, storeTaskRunner, operationTableManager
             }, function(error) {
                 // failed to push
                 return unlockPendingOperation().then(function() {
-                    pushError = createPushError(store, storeTaskRunner, currentOperation, error);
+                    pushError = createPushError(store, operationTableManager, storeTaskRunner, currentOperation, error);
                     //TODO: If the conflict isn't resolved but the error is marked as handled by the user,
                     //we can end up in an infinite loop. Guard against this by capping the max number of 
                     //times handlePushError can be called for the same record.
@@ -158,7 +158,9 @@ function createPushManager(client, store, storeTaskRunner, operationTableManager
                         return store.upsert(operation.logRecord.tableName, result); // Upsert the result of update into the local table
                     });
                 case 'delete':
-                    return mobileServiceTable.del({id: operation.logRecord.itemId});
+                    // Use the version info form the log record.
+                    operation.logRecord.metadata = operation.logRecord.metadata || {};
+                    return mobileServiceTable.del({id: operation.logRecord.itemId, version: operation.logRecord.metadata.version});
                 default:
                     throw new Error('Unsupported action ' + operation.logRecord.action);
             }

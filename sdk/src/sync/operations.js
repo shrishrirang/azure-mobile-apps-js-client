@@ -15,7 +15,9 @@ var Validate = require('../Utilities/Validate'),
     _ = require('../Utilities/Extensions'),
     Query = require('azure-query-js').Query;
 
-var operationTableName = tableConstants.operationTableName;
+var idPropertyName = tableConstants.idPropertyName,
+    versionColumnName = tableConstants.sysProps.versionColumnName,
+    operationTableName = tableConstants.operationTableName;
     
 function createOperationTableManager(store) {
 
@@ -28,15 +30,22 @@ function createOperationTableManager(store) {
         lockedOperationId,
         maxId;
 
-    return {
+    var api = {
         initialize: initialize,
         lockOperation: lockOperation,
         unlockOperation: unlockOperation,
         readPendingOperations: readPendingOperations,
         readFirstPendingOperationWithData: readFirstPendingOperationWithData,
         removeLockedOperation: removeLockedOperation,
-        getLoggingOperation: getLoggingOperation
+        getLoggingOperation: getLoggingOperation,
+        getMetadata: getMetadata
     };
+
+    // Exports for testing purposes only
+    api._getOperationForInsertingLog = getOperationForInsertingLog;
+    api._getOperationForUpdatingLog = getOperationForUpdatingLog;
+
+    return api;
     
     /**
      * Defines the operation table in the local store.
@@ -52,7 +61,8 @@ function createOperationTableManager(store) {
                 id: ColumnType.Integer,
                 tableName: ColumnType.String,
                 action: ColumnType.String,
-                itemId: ColumnType.String
+                itemId: ColumnType.String,
+                metadata: ColumnType.Object 
             }
         }).then(function() {
             return getMaxOperationId();
@@ -103,11 +113,11 @@ function createOperationTableManager(store) {
      * 
      * @param tableName Name of the table on which the action is performed
      * @param action Action performed on the table. Valid actions are 'insert', 'update' or 'delete'
-     * @param itemId ID of the record that is being inserted, updated or deleted.
+     * @param item Record that is being inserted, updated or deleted. In case of 'delete', all properties other than id will be ignored.
      * 
      * @returns Promise that is resolved with the logging operation. In case of a failure the promise is rejected.
      */
-    function getLoggingOperation(tableName, action, itemId) {
+    function getLoggingOperation(tableName, action, item) {
         
         // Run as a single task to avoid task interleaving.
         return runner.run(function() {
@@ -117,13 +127,15 @@ function createOperationTableManager(store) {
             Validate.notNull(action);
             Validate.isString(action);
             
-            Validate.isValidId(itemId);
-            
+            Validate.notNull(item);
+            Validate.isObject(item);
+            Validate.isValidId(item[idPropertyName]);
+
             if (!isInitialized) {
                 throw new Error('Operation table manager is not initialized');
             }
             
-            return readPendingOperations(tableName, itemId).then(function(pendingOperations) {
+            return readPendingOperations(tableName, item[idPropertyName]).then(function(pendingOperations) {
                 
                 // Multiple operations can be pending for <tableName, itemId> due to an opertion being locked in the past.
                 // Get the last pending operation
@@ -139,11 +151,11 @@ function createOperationTableManager(store) {
                 }
 
                 if (condenseAction === 'add') { // Add a new operation
-                    return insertLoggingOperation(tableName, action, itemId);
+                    return getOperationForInsertingLog(tableName, action, item);
                 } else if (condenseAction === 'modify') { // Edit the pending operation's action to be the new action.
-                    return updateLoggingOperation(pendingOperation.id, action /* new action */);
+                    return getOperationForUpdatingLog(pendingOperation.id, tableName, action /* new action */, item);
                 } else if (condenseAction === 'remove') { // Remove the earlier log from the operation table
-                    return deleteLoggingOperation(pendingOperation.id);
+                    return getOperationForDeletingLog(pendingOperation.id);
                 } else if (condenseAction === 'nop') { // NO OP. Nothing to be logged
                     return; 
                 } else  { // Error
@@ -303,42 +315,82 @@ function createOperationTableManager(store) {
     /**
      * Gets the operation that will insert a new record in the operation table.
      */
-    function insertLoggingOperation(tableName, action, itemId) {
-        return {
-            tableName: operationTableName,
-            action: 'upsert',
-            data: {
-                id: ++maxId,
-                tableName: tableName,
-                action: action,
-                itemId: itemId
-            }
-        };
+    function getOperationForInsertingLog(tableName, action, item) {
+        return api.getMetadata(tableName, action, item).then(function(metadata) {
+            return {
+                tableName: operationTableName,
+                action: 'upsert',
+                data: {
+                    id: ++maxId,
+                    tableName: tableName,
+                    action: action,
+                    itemId: item[idPropertyName],
+                    metadata: metadata
+                }
+            };
+        });
     }
     
     /**
      * Gets the operation that will update an existing record in the operation table.
      */
-    function updateLoggingOperation(id, action) {
-        return {
-            tableName: operationTableName,
-            action: 'upsert',
-            data: {
-                id: id,
-                action: action
-            }
-        };
+    function getOperationForUpdatingLog(operationId, tableName, action, item) {
+        return api.getMetadata(tableName, action, item).then(function(metadata) {
+            return {
+                tableName: operationTableName,
+                action: 'upsert',
+                data: {
+                    id: operationId,
+                    action: action,
+                    metadata: metadata
+                }
+            };
+        });
     }
     
     /**
      * Gets an operation that will delete a record from the operation table.
      */
-    function deleteLoggingOperation(id) {
+    function getOperationForDeletingLog(operationId) {
         return {
             tableName: operationTableName,
             action: 'delete',
-            id: id
+            id: operationId
         };
+    }
+
+    /**
+     * Gets the metadata to associate with a log record in the operation table
+     * 
+     * @param action 'insert', 'update' and 'delete' correspond to the insert, update and delete operations.
+     *               'upsert' is a special action that is used only in the context of conflict handling.
+     */
+    function getMetadata(tableName, action, item) {
+        
+        return Platform.async(function(callback) {
+            callback();
+        })().then(function() {
+            var metadata = {};
+
+            // If action is update and item defines version property OR if action is insert / update,
+            // define metadata.version to be the item's version property
+            if (action === 'upsert' || 
+                action === 'insert' ||
+                (action === 'update' && item.hasOwnProperty(versionColumnName))) {
+                metadata[versionColumnName] = item[versionColumnName];
+                return metadata;
+            } else if (action == 'update' || action === 'delete') { // Read item's version property from the table
+                return store.lookup(tableName, item[idPropertyName], true /* suppressRecordNotFoundError */).then(function(result) {
+                    if (result) {
+                        metadata[versionColumnName] = result[versionColumnName];
+                    }
+                    return metadata;
+                });
+            } else {
+                throw new Error('Invalid action ' + action);
+            }
+        });
+        
     }
 
     /**

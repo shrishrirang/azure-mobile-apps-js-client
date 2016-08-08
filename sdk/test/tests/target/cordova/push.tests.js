@@ -16,7 +16,9 @@ var Platform = require('Platforms/Platform'),
     storeTestHelper = require('./storeTestHelper'),
     runner = require('../../../../src/Utilities/taskRunner'),
     createOperationTableManager = require('../../../../src/sync/operations').createOperationTableManager,
-    MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore'),
+    MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore');
+
+var operationTableName = tableConstants.operationTableName,
     store,
     filter,
     client;
@@ -39,7 +41,8 @@ $testGroup('push tests')
                 name: storeTestHelper.testTableName,
                 columnDefinitions: {
                     id: 'string',
-                    price: 'int'
+                    price: 'int',
+                    version: 'string'
                 }
             }).then(function() {
                 return client.getSyncContext().initialize(store);
@@ -47,7 +50,7 @@ $testGroup('push tests')
         });
     }).tests(
 
-    $test('Insert - verify X-ZUMO-FEATURES')
+    $test('Local insert - verify X-ZUMO-FEATURES')
     .checkAsync(function () {
         var table = client.getSyncTable(storeTestHelper.testTableName);
         return table.insert({
@@ -58,7 +61,7 @@ $testGroup('push tests')
         });
     }),
 
-    $test('Update - verify X-ZUMO-FEATURES')
+    $test('Local update - verify X-ZUMO-FEATURES')
     .checkAsync(function () {
         var table = client.getSyncTable(storeTestHelper.testTableName);
         return store.upsert(storeTestHelper.testTableName, {
@@ -74,7 +77,7 @@ $testGroup('push tests')
         });
     }),
 
-    $test('Delete - verify X-ZUMO-FEATURES')
+    $test('Local delete - verify X-ZUMO-FEATURES')
     .checkAsync(function () {
         var table = client.getSyncTable(storeTestHelper.testTableName);
         return store.upsert(storeTestHelper.testTableName, {
@@ -88,10 +91,25 @@ $testGroup('push tests')
         }).then(function() {
             return pushAndValidateFeatures(false /* incremental sync */);
         });
+    }),
+
+    $test('Verify push uses correct version - insert')
+    .checkAsync(function () {
+        return pushAndValidateIfMatch('insert');
+    }),
+
+    $test('Verify push uses correct version - update')
+    .checkAsync(function () {
+        return pushAndValidateIfMatch('update');
+    }),
+
+    $test('Verify push uses correct version - delete')
+    .checkAsync(function () {
+        return pushAndValidateIfMatch('delete');
     })
 );
 
-function pushAndValidateFeatures(incrementalSync) {
+function pushAndValidateFeatures() {
     var filterInvoked = false;
     var offlineFeatureAdded = false;
     filter = function(req, next, callback) {
@@ -114,5 +132,65 @@ function pushAndValidateFeatures(incrementalSync) {
     }, function(error) {
         $assert.isTrue(filterInvoked);
         $assert.isFalse(offlineFeatureAdded); // Don't expect the offline feature to be added this time.
+    });
+}
+
+function pushAndValidateIfMatch(action) {
+
+    var logOperation = {
+        tableName: operationTableName,
+        action: 'upsert',
+        data: {
+            id: 1,
+            tableName: storeTestHelper.testTableName,
+            action: action,
+            itemId: '1'
+        }
+    };
+
+    var batch = [];
+    // If action is insert / update, add a record to the local table, but
+    // skip adding metadata to the log record be sure that push uses the metadata/version from the sync table record.
+    // For delete, simply add metadata to the log record.
+    if (action === 'insert' || action === 'update') { 
+        batch.push({
+            tableName: storeTestHelper.testTableName,
+            action: 'upsert',
+            data: {
+                id: '1',
+                price: 2,
+                version: 'testversion'
+            }
+        });
+    } else { // action === 'delete'
+        logOperation.data.metadata = {version: 'testversion'};
+    }
+
+    batch.push(logOperation);
+
+    return store.executeBatch(batch).then(function() {
+        return pushAndValidateHeader(action);
+    });
+}
+
+function pushAndValidateHeader(action) {
+    var filterInvoked = false;
+    filter = function(req, next, callback) {
+
+        // Verify the If-Match header
+        var expectedHeader;
+        if (action !== 'insert') {
+            expectedHeader = '"testversion"';
+        }
+        $assert.areEqual(req.headers['If-Match'], expectedHeader);
+
+        filterInvoked = true;
+        callback('someerror');
+    };
+
+    return client.getSyncContext().push().then(function() {
+        $assert.fail('failure expected');
+    }, function(error) {
+        $assert.isTrue(filterInvoked);
     });
 }

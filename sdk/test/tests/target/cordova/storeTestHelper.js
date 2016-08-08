@@ -12,7 +12,7 @@ var Platform = require('Platforms/Platform'),
     MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore'),
     operationTableName = require('../../../../src/constants').table.operationTableName,
     pulltimeTableName = require('../../../../src/constants').table.pulltimeTableName,
-    testTableName = 'sometable',
+    testTableName = 'todoitem',
     testDbFile = 'somedbfile.db',
     store;
 

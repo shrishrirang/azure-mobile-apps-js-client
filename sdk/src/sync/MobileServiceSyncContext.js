@@ -28,6 +28,7 @@ function MobileServiceSyncContext(client) {
         operationTableManager,
         pullManager,
         pushManager,
+        purgeManager,
         isInitialized = false,
         syncTaskRunner = taskRunner(), // Used to run push / pull tasks
         storeTaskRunner = taskRunner(); // Used to run insert / update / delete tasks on the store
@@ -177,7 +178,7 @@ function MobileServiceSyncContext(client) {
                 throw new Error('MobileServiceSyncContext not initialized');
             }
 
-            return operationTableManager.getLoggingOperation(tableName, 'delete', instance.id).then(function(loggingOperation) {
+            return operationTableManager.getLoggingOperation(tableName, 'delete', instance).then(function(loggingOperation) {
                 return store.executeBatch([
                     {
                         action: 'delete',
@@ -278,7 +279,7 @@ function MobileServiceSyncContext(client) {
                 throw new Error('Record with ID ' + existingRecord.id + ' already exists in the table ' + tableName);
             }
         }).then(function() {
-            return operationTableManager.getLoggingOperation(tableName, action, instance.id);
+            return operationTableManager.getLoggingOperation(tableName, action, instance);
         }).then(function(loggingOperation) {
             return store.executeBatch([
                 {

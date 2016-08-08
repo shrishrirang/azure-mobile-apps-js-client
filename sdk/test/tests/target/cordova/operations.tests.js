@@ -15,7 +15,11 @@ var Platform = require('Platforms/Platform'),
     
 var createOperationTableManager = operations.createOperationTableManager,
     operationTableName = tableConstants.operationTableName,
-    store;
+    store,
+    testId = 'abc',
+    testVersion = 'testversion',
+    testItem = {id: testId},
+    testMetadata = {version: 'someversion'};
 
 $testGroup('operations tests')
 
@@ -27,7 +31,8 @@ $testGroup('operations tests')
             return store.defineTable({
                 name: storeTestHelper.testTableName,
                 columnDefinitions: {
-                    id: MobileServiceSqliteStore.ColumnType.String
+                    id: MobileServiceSqliteStore.ColumnType.String,
+                    version: MobileServiceSqliteStore.ColumnType.String
                 }
             });
         });
@@ -48,22 +53,22 @@ $testGroup('operations tests')
     
     $test('basic logging')
     .checkAsync(function () {
-        var operationTableManager = createOperationTableManager(store),
-            itemId = 'abc';
+        var operationTableManager = createOperationTableManager(store);
         
         return operationTableManager.initialize().then(function() {
-            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', itemId);
+            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', testItem);
         }).then(function(op) {
             return store.executeBatch([op]);
         }).then(function() {
-            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, itemId);
+            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, testItem.id);
         }).then(function(result) {
             $assert.areEqual(result, [
                 {
                     action: 'insert',
                     id: 1,
-                    itemId: itemId,
-                    tableName: storeTestHelper.testTableName
+                    itemId: testId,
+                    tableName: storeTestHelper.testTableName,
+                    metadata: {}
                 }
             ]);
         }, function(error) {
@@ -74,59 +79,62 @@ $testGroup('operations tests')
     $test('operation ID generation')
     .checkAsync(function () {
         var operationTableManager = createOperationTableManager(store),
-            itemId1 = 'abc',
-            itemId2 = 'def';
+            item1 = {id: 'abc'},
+            item2 = {id: 'def'};
         
         return operationTableManager.initialize().then(function() {
-            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', itemId1); // insert item1
+            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', item1); // insert item1
         }).then(function(op) {
             return store.executeBatch([op]);
         }).then(function() {
-            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, itemId1);
+            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, item1.id);
         }).then(function(result) {
             $assert.areEqual(result, [
                 {
                     action: 'insert',
                     id: 1,
-                    itemId: itemId1,
-                    tableName: storeTestHelper.testTableName
+                    itemId: item1.id,
+                    tableName: storeTestHelper.testTableName,
+                    metadata: {}
                 }
             ]);
         }).then(function() {
-            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'delete', itemId1); // delete item1
+            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'delete', item1); // delete item1
         }).then(function(op) {
             return store.executeBatch([op]);
         }).then(function() {
-            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', itemId1); // insert item1
+            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', item1); // insert item1 again
         }).then(function(op) {
             return store.executeBatch([op]);
         }).then(function() {
-            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, itemId1);
+            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, item1.id);
         }).then(function(result) {
             $assert.areEqual(result, [
                 {
                     action: 'insert',
                     id: 2,
-                    itemId: itemId1,
-                    tableName: storeTestHelper.testTableName
+                    itemId: item1.id,
+                    tableName: storeTestHelper.testTableName,
+                    metadata: {}
                 }
             ]);
         }).then(function() {
             operationTableManager = createOperationTableManager(store); // create new instance of operation table manager
             return operationTableManager.initialize();
         }).then(function() {
-            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', itemId2); // insert item1
+            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', item2); // insert item2
         }).then(function(op) {
             return store.executeBatch([op]);
         }).then(function() {
-            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, itemId2);
+            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, item2.id);
         }).then(function(result) {
             $assert.areEqual(result, [
                 {
                     action: 'insert',
                     id: 3,
-                    itemId: itemId2,
-                    tableName: storeTestHelper.testTableName
+                    itemId: item2.id,
+                    tableName: storeTestHelper.testTableName,
+                    metadata: {}
                 }
             ]);
         }, function(error) {
@@ -283,13 +291,13 @@ $testGroup('operations tests')
     $test('readFirstPendingOperationWithData reads - insert log operation')
     .checkAsync(function () {
         var operationTableManager = createOperationTableManager(store);
-        var logRecord1 = { id: 1001, action: 'update', tableName: storeTestHelper.testTableName, itemId: 'a' },
-            logRecord2 = { id: 1,    action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'b' },
-            logRecord3 = { id: 1002,    action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'c' },
-            logRecord4 = { id: 2001, action: 'delete', tableName: storeTestHelper.testTableName, itemId: 'dd' },
-            data1 = { id: 'a' },
-            data2 = { id: 'b' },
-            data3 = { id: 'c' };            
+        var logRecord1 = { id: 1001, action: 'update', tableName: storeTestHelper.testTableName, itemId: 'a', metadata: testMetadata },
+            logRecord2 = { id: 1,    action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'b', metadata: testMetadata },
+            logRecord3 = { id: 1002,    action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'c', metadata: testMetadata },
+            logRecord4 = { id: 2001, action: 'delete', tableName: storeTestHelper.testTableName, itemId: 'dd', metadata: testMetadata },
+            data1 = { id: 'a', version: testVersion },
+            data2 = { id: 'b', version: testVersion },
+            data3 = { id: 'c', version: testVersion };            
             
         return operationTableManager.initialize().then(function() {
             return store.executeBatch([
@@ -325,13 +333,13 @@ $testGroup('operations tests')
     $test('readFirstPendingOperationWithData - update log operation')
     .checkAsync(function () {
         var operationTableManager = createOperationTableManager(store);
-        var logRecord1 = { id: 1001, action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'a' },
-            logRecord2 = { id: 1,    action: 'update', tableName: storeTestHelper.testTableName, itemId: 'b' },
-            logRecord3 = { id: 500,    action: 'update', tableName: storeTestHelper.testTableName, itemId: 'c' },
-            logRecord4 = { id: 2001, action: 'delete', tableName: storeTestHelper.testTableName, itemId: 'dd' },
-            data1 = { id: 'a' },
-            data2 = { id: 'b' },
-            data3 = { id: 'c' };
+        var logRecord1 = { id: 1001, action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'a', metadata: testMetadata },
+            logRecord2 = { id: 1,    action: 'update', tableName: storeTestHelper.testTableName, itemId: 'b', metadata: testMetadata },
+            logRecord3 = { id: 500,    action: 'update', tableName: storeTestHelper.testTableName, itemId: 'c', metadata: testMetadata },
+            logRecord4 = { id: 2001, action: 'delete', tableName: storeTestHelper.testTableName, itemId: 'dd', metadata: testMetadata },
+            data1 = { id: 'a', version: testVersion },
+            data2 = { id: 'b', version: testVersion },
+            data3 = { id: 'c', version: testVersion };
             
         return operationTableManager.initialize().then(function() {
             return store.executeBatch([
@@ -367,12 +375,12 @@ $testGroup('operations tests')
     $test('readFirstPendingOperationWithData - delete log operation')
     .checkAsync(function () {
         var operationTableManager = createOperationTableManager(store);
-        var logRecord1 = { id: 1001, action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'a' },
-            logRecord2 = { id: 1,    action: 'delete', tableName: storeTestHelper.testTableName, itemId: 'dd1' },
-            logRecord3 = { id: 5000,    action: 'delete', tableName: storeTestHelper.testTableName, itemId: 'dd2' },
-            logRecord4 = { id: 2001, action: 'update', tableName: storeTestHelper.testTableName, itemId: 'b' },
-            data1 = { id: 'a' },
-            data2 = { id: 'b' };            
+        var logRecord1 = { id: 1001, action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'a', metadata: testMetadata },
+            logRecord2 = { id: 1,    action: 'delete', tableName: storeTestHelper.testTableName, itemId: 'dd1', metadata: testMetadata },
+            logRecord3 = { id: 5000,    action: 'delete', tableName: storeTestHelper.testTableName, itemId: 'dd2', metadata: testMetadata },
+            logRecord4 = { id: 2001, action: 'update', tableName: storeTestHelper.testTableName, itemId: 'b', metadata: testMetadata },
+            data1 = { id: 'a', version: testVersion },
+            data2 = { id: 'b', version: testVersion };            
             
         return operationTableManager.initialize().then(function() {
             return store.executeBatch([
@@ -405,11 +413,11 @@ $testGroup('operations tests')
     $test('readFirstPendingOperationWithData - first log record without data record, next log record has data record')
     .checkAsync(function () {
         var operationTableManager = createOperationTableManager(store);
-        var logRecord1 = { id: 1001, action: 'udpate', tableName: storeTestHelper.testTableName, itemId: 'a' },
-            logRecord2 = { id: 1,    action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'b' },
-            logRecord3 = { id: 2001, action: 'delete', tableName: storeTestHelper.testTableName, itemId: 'dd' },
-            data1 = { id: 'a' },
-            data2 = { id: 'c' };            
+        var logRecord1 = { id: 1001, action: 'udpate', tableName: storeTestHelper.testTableName, itemId: 'a', metadata: testMetadata },
+            logRecord2 = { id: 1,    action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'b', metadata: testMetadata },
+            logRecord3 = { id: 2001, action: 'delete', tableName: storeTestHelper.testTableName, itemId: 'dd', metadata: testMetadata },
+            data1 = { id: 'a', version: testVersion },
+            data2 = { id: 'c', version: testVersion };            
             
         return operationTableManager.initialize().then(function() {
             return store.executeBatch([
@@ -437,7 +445,7 @@ $testGroup('operations tests')
     $test('readFirstPendingOperationWithData - first log record without data record, next log record does not exist')
     .checkAsync(function () {
         var operationTableManager = createOperationTableManager(store);
-        var logRecord1 = { id: 1,    action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'b' };            
+        var logRecord1 = { id: 1,    action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'b', metadata: testMetadata };            
             
         return operationTableManager.initialize().then(function() {
             return store.executeBatch([
@@ -471,9 +479,9 @@ $testGroup('operations tests')
     $test('removeLockedOperation')
     .checkAsync(function () {
         var operationTableManager = createOperationTableManager(store);
-        var logRecord1 = { id: 1, action: 'udpate', tableName: storeTestHelper.testTableName, itemId: 'a' },
-            logRecord2 = { id: 101,    action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'b' },
-            logRecord3 = { id: 2001, action: 'delete', tableName: storeTestHelper.testTableName, itemId: 'dd' };            
+        var logRecord1 = { id: 1, action: 'udpate', tableName: storeTestHelper.testTableName, itemId: 'a', metadata: testMetadata },
+            logRecord2 = { id: 101,    action: 'insert', tableName: storeTestHelper.testTableName, itemId: 'b', metadata: testMetadata },
+            logRecord3 = { id: 2001, action: 'delete', tableName: storeTestHelper.testTableName, itemId: 'dd', metadata: testMetadata };
             
         return operationTableManager.initialize().then(function() {
             return store.executeBatch([
@@ -492,17 +500,209 @@ $testGroup('operations tests')
         }, function(error) {
             $assert.fail(error);
         });
+    }),
+
+    // getMetadata tests - action: insert
+
+    $test('getMetadata - action is insert, new record has version')
+    .checkAsync(function () {
+        return verify_getMetadata('insert', undefined, {version: testVersion}, {version: testVersion});
+    }),
+    
+    $test('getMetadata - action is insert, new record has null version')
+    .checkAsync(function () {
+        return verify_getMetadata('insert', undefined, {version: null}, {version: null});
+    }),
+    
+    $test('getMetadata - action is insert, new record has no version')
+    .checkAsync(function () {
+        return verify_getMetadata('insert', undefined, {}, {version: undefined});
+    }),
+    
+    // getMetadata tests - action: upsert
+
+    $test('getMetadata - action is upsert, new record has version')
+    .checkAsync(function () {
+        return verify_getMetadata('upsert', undefined, {version: testVersion}, {version: testVersion});
+    }),
+    
+    $test('getMetadata - action is upsert, new record has null version')
+    .checkAsync(function () {
+        return verify_getMetadata('upsert', undefined, {version: null}, {version: null});
+    }),
+    
+    $test('getMetadata - action is upsert, new record has no version')
+    .checkAsync(function () {
+        return verify_getMetadata('upsert', undefined, {}, {version: undefined});
+    }),
+    
+    // getMetadata tests - action: update
+
+    $test('getMetadata - action is update, store has no such record, new record has version')
+    .checkAsync(function () {
+        return verify_getMetadata('update', undefined, {version: testVersion}, {version: testVersion});
+    }),
+    
+    $test('getMetadata - action is update, store has no such record, new record has null version')
+    .checkAsync(function () {
+        return verify_getMetadata('update', undefined, {version: null}, {version: null});
+    }),
+    
+    $test('getMetadata - action is update, store has no such record, new record has no version')
+    .checkAsync(function () {
+        return verify_getMetadata('update', undefined, {}, {});
+    }),
+    
+    $test('getMetadata - action is update, store has record without version, new record has version')
+    .checkAsync(function () {
+        return verify_getMetadata('update', {version: undefined}, {version: testVersion}, {version: testVersion});
+    }),
+    
+    $test('getMetadata - action is update, store has record without version, new record has null version')
+    .checkAsync(function () {
+        return verify_getMetadata('update', {version: undefined}, {version: null}, {version: null});
+    }),
+    
+    $test('getMetadata - action is update, store has record without version, new record has no version')
+    .checkAsync(function () {
+        return verify_getMetadata('update', {version: undefined}, {}, {version: null});
+    }),
+    
+    $test('getMetadata - action is update, store has record with version, new record has new version')
+    .checkAsync(function () {
+        return verify_getMetadata('update', {version: 'oldversion'}, {version: testVersion}, {version: testVersion});
+    }),
+
+    $test('getMetadata - action is update, store has record with version, new record has same version')
+    .checkAsync(function () {
+        return verify_getMetadata('update', {version: testVersion}, {version: testVersion}, {version: testVersion});
+    }),
+
+    $test('getMetadata - action is update, store has record with version, new record has null version')
+    .checkAsync(function () {
+        return verify_getMetadata('update', {version: testVersion}, {version: undefined}, {version: undefined});
+    }),
+
+    $test('getMetadata - action is update, store has record with version, new record has no version')
+    .checkAsync(function () {
+        return verify_getMetadata('update', {version: testVersion}, {}, {version: testVersion});
+    }),
+
+    // getMetadata tests - action: delete
+
+    $test('getMetadata - action is delete, store has no such record')
+    .checkAsync(function () {
+        return verify_getMetadata('delete', undefined, {}, {});
+    }),
+
+    $test('getMetadata - action is delete, store has record with version')
+    .checkAsync(function () {
+        return verify_getMetadata('delete', {version: testVersion}, {}, {version: testVersion});
+    }),
+
+    $test('getMetadata - action is delete, store has record with null version')
+    .checkAsync(function () {
+        return verify_getMetadata('delete', {version: null}, {}, {version: null});
+    }),
+
+    $test('getMetadata - action is delete, store has record with no version')
+    .checkAsync(function () {
+        return verify_getMetadata('delete', {}, {}, {version: null});
+    }),
+
+    $test('getMetadata - action is delete, store has record with no version, specified record has version')
+    .description('verify that version passed to getMetadata is not used in case of a delete operation')
+    .checkAsync(function () {
+        return verify_getMetadata('delete', {}, {version: testVersion}, {version: null});
+    }),
+
+    $test('getOperationForInsertingLog')
+    .description('verify that getOperationForInsertingLog uses whatever metadata is returned by getMetadata()')
+    .checkAsync(function () {
+        return verify_getOperation(function(operationTableManager) {
+            return operationTableManager._getOperationForInsertingLog(storeTestHelper.testTableName, 'someaction', {id: testId});
+        }, function(operation) {
+            $assert.areEqual(operation, {
+                action: 'upsert',
+                tableName: operationTableName,
+                data: {
+                    id: 1,
+                    tableName: storeTestHelper.testTableName,
+                    action: 'someaction',
+                    itemId: testId,
+                    metadata: 'some-metadata'
+                }
+            });
+        });
+    }),
+
+    $test('getOperationForUpdatingLog')
+    .description('verify that getOperationForInsertingLog uses whatever metadata is returned by getMetadata()')
+    .checkAsync(function () {
+        return verify_getOperation(function(operationTableManager) {
+            return operationTableManager._getOperationForUpdatingLog(1, storeTestHelper.testTableName, 'someaction', {id: testId});
+        }, function(operation) {
+            $assert.areEqual(operation, {
+                action: 'upsert',
+                tableName: operationTableName,
+                data: {
+                    id: 1,
+                    action: 'someaction',
+                    metadata: 'some-metadata'
+                }
+            });
+        });
     })
 );
 
+function verify_getOperation(getOperation, verifyOperation) {
+    var operationTableManager = createOperationTableManager(store);
+    operationTableManager.getMetadata = function() {
+        return Platform.async(function(callback) {
+            callback();
+        })().then(function() {
+            return 'some-metadata';
+        });
+    };
+
+    return operationTableManager.initialize().then(function() {
+        return getOperation(operationTableManager);
+    }).then(function(result) {
+        verifyOperation(result);
+    }, function(error) {
+        $assert.fail(error);
+    });
+}
+
+function verify_getMetadata(action, existingRecord, record, expectedMetadata) {
+    var operationTableManager = createOperationTableManager(store);
+    
+    return operationTableManager.initialize().then(function() {
+        // Setup the local table
+        if (existingRecord) {
+            existingRecord.id = testId;
+            return store.upsert(storeTestHelper.testTableName, existingRecord);
+        }
+    }).then(function(result) {
+        // call getMetadata
+        record.id = testId; 
+        return operationTableManager.getMetadata(storeTestHelper.testTableName, action, record);
+    }).then(function(result) {
+        // verify result of getMetadata
+        expectedMetadata = expectedMetadata;
+        $assert.areEqual(result, expectedMetadata);
+    }, function(error) {
+        $assert.fail(error);
+    });
+}
+
 // Perform the specified actions and verify that the operation table has the expected operations
 function performActionsAndVerifySuccess(actions, expectedOperations) {
-    var operationTableManager = createOperationTableManager(store),
-        itemId = 'abc';
+    var operationTableManager = createOperationTableManager(store);
 
-    return performActions(operationTableManager, itemId, actions).then(function() {
+    return performActions(operationTableManager, testItem, actions).then(function() {
         $assert.isNotNull(expectedOperations);
-        return verifyOperations(operationTableManager, itemId, expectedOperations);
+        return verifyOperations(operationTableManager, testItem.id, expectedOperations);
     }, function(error) {
         $assert.isNull(expectedOperations);
     });
@@ -510,11 +710,10 @@ function performActionsAndVerifySuccess(actions, expectedOperations) {
 
 // Perform the specified setupActions and then verify that errorAction fails
 function performActionsAndVerifyError(setupActions, errorAction) {
-    var operationTableManager = createOperationTableManager(store),
-        itemId = 'abc';
+    var operationTableManager = createOperationTableManager(store);
 
-    return performActions(operationTableManager, itemId, setupActions).then(function() {
-        return performActions(operationTableManager, itemId, [errorAction]);
+    return performActions(operationTableManager, testItem, setupActions).then(function() {
+        return performActions(operationTableManager, testItem.id, [errorAction]);
     }, function(error) {
         $assert.fail(error);
     }).then(function() {
@@ -526,18 +725,18 @@ function performActionsAndVerifyError(setupActions, errorAction) {
 
 // Perform actions specified by the actions array. Valid values for the actions
 // array are 'insert', 'update', 'delete', 'lock' and 'unlock'.
-function performActions(operationTableManager, itemId, actions) {
+function performActions(operationTableManager, item, actions) {
     var asyncChain = operationTableManager.initialize();
     for (var i in actions) {
-        asyncChain = performAction(asyncChain, operationTableManager, itemId, actions[i]);
+        asyncChain = performAction(asyncChain, operationTableManager, item, actions[i]);
     }
     return asyncChain;
 }
 
-function performAction(asyncChain, operationTableManager, itemId, action) {
+function performAction(asyncChain, operationTableManager, item, action) {
     return asyncChain.then(function() {
         if (action === 'insert' || action === 'update' || action === 'delete') {
-            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, action, itemId).then(function(operation) {
+            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, action, item).then(function(operation) {
                 return store.executeBatch([operation]);
             });
         } else if (action === 'lock') {
@@ -557,6 +756,7 @@ function verifyOperations(operationTableManager, itemId, expectedOperations) {
         for (var i in expectedOperations) {
             expectedOperations[i].tableName = storeTestHelper.testTableName;
             expectedOperations[i].itemId = itemId;
+            expectedOperations[i].metadata = expectedOperations[i].metadata || {};
         }
         
         $assert.areEqual(operations, expectedOperations);
