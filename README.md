@@ -127,7 +127,7 @@ Changes are pushed to the server, one change at a time. Pushing a change can res
 Here is how you register a push handler:
 ```
 syncContext.pushHandler = {
-    onConflict: function (serverRecord, clientRecord, pushError) {
+    onConflict: function (pushError) {
         // Handle the conflict
     },
     onError: function (pushError) {
@@ -136,11 +136,15 @@ syncContext.pushHandler = {
 };
 ```
 
-The `onConflict` callback passes the values of the server and client records at the time of push. Note that `serverRecord` is provided only for convenience, and _may not be always available_ based on the kind of conflict. Specifically, `serverRecord` will not be available when the server inserts or deletes a record and the client inserts a record with the same ID. This should be rare if you use GUIDs for IDs. The `pushError` object contains details of the error and has helper methods for resolving the conflict.
+The `pushError` object contains all the details of the error / conflict and has helper methods to resolve it.
 
 _Informational methods:_
 
 `pushError` provides the following informational methods:
+
+* `getServerRecord()`  - Get the value of the record on the server. Note that the server value will not be available in the _onError_ callback and _may not be always available_ in the _onConflict_ callback depending on the kind of conflict. Specifically, the server value will not be available when the server inserts or deletes a record and the client inserts a record with the same ID. This should be rare if you use GUIDs for IDs.
+
+* `getClientRecord()`  - Get the value of the record that was attempted to be pushed from the client to server 
 
 * `getError()`  - Get the detailed underlying error that caused the push to fail
 

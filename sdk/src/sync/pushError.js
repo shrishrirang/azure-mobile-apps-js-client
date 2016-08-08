@@ -318,7 +318,7 @@ function handlePushError(pushError, pushHandler) {
         if (pushError.isConflict()) {
             if (pushHandler && pushHandler.onConflict) {
                 // NOTE: value of server record will not be available in case of 409.
-                return pushHandler.onConflict(pushError.getServerRecord(), pushError.getClientRecord(), pushError);
+                return pushHandler.onConflict(pushError);
             }
         } else if (pushHandler && pushHandler.onError) {
             return pushHandler.onError(pushError);
