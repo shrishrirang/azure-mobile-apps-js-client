@@ -223,12 +223,10 @@ $testGroup('offline functional tests')
     .checkAsync(function () {
         
         syncContext.pushHandler = {};
-        syncContext.pushHandler.onConflict = function (serverRecord, clientRecord, pushError) {
+        syncContext.pushHandler.onConflict = function (pushError) {
             $assert.areEqual(pushError.getError().request.status, 409);
             
-            return table.lookup(clientRecord.id).then(function(serverValue) {
-                return pushError.changeAction('update');
-            });
+            return pushError.changeAction('update');
         };
         
         var actions = [
@@ -266,10 +264,10 @@ $testGroup('offline functional tests')
     .checkAsync(function () {
         
         syncContext.pushHandler = {};
-        syncContext.pushHandler.onConflict = function (serverRecord, clientRecord, pushError) {
+        syncContext.pushHandler.onConflict = function (pushError) {
             $assert.areEqual(pushError.getError().request.status, 412);
-            var newValue = clientRecord;
-            newValue.version = serverRecord.version;
+            var newValue = pushError.getClientRecord();
+            newValue.version = pushError.getServerRecord().version;
             return pushError.update(newValue);
         };
         
@@ -360,10 +358,10 @@ $testGroup('offline functional tests')
     .checkAsync(function () {
         
         syncContext.pushHandler = {};
-        syncContext.pushHandler.onConflict = function (serverRecord, clientRecord, pushError) {
+        syncContext.pushHandler.onConflict = function (pushError) {
             $assert.areEqual(pushError.getError().request.status, 412);
-            var newValue = clientRecord;
-            newValue.version = serverRecord.version;
+            var newValue = pushError.getClientRecord();
+            newValue.version = pushError.getServerRecord().version;
             return pushError.update(newValue);
         };
         
@@ -387,10 +385,10 @@ $testGroup('offline functional tests')
     .checkAsync(function () {
         
         syncContext.pushHandler = {};
-        syncContext.pushHandler.onConflict = function (serverRecord, clientRecord, pushError) {
+        syncContext.pushHandler.onConflict = function (pushError) {
             $assert.areEqual(pushError.getError().request.status, 412);
-            var newValue = clientRecord;
-            newValue.version = serverRecord.version;
+            var newValue = pushError.getClientRecord();
+            newValue.version = pushError.getServerRecord().version;
             return pushError.cancelAndUpdate(newValue).then(function() {
                 // We are going to push twice. We want pushHandler to be used only the first time.
                 syncContext.pushHandler = undefined;
@@ -436,10 +434,10 @@ $testGroup('offline functional tests')
     .checkAsync(function () {
         
         syncContext.pushHandler = {};
-        syncContext.pushHandler.onConflict = function (serverRecord, clientRecord, pushError) {
+        syncContext.pushHandler.onConflict = function (pushError) {
             $assert.areEqual(pushError.getError().request.status, 412);
-            var newValue = clientRecord;
-            newValue.version = serverRecord.version;
+            var newValue = pushError.getClientRecord();
+            newValue.version = pushError.getServerRecord().version;
             return pushError.cancelAndDiscard(newValue).then(function() {
                 // We are going to push twice. We want pushHandler to be used only the first time.
                 syncContext.pushHandler = undefined;
@@ -490,10 +488,10 @@ $testGroup('offline functional tests')
     .checkAsync(function () {
         
         syncContext.pushHandler = {};
-        syncContext.pushHandler.onConflict = function (serverRecord, clientRecord, pushError) {
+        syncContext.pushHandler.onConflict = function (pushError) {
             $assert.areEqual(pushError.getError().request.status, 412);
-            var newValue = clientRecord;
-            newValue.version = serverRecord.version;
+            var newValue = pushError.getClientRecord();
+            newValue.version = pushError.getServerRecord().version;
             return pushError.update(newValue);
         };
         
@@ -624,10 +622,10 @@ $testGroup('offline functional tests')
     .checkAsync(function () {
         
         syncContext.pushHandler = {};
-        syncContext.pushHandler.onConflict = function (serverRecord, clientRecord, pushError) {
+        syncContext.pushHandler.onConflict = function (pushError) {
             $assert.areEqual(pushError.getError().request.status, 412);
-            var newValue = clientRecord;
-            newValue.version = serverRecord.version;
+            var newValue = pushError.getClientRecord();
+            newValue.version = pushError.getServerRecord().version;
             return pushError.cancelAndDiscard(newValue).then(function() {
                 pushError.isHandled = false;
             });
@@ -665,10 +663,10 @@ $testGroup('offline functional tests')
     .checkAsync(function () {
         
         syncContext.pushHandler = {};
-        syncContext.pushHandler.onConflict = function (serverRecord, clientRecord, pushError) {
+        syncContext.pushHandler.onConflict = function (pushError) {
             $assert.areEqual(pushError.getError().request.status, 412);
-            var newValue = clientRecord;
-            newValue.version = serverRecord.version;
+            var newValue = pushError.getClientRecord();
+            newValue.version = pushError.getServerRecord().version;
             return pushError.cancelAndDiscard(newValue).then(function() {
                 throw 'some error';
             });
