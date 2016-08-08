@@ -17,7 +17,7 @@ var operationTableName = tableConstants.operationTableName,
  * Creates a pushError object that wraps the low level error encountered while pushing
  * and adds other useful methods for error handling.
  */
-function createPushError(store, storeTaskRunner, pushOperation, operationError) {
+function createPushError(store, operationTableManager, storeTaskRunner, pushOperation, operationError) {
     
     return {
         isHandled: false,
@@ -171,6 +171,7 @@ function createPushError(store, storeTaskRunner, pushOperation, operationError) 
     
     /**
      * Updates the client data record associated with the current operation.
+     * If required, the metadata in the log record will also be associated.
      *
      * @param newValue New value of the data record. 
      * 
@@ -197,10 +198,25 @@ function createPushError(store, storeTaskRunner, pushOperation, operationError) 
 
             //TODO: Do we need to disallow updating record if the record has been deleted after
             //we attempted push?
-                        
-            return store.upsert(pushOperation.logRecord.tableName, newValue).then(function() {
-                self.isHandled = this;
+
+            return operationTableManager.getMetadata(pushOperation.logRecord.tableName, 'upsert', newValue).then(function(metadata) {
+                pushOperation.logRecord.metadata = metadata;
+                return store.executeBatch([
+                    { // Update the log record
+                        tableName: operationTableName,
+                        action: 'upsert',
+                        data: pushOperation.logRecord
+                    },
+                    { // Update the record in the local table
+                        tableName: pushOperation.logRecord.tableName,
+                        action: 'upsert',
+                        data: newValue
+                    }
+                ]).then(function() {
+                    self.isHandled = this;
+                });
             });
+
         });
     }
     
@@ -216,8 +232,9 @@ function createPushError(store, storeTaskRunner, pushOperation, operationError) 
      * data table in the local store.
      * 
      * @param newAction New type of the operation. Valid values are 'insert', 'update' and 'delete'
-     * @param [newClientRecord] New value of the client record. The new record ID should match the original record ID. Also,
-     *                         a new record value cannot be specified if the new action is 'delete'
+     * @param [newClientRecord] New value of the client record. The new record ID should match the original record ID.
+     *                          If newAction is 'delete', only the version property will be read from newClientRecord. This is useful if
+     *                          the conflict handler changes an insert/update action to delete and wants to udpate the version.
      * 
      * @returns A promise that is fulfilled when the action is changed and, optionally, the data record is updated / deleted.
      */
@@ -230,22 +247,32 @@ function createPushError(store, storeTaskRunner, pushOperation, operationError) 
                     action: 'upsert',
                     data: makeCopy(pushOperation.logRecord)
                 };
-            
+
+            // If a new value for the record is specified, use the version property to update the metadata
+            // If not, there is nothing that needs to be changed in the metadata. Just use the metadata we already have.
+            if (newClientRecord) {
+                if (!newClientRecord.id) {
+                    throw new Error('New client record value must specify the record ID');
+                }
+                    
+                if (newClientRecord.id !== pushOperation.logRecord.itemId) {
+                    throw new Error('New client record value cannot change the record ID. Original ID: ' +
+                                    pushOperation.logRecord.id + ' New ID: ' + newClientRecord.id);
+                }
+
+                // FYI: logOperation.data and pushOperation.data are not the same thing!
+                logOperation.data.metadata = logOperation.data.metadata || {};
+                logOperation.data.metadata[tableConstants.sysProps.versionColumnName] = newClientRecord[tableConstants.sysProps.versionColumnName];
+            }
+
             if (newAction === 'insert' || newAction === 'update') {
                 
                 // Change the action as specified
+                var oldAction = logOperation.data.action;
                 logOperation.data.action = newAction;
-                
+
                 // Update the client record, if a new value is specified
                 if (newClientRecord) {
-                    
-                    if (!newClientRecord.id) {
-                        throw new Error('New client record value must specify the record ID');
-                    }
-                    
-                    if (newClientRecord.id !== pushOperation.logRecord.itemId) {
-                        throw new Error('New client record value cannot change the record ID. Original ID: ' + pushOperation.logRecord.id + ' New ID: ' + newClientRecord.id);
-                    }
                     
                     dataOperation = {
                         tableName: pushOperation.logRecord.tableName,
@@ -253,17 +280,20 @@ function createPushError(store, storeTaskRunner, pushOperation, operationError) 
                         data: newClientRecord
                     };
                     
+                } else if (oldAction !== 'insert' && oldAction !== 'update') {
+
+                    // If we are here, it means we are changing the action from delete to insert / update. 
+                    // In such a case we expect newClientRecord to be non-null as we won't otherwise know what to insert / update.
+                    // Example: changing delete to insert without specifying a newClientRecord is meaningless.
+                    throw new Error('Changing action from ' + oldAction + ' to ' + newAction +
+                                    ' without specifying a value for the associated record is not allowed!');
                 }
                 
             } else if (newAction === 'delete' || newAction === 'del') {
 
-                if (newClientRecord) {
-                    throw new Error('Cannot specify a new value for the client record if the new action is delete');
-                }
-
                 // Change the action to 'delete'
                 logOperation.data.action = 'delete';
-                
+
                 // Delete the client record as the new action is 'delete'
                 dataOperation = {
                     tableName: pushOperation.logRecord.tableName,
@@ -276,8 +306,7 @@ function createPushError(store, storeTaskRunner, pushOperation, operationError) 
             }
             
             // Execute the log and data operations
-            var operations = dataOperation ? [logOperation, dataOperation] : [logOperation];
-            return store.executeBatch(operations).then(function() {
+            return store.executeBatch([logOperation, dataOperation]).then(function() {
                 self.isHandled = true;
             });
         });

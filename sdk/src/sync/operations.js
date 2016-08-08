@@ -16,6 +16,7 @@ var Validate = require('../Utilities/Validate'),
     Query = require('azure-query-js').Query;
 
 var idPropertyName = tableConstants.idPropertyName,
+    versionColumnName = tableConstants.sysProps.versionColumnName,
     operationTableName = tableConstants.operationTableName;
     
 function createOperationTableManager(store) {
@@ -36,10 +37,11 @@ function createOperationTableManager(store) {
         readPendingOperations: readPendingOperations,
         readFirstPendingOperationWithData: readFirstPendingOperationWithData,
         removeLockedOperation: removeLockedOperation,
-        getLoggingOperation: getLoggingOperation
+        getLoggingOperation: getLoggingOperation,
+        getMetadata: getMetadata
     };
 
-    // Methods for testing purposes only
+    // Exports for testing purposes only
     api._getOperationForInsertingLog = getOperationForInsertingLog;
     api._getOperationForUpdatingLog = getOperationForUpdatingLog;
 
@@ -59,7 +61,8 @@ function createOperationTableManager(store) {
                 id: ColumnType.Integer,
                 tableName: ColumnType.String,
                 action: ColumnType.String,
-                itemId: ColumnType.String
+                itemId: ColumnType.String,
+                metadata: ColumnType.Object 
             }
         }).then(function() {
             return getMaxOperationId();
@@ -313,30 +316,36 @@ function createOperationTableManager(store) {
      * Gets the operation that will insert a new record in the operation table.
      */
     function getOperationForInsertingLog(tableName, action, item) {
-        return {
-            tableName: operationTableName,
-            action: 'upsert',
-            data: {
-                id: ++maxId,
-                tableName: tableName,
-                action: action,
-                itemId: item[idPropertyName]
-            }
-        };
+        return api.getMetadata(tableName, action, item).then(function(metadata) {
+            return {
+                tableName: operationTableName,
+                action: 'upsert',
+                data: {
+                    id: ++maxId,
+                    tableName: tableName,
+                    action: action,
+                    itemId: item[idPropertyName],
+                    metadata: metadata
+                }
+            };
+        });
     }
     
     /**
      * Gets the operation that will update an existing record in the operation table.
      */
     function getOperationForUpdatingLog(operationId, tableName, action, item) {
-        return {
-            tableName: operationTableName,
-            action: 'upsert',
-            data: {
-                id: operationId,
-                action: action
-            }
-        };
+        return api.getMetadata(tableName, action, item).then(function(metadata) {
+            return {
+                tableName: operationTableName,
+                action: 'upsert',
+                data: {
+                    id: operationId,
+                    action: action,
+                    metadata: metadata
+                }
+            };
+        });
     }
     
     /**
@@ -348,6 +357,40 @@ function createOperationTableManager(store) {
             action: 'delete',
             id: operationId
         };
+    }
+
+    /**
+     * Gets the metadata to associate with a log record in the operation table
+     * 
+     * @param action 'insert', 'update' and 'delete' correspond to the insert, update and delete operations.
+     *               'upsert' is a special action that is used only in the context of conflict handling.
+     */
+    function getMetadata(tableName, action, item) {
+        
+        return Platform.async(function(callback) {
+            callback();
+        })().then(function() {
+            var metadata = {};
+
+            // If action is update and item defines version property OR if action is insert / update,
+            // define metadata.version to be the item's version property
+            if (action === 'upsert' || 
+                action === 'insert' ||
+                (action === 'update' && item.hasOwnProperty(versionColumnName))) {
+                metadata[versionColumnName] = item[versionColumnName];
+                return metadata;
+            } else if (action == 'update' || action === 'delete') { // Read item's version property from the table
+                return store.lookup(tableName, item[idPropertyName], true /* suppressRecordNotFoundError */).then(function(result) {
+                    if (result) {
+                        metadata[versionColumnName] = result[versionColumnName];
+                    }
+                    return metadata;
+                });
+            } else {
+                throw new Error('Invalid action ' + action);
+            }
+        });
+        
     }
 
     /**
