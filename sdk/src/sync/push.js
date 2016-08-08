@@ -24,6 +24,9 @@ function createPushManager(client, store, storeTaskRunner, operationTableManager
     var pushTaskRunner = taskRunner(),
         lastProcessedOperationId,
         pushConflicts,
+        lastFailedOperationId,
+        retryCount,
+        maxRetryCount = 5,
         pushHandler;
     
     return {
@@ -50,6 +53,8 @@ function createPushManager(client, store, storeTaskRunner, operationTableManager
     // Resets the state for starting a new push operation
     function reset() {
         lastProcessedOperationId = -1; // Initialize to an invalid operation id
+        lastFailedOperationId = -1; // Initialize to an invalid operation id
+        retryCount = 0;
         pushConflicts = [];
     }
     
@@ -80,7 +85,18 @@ function createPushManager(client, store, storeTaskRunner, operationTableManager
                     //TODO: If the conflict isn't resolved but the error is marked as handled by the user,
                     //we can end up in an infinite loop. Guard against this by capping the max number of 
                     //times handlePushError can be called for the same record.
-                    return handlePushError(pushError, pushHandler);
+
+                    // We want to reset the retryCount when we move on to the next record
+                    if (lastFailedOperationId !== currentOperation.logRecord.id) {
+                        lastFailedOperationId = currentOperation.logRecord.id;
+                        retryCount = 0;
+                    }
+
+                    // Cap the number of times error handling logic is invoked for the same record
+                    if (retryCount < maxRetryCount) {
+                        ++retryCount;
+                        return handlePushError(pushError, pushHandler);
+                    }
                 });
             }).then(function() {
                 if (!pushError) { // no push error
