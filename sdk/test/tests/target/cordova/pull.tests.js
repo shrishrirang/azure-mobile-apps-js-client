@@ -105,7 +105,7 @@ $testGroup('pull tests')
 
 function pullAndValidateSettings(settings, expectedPageSize) {
     client = client.withFilter( function(req, next, callback) {
-        $assert.areEqual(req.url, "http://someurl/tables/sometable?$filter=(updatedAt ge datetimeoffset'1969-12-31T08:00:00.000Z')&$orderby=updatedAt&$top=" + 
+        $assert.areEqual(req.url, "http://someurl/tables/todoitem?$filter=(updatedAt ge datetimeoffset'1969-12-31T08:00:00.000Z')&$orderby=updatedAt&$top=" + 
                         expectedPageSize + "&__includeDeleted=true");
         callback('someerror', 'response');
     });
