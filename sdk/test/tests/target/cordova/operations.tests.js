@@ -15,7 +15,9 @@ var Platform = require('Platforms/Platform'),
     
 var createOperationTableManager = operations.createOperationTableManager,
     operationTableName = tableConstants.operationTableName,
-    store;
+    store,
+    testId = 'abc',
+    testItem = {id: testId};
 
 $testGroup('operations tests')
 
@@ -48,21 +50,20 @@ $testGroup('operations tests')
     
     $test('basic logging')
     .checkAsync(function () {
-        var operationTableManager = createOperationTableManager(store),
-            itemId = 'abc';
+        var operationTableManager = createOperationTableManager(store);
         
         return operationTableManager.initialize().then(function() {
-            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', itemId);
+            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', testItem);
         }).then(function(op) {
             return store.executeBatch([op]);
         }).then(function() {
-            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, itemId);
+            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, testItem.id);
         }).then(function(result) {
             $assert.areEqual(result, [
                 {
                     action: 'insert',
                     id: 1,
-                    itemId: itemId,
+                    itemId: testId,
                     tableName: storeTestHelper.testTableName
                 }
             ]);
@@ -74,40 +75,40 @@ $testGroup('operations tests')
     $test('operation ID generation')
     .checkAsync(function () {
         var operationTableManager = createOperationTableManager(store),
-            itemId1 = 'abc',
-            itemId2 = 'def';
+            item1 = {id: 'abc'},
+            item2 = {id: 'def'};
         
         return operationTableManager.initialize().then(function() {
-            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', itemId1); // insert item1
+            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', item1); // insert item1
         }).then(function(op) {
             return store.executeBatch([op]);
         }).then(function() {
-            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, itemId1);
+            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, item1);
         }).then(function(result) {
             $assert.areEqual(result, [
                 {
                     action: 'insert',
                     id: 1,
-                    itemId: itemId1,
+                    itemId: item1.id,
                     tableName: storeTestHelper.testTableName
                 }
             ]);
         }).then(function() {
-            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'delete', itemId1); // delete item1
+            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'delete', item1); // delete item1
         }).then(function(op) {
             return store.executeBatch([op]);
         }).then(function() {
-            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', itemId1); // insert item1
+            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', item1); // insert item1
         }).then(function(op) {
             return store.executeBatch([op]);
         }).then(function() {
-            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, itemId1);
+            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, item1.id);
         }).then(function(result) {
             $assert.areEqual(result, [
                 {
                     action: 'insert',
                     id: 2,
-                    itemId: itemId1,
+                    itemId: item1.id,
                     tableName: storeTestHelper.testTableName
                 }
             ]);
@@ -115,17 +116,17 @@ $testGroup('operations tests')
             operationTableManager = createOperationTableManager(store); // create new instance of operation table manager
             return operationTableManager.initialize();
         }).then(function() {
-            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', itemId2); // insert item1
+            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, 'insert', item2); // insert item2
         }).then(function(op) {
             return store.executeBatch([op]);
         }).then(function() {
-            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, itemId2);
+            return operationTableManager.readPendingOperations(storeTestHelper.testTableName, item2);
         }).then(function(result) {
             $assert.areEqual(result, [
                 {
                     action: 'insert',
                     id: 3,
-                    itemId: itemId2,
+                    itemId: item2.id,
                     tableName: storeTestHelper.testTableName
                 }
             ]);
@@ -497,12 +498,11 @@ $testGroup('operations tests')
 
 // Perform the specified actions and verify that the operation table has the expected operations
 function performActionsAndVerifySuccess(actions, expectedOperations) {
-    var operationTableManager = createOperationTableManager(store),
-        itemId = 'abc';
+    var operationTableManager = createOperationTableManager(store);
 
-    return performActions(operationTableManager, itemId, actions).then(function() {
+    return performActions(operationTableManager, testItem, actions).then(function() {
         $assert.isNotNull(expectedOperations);
-        return verifyOperations(operationTableManager, itemId, expectedOperations);
+        return verifyOperations(operationTableManager, testItem.id, expectedOperations);
     }, function(error) {
         $assert.isNull(expectedOperations);
     });
@@ -513,8 +513,8 @@ function performActionsAndVerifyError(setupActions, errorAction) {
     var operationTableManager = createOperationTableManager(store),
         itemId = 'abc';
 
-    return performActions(operationTableManager, itemId, setupActions).then(function() {
-        return performActions(operationTableManager, itemId, [errorAction]);
+    return performActions(operationTableManager, testItem.id, setupActions).then(function() {
+        return performActions(operationTableManager, testItem.id, [errorAction]);
     }, function(error) {
         $assert.fail(error);
     }).then(function() {
@@ -526,18 +526,18 @@ function performActionsAndVerifyError(setupActions, errorAction) {
 
 // Perform actions specified by the actions array. Valid values for the actions
 // array are 'insert', 'update', 'delete', 'lock' and 'unlock'.
-function performActions(operationTableManager, itemId, actions) {
+function performActions(operationTableManager, item, actions) {
     var asyncChain = operationTableManager.initialize();
     for (var i in actions) {
-        asyncChain = performAction(asyncChain, operationTableManager, itemId, actions[i]);
+        asyncChain = performAction(asyncChain, operationTableManager, item, actions[i]);
     }
     return asyncChain;
 }
 
-function performAction(asyncChain, operationTableManager, itemId, action) {
+function performAction(asyncChain, operationTableManager, item, action) {
     return asyncChain.then(function() {
         if (action === 'insert' || action === 'update' || action === 'delete') {
-            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, action, itemId).then(function(operation) {
+            return operationTableManager.getLoggingOperation(storeTestHelper.testTableName, action, item).then(function(operation) {
                 return store.executeBatch([operation]);
             });
         } else if (action === 'lock') {

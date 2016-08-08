@@ -360,7 +360,7 @@ function performActionWithCustomLogging(id, action) {
     var syncContext;
     return getSyncContext().then(function(context) {
         syncContext = context;
-        syncContext._getOperationTableManager().getLoggingOperation = function(tableName, action, itemId) {
+        syncContext._getOperationTableManager().getLoggingOperation = function(tableName, action, item) {
             return Platform.async(function(callback) {
                 callback();
             })().then(function() {
@@ -371,7 +371,7 @@ function performActionWithCustomLogging(id, action) {
                         id: testOperationId,
                         tableName: tableName,
                         action: action + '_override',
-                        itemId: itemId
+                        itemId: item.id
                     }
                 };
             });
@@ -405,7 +405,7 @@ function createSyncContextWithLongExecutionTime(callback1, callback2) {
         // Override getLoggingOperation() and simulate long execution time
         
         var getLoggingOperation = syncContext._getOperationTableManager().getLoggingOperation;
-        syncContext._getOperationTableManager().getLoggingOperation = function(tableName, action, itemId) {
+        syncContext._getOperationTableManager().getLoggingOperation = function(tableName, action, item) {
             var args = arguments;
             callback1();
             return Platform.async(function(callback) {
