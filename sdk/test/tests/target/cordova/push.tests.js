@@ -256,7 +256,7 @@ function pushAndValidateRetryCount(responses1, expectedPushCount1, responses2, e
         onError: function(pushError) {
             pushError.isHandled = true;
         }
-    }
+    };
 
     var table = client.getSyncTable(storeTestHelper.testTableName);
     return table.del({
@@ -268,7 +268,7 @@ function pushAndValidateRetryCount(responses1, expectedPushCount1, responses2, e
             price: 2
         });
     }).then(function() {
-        return client.getSyncContext().push()
+        return client.getSyncContext().push();
     }).then(function() {
         $assert.areEqual(firstRecordPushCount, expectedPushCount1);
         $assert.areEqual(secondRecordPushCount, expectedPushCount2);
