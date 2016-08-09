@@ -1,5 +1,10 @@
 # Azure Mobile Apps JavaScript SDK Change Log
 
+### cordova-2.0.0-rc1
+- ** __BREAKING CHANGE__ ** - `onConflict(serverRecord, clientRecord, pushError)` method of `pushError` has been changed to `onConflict(pushError)` [ f1167bc ](https://github.com/Azure/azure-mobile-apps-js-client/commit/f1167bc0f656241e13e867b3ebc7170d93492df5)
+- [Issue #145](https://github.com/Azure/azure-mobile-apps-js-client/issues/145) - Bug fix: Invalid push error handling can cause push to run endlessly [ a2287d4 ](https://github.com/Azure/azure-mobile-apps-js-client/commit/a2287d41cda16cdbd35ccc8bba83041e8cdb30a8)
+- [Issue #179](https://github.com/Azure/azure-mobile-apps-js-client/issues/179) - Fix conflict detection while pushing delete operations [ 366f055](https://github.com/Azure/azure-mobile-apps-js-client/commit/366f0551aabc1b220502727ccf46d81f1ef71469)
+
 ### cordova-2.0.0-beta6
 - [Issue #135](https://github.com/Azure/azure-mobile-apps-js-client/issues/135) - Pull supports custom page size [ 34b9be5](https://github.com/Azure/azure-mobile-apps-js-client/commit/34b9be55a4432af78501b3028b728790aa89ca0b)
 - [Issue #131](https://github.com/Azure/azure-mobile-apps-js-client/issues/131) - Updated store to be insensitive to table and column name casing [4958927](https://github.com/Azure/azure-mobile-apps-js-client/commit/49589276c6ebdb792455d0e5dd087ac908d30c50)

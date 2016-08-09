@@ -221,12 +221,10 @@ store
 
 #### Future work
 
-This is a first preview of the offline data sync feature and have several features missing. Also, only limited testing of the offline sync features has been performed at this point of time. 
-
-Some of the missing features are:
-- cancellability of push and pull
-- automatically triggering a push when a pull is performed
-- advanced querying functions like indexOf, etc do not work on the local store
+Brief list of work planned in the future:
+- ability to cancel push and pull operations
+- triggering a push automatically when a pull is performed
+- support for math and date/time functions while querying for records
 - callback to allow changing how records are sent to the server during a push
 - configurable ID column. Currently ID column has to be named 'id'.
 
