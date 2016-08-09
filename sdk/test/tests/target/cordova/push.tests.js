@@ -57,7 +57,7 @@ $testGroup('push tests')
             id: '1',
             price: 2
         }).then(function() {
-            return pushAndValidateFeatures(false /* incremental sync */);
+            return pushAndValidateFeatures();
         });
     }),
 
@@ -73,7 +73,7 @@ $testGroup('push tests')
                 price: 2
             });
         }).then(function() {
-            return pushAndValidateFeatures(false /* incremental sync */);
+            return pushAndValidateFeatures();
         });
     }),
 
@@ -89,7 +89,7 @@ $testGroup('push tests')
                 price: 2
             });
         }).then(function() {
-            return pushAndValidateFeatures(false /* incremental sync */);
+            return pushAndValidateFeatures();
         });
     }),
 
@@ -106,6 +106,37 @@ $testGroup('push tests')
     $test('Verify push uses correct version - delete')
     .checkAsync(function () {
         return pushAndValidateIfMatch('delete');
+    }),
+
+    $test('Retry count: special case - successful in the first attempt')
+    .checkAsync(function () {
+        var table = client.getSyncTable(storeTestHelper.testTableName);
+        return pushAndValidateRetryCount([200], 1, [200], 1);
+    }),
+
+    $test('Retry count: pushing first record successful after one retry')
+    .checkAsync(function () {
+        var table = client.getSyncTable(storeTestHelper.testTableName);
+        return pushAndValidateRetryCount([412, 200], 2, [200], 1);
+    }),
+
+    $test('Retry count: retry limit hit before first record is successfully pushed')
+    .checkAsync(function () {
+        var table = client.getSyncTable(storeTestHelper.testTableName);
+        return pushAndValidateRetryCount([412, 412, 412, 412, 412, 200], 6, [200], 1);
+    }),
+
+    $test('Retry count: push limit almost hit while pushing first record as well as second record')
+    .description('verifies that retry count is reset after first record push is complete')
+    .checkAsync(function () {
+        var table = client.getSyncTable(storeTestHelper.testTableName);
+        return pushAndValidateRetryCount([412, 412, 412, 412, 200], 5, [412, 412, 412, 412, 200], 5);
+    }),
+
+    $test('Retry count: response status code 500, successful after few retries')
+    .checkAsync(function () {
+        var table = client.getSyncTable(storeTestHelper.testTableName);
+        return pushAndValidateRetryCount([500, 500, 500, 200], 4, [500, 500, 500, 200], 4);
     })
 );
 
@@ -192,5 +223,54 @@ function pushAndValidateHeader(action) {
         $assert.fail('failure expected');
     }, function(error) {
         $assert.isTrue(filterInvoked);
+    });
+}
+
+// Verifies that conflict / error handling does not go in an infinite loop
+function pushAndValidateRetryCount(responses1, expectedPushCount1, responses2, expectedPushCount2) {
+
+    var firstRecordPushCount = 0,
+        secondRecordPushCount = 0;
+
+    filter = function(req, next, callback) {
+        if (req.url.indexOf('record1') >= 0) {
+            ++firstRecordPushCount;
+            if (firstRecordPushCount <= responses1.length) {
+                return callback(null, {status: responses1[firstRecordPushCount-1] }); 
+            }
+        } else if (req.url.indexOf('record2') >= 0) {
+            ++secondRecordPushCount;
+            if (secondRecordPushCount <= responses2.length) {
+                return callback(null, {status: responses2[secondRecordPushCount-1] }); 
+            }
+        }
+
+        $assert.fail('something is wrong');
+        return callback('something is wrong');
+    };
+
+    client.getSyncContext().pushHandler = {
+        onConflict: function(pushError) {
+            pushError.isHandled = true;
+        },
+        onError: function(pushError) {
+            pushError.isHandled = true;
+        }
+    }
+
+    var table = client.getSyncTable(storeTestHelper.testTableName);
+    return table.del({
+        id: 'record1',
+        price: 2
+    }).then(function() {
+        return table.del({
+            id: 'record2',
+            price: 2
+        });
+    }).then(function() {
+        return client.getSyncContext().push()
+    }).then(function() {
+        $assert.areEqual(firstRecordPushCount, expectedPushCount1);
+        $assert.areEqual(secondRecordPushCount, expectedPushCount2);
     });
 }
