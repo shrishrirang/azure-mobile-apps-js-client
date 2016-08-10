@@ -710,7 +710,7 @@ $testGroup('offline functional tests')
     $test('Conflict detection - update')
     .checkAsync(function () {
         
-        return verifyConflict(['serverinsert', 'vanillapull', 'serverupdate', 'clientupdate', 'push'], 412);
+        return verifyConflict(['serverinsert', 'vanillapull', 'serverdelete', 'clientupdate', 'push'], 412);
     }),
 
     $test('Conflict detection - delete')
@@ -722,15 +722,22 @@ $testGroup('offline functional tests')
 
 function verifyConflict(actions, expectedResponseCode) {
     syncContext.pushHandler = {};
-    syncContext.pushHandler.onConflict = function (serverRecord, clientRecord, pushError) {
-        $assert.areEqual(pushError.getError().request.status, expectedResponseCode);
+    var observedResponseCode; 
+    syncContext.pushHandler.onConflict = function (pushError) {
+        observedResponseCode = pushError.getError().request.status;
+    };
+
+    syncContext.pushHandler.onError = function (pushError) {
+        $assert.fail('not expected');
     };
 
     actions.push(function(conflicts) {
         $assert.areEqual(conflicts.length, 1);
     });
 
-    return performActions(actions);
+    return performActions(actions).then(function() {
+       $assert.areEqual(observedResponseCode, expectedResponseCode);
+    });
 }
 
 function performActions (actions) {
