@@ -6,8 +6,8 @@
 /*global WinJS:false, Windows:false, $__fileVersion__:false, $__version__:false */
 
 var _ = require('../../Utilities/Extensions'),
-    Validate = require('../../Utilities/Validate'),
     WebAuthBroker = require('../../LoginUis/WebAuthBroker'),
+    Validate = require('../../Utilities/Validate'),
     Constants = require('../../Generated/Constants.js');
 
 exports.async = function async(func) {

@@ -14,5 +14,7 @@ var browserExports = require('../web/Platform');
 // simply returning browserExports to work around a limitation / bug
 // in browserify's cyclic dependency handling 
 for (var i in browserExports) {
-    module.exports[i] = browserExports[i];
+    exports[i] = browserExports[i];
 }
+
+exports.sdkExports = require('./sdkExports');

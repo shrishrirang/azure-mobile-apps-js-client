@@ -235,6 +235,8 @@ exports.allowPlatformToMutateOriginal = function (original, updated) {
     return updated;
 };
 
+exports.sdkExports = require('./sdkExports');
+
 function getBestTransport() {
     // We cache this just because it gets called such a lot
     if (!bestAvailableTransport) {
