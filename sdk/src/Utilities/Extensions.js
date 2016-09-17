@@ -6,7 +6,7 @@
 /*global XMLHttpRequest:false */
 
 var Validate = require('./Validate');
-var Platform = require('Platforms/Platform');
+var Platform = require('../Platform');
 var _ = exports;
 
 exports.isNull = function (value) {

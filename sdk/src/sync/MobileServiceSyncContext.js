@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 
 var Validate = require('../Utilities/Validate'),
-    Platform = require('Platforms/Platform'),
+    Platform = require('../Platform'),
     createOperationTableManager = require('./operations').createOperationTableManager,
     taskRunner = require('../Utilities/taskRunner'),
     createPullManager = require('./pull').createPullManager,

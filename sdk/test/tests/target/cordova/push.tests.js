@@ -8,7 +8,7 @@
  * The push module has minimal unit tests and relies more on functional tests for validation
  */
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../../src/Platform'),
     Query = require('azure-query-js').Query,
     createPushManager = require('../../../../src/sync/push').createPushManager,
     tableConstants = require('../../../../src/constants').table,
@@ -16,7 +16,7 @@ var Platform = require('Platforms/Platform'),
     storeTestHelper = require('./storeTestHelper'),
     runner = require('../../../../src/Utilities/taskRunner'),
     createOperationTableManager = require('../../../../src/sync/operations').createOperationTableManager,
-    MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore');
+    MobileServiceSqliteStore = require('../../../../src/Platform/cordova/MobileServiceSqliteStore');
 
 var operationTableName = tableConstants.operationTableName,
     store,

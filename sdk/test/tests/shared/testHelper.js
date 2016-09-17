@@ -6,7 +6,7 @@
  * @file Test helper module
  */
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../src/Platform'),
     _ = require('../../../src/Utilities/Extensions');
 
 /**

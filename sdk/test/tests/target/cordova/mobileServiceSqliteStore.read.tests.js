@@ -6,10 +6,10 @@
  * @file MobileServiceSqliteStore.read(..) unit tests
  */
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../../src/Platform'),
     Query = require('azure-query-js').Query,
     storeTestHelper = require('./storeTestHelper'),
-    MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore'),
+    MobileServiceSqliteStore = require('../../../../src/Platform/cordova/MobileServiceSqliteStore'),
     store;
 
 $testGroup('SQLiteStore - read tests')

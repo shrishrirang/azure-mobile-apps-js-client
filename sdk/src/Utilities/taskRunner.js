@@ -7,7 +7,7 @@
  */
 
 var Validate = require('./Validate'),
-    Platform = require('Platforms/Platform');
+    Platform = require('../Platform');
 
 module.exports = function () {
     

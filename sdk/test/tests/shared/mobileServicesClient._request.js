@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../src/Platform'),
     MobileServiceClient = require('../../../src/MobileServiceClient');
 
 $testGroup('MobileServiceClient._request',

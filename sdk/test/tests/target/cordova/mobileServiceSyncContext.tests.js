@@ -6,14 +6,14 @@
  * @file MobileServiceSyncContext unit tests
  */
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../../src/Platform'),
     Query = require('azure-query-js').Query,
     operations = require('../../../../src/sync/operations'),
     MobileServiceClient = require('../../../../src/MobileServiceClient'),
     tableConstants = require('../../../../src/constants').table,
     MobileServiceSyncContext = require('../../../../src/sync/MobileServiceSyncContext'),
     storeTestHelper = require('./storeTestHelper'),
-    MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore');
+    MobileServiceSqliteStore = require('../../../../src/Platform/cordova/MobileServiceSqliteStore');
     
 var store,
     testOperationId = 100000,

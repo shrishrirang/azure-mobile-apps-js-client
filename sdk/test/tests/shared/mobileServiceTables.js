@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 
 var testData = require('../../misc/constants'),
-    Platform = require('Platforms/Platform'),
+    Platform = require('../../../src/Platform'),
     MobileServiceClient = require('../../../src/MobileServiceClient'),
     MobileServiceTable = require('../../../src/MobileServiceTable');
 

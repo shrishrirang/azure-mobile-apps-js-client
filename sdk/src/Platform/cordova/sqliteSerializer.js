@@ -8,7 +8,7 @@
  *       a deserialization operation is determined by the specified column definition.
  */
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('.'),
     Validate = require('../../Utilities/Validate'),
     _ = require('../../Utilities/Extensions'),
     ColumnType = require('../../sync/ColumnType'),

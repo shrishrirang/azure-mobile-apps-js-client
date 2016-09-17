@@ -6,9 +6,9 @@
  * @file MobileServiceSqliteStore.del(..) unit tests
  */
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../../src/Platform'),
     Query = require('azure-query-js').Query,
-    MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore');
+    MobileServiceSqliteStore = require('../../../../src/Platform/cordova/MobileServiceSqliteStore');
     storeTestHelper = require('./storeTestHelper');
 
 var store;

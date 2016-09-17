@@ -6,10 +6,10 @@
  * @file Helper file for local store unit tests
  */
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../../src/Platform'),
     Query = require('azure-query-js').Query,
     operations = require('../../../../src/sync/operations'),
-    MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore'),
+    MobileServiceSqliteStore = require('../../../../src/Platform/cordova/MobileServiceSqliteStore'),
     operationTableName = require('../../../../src/constants').table.operationTableName,
     pulltimeTableName = require('../../../../src/constants').table.pulltimeTableName,
     testTableName = 'todoitem',

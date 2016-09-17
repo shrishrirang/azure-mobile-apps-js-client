@@ -7,7 +7,7 @@
  * This uses the https://www.npmjs.com/package/cordova-sqlite-storage Cordova plugin.
  */
  
-var Platform = require('Platforms/Platform'),
+var Platform = require('.'),
     Validate = require('../../Utilities/Validate'),
     _ = require('../../Utilities/Extensions'),
     ColumnType = require('../../sync/ColumnType'),

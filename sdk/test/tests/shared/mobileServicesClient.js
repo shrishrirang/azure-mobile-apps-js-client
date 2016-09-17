@@ -4,7 +4,7 @@
 
 // revert isvalidate, isarray, etc from validate.js, extensions.js and corresponding 2 test files and *.resjson
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../src/Platform'),
     MobileServiceClient = require('../../../src/MobileServiceClient');
 
 $testGroup('MobileServiceClient.js',

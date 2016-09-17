@@ -9,13 +9,13 @@
 // These tests need the todoitem (quickstart) table to be setup in the backend with the name
 // matching storeTestHelper.testTableName
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../../src/Platform'),
     Query = require('azure-query-js').Query,
     pullManager = require('../../../../src/sync/pull'),
     _ = require('../../../../src/Utilities/Extensions'),
     MobileServiceSyncContext = require('../../../../src/sync/MobileServiceSyncContext'),
     MobileServiceClient = require('../../../../src/MobileServiceClient'),
-    MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore'),
+    MobileServiceSqliteStore = require('../../../../src/Platform/cordova/MobileServiceSqliteStore'),
     serverUrl = require('./config').server,
     uuid = require('node-uuid'),
     storeTestHelper = require('./storeTestHelper');

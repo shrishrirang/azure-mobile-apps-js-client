@@ -8,7 +8,7 @@
 
 var Validate = require('../Utilities/Validate'),
     Query = require('azure-query-js').Query,
-    Platform = require('Platforms/Platform'),
+    Platform = require('../Platform'),
     taskRunner = require('../Utilities/taskRunner'),
     MobileServiceTable = require('../MobileServiceTable'),
     constants = require('../constants'),
