@@ -1,11 +1,3 @@
-var remapify = require('remapify');
-
-function definePlatformMappings(mappings) {
-    return function(b) {
-        b.plugin(remapify, mappings);
-    };
-}
-
 module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
@@ -84,27 +76,18 @@ module.exports = function(grunt) {
             },
             web: {
                 src: '<%= files.web %>',
-                dest: './sdk/src/generated/MobileServices.Web.js',
-                options: {
-                    preBundleCB: definePlatformMappings( [ { src: '**/*.js', cwd: __dirname + '/sdk/src/Platforms/web', expose: 'Platforms' } ] )
-                }
+                dest: './sdk/src/generated/MobileServices.Web.js'
             },
             cordova: {
                 src: '<%= files.cordova %>',
-                dest: './sdk/src/generated/MobileServices.Cordova.js',
-                options: {
-                    preBundleCB: definePlatformMappings( [ { src: '**/*.js', cwd: __dirname + '/sdk/src/Platforms/cordova', expose: 'Platforms' } ] )
-                }
+                dest: './sdk/src/generated/MobileServices.Cordova.js'
             },
             webTest: {
                 src: [
                     '<%= files.web %>',
                     '<%= files.testcore %>'
                 ],
-                dest: './sdk/test/app/browser/generated/tests.js',
-                options: {
-                    preBundleCB: definePlatformMappings( [ { src: '**/*.js', cwd: __dirname + '/sdk/src/Platforms/web', expose: 'Platforms' } ] )
-                }
+                dest: './sdk/test/app/browser/generated/tests.js'
             },
             cordovaTest: {
                 src: [
@@ -112,10 +95,7 @@ module.exports = function(grunt) {
                     '<%= files.cordova %>',
                     './sdk/test/tests/target/cordova/**/*.js'
                 ],
-                dest: './sdk/test/app/cordova/www/scripts/generated/tests.js',
-                options: {
-                    preBundleCB: definePlatformMappings( [ { src: '**/*.js', cwd: __dirname + '/sdk/src/Platforms/cordova', expose: 'Platforms' } ] )
-                }
+                dest: './sdk/test/app/cordova/www/scripts/generated/tests.js'
             },
         },
         copy: {
