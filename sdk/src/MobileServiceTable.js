@@ -286,16 +286,12 @@ MobileServiceTable.prototype.insert = Platform.async(
                 if (_.isString(id)) {
                     // String Id's are allowed iif using 'id'
                     if (idNames[i] !== idPropertyName) {
-                        throw _.format(
-                            Platform.getResourceString("MobileServiceTable_InsertIdAlreadySet"),
-                            idPropertyName);
+                        throw new Error('Cannot insert if the ' + idPropertyName + ' member is already set.');
                     } else {
                         Validate.isValidId(id, idPropertyName);
                     }
                 } else {
-                    throw _.format(
-                        Platform.getResourceString("MobileServiceTable_InsertIdAlreadySet"),
-                        idPropertyName);
+                    throw new Error('Cannot insert if the ' + idPropertyName + ' member is already set.');
                 }
             }
         }
@@ -437,7 +433,7 @@ MobileServiceTable.prototype.refresh = Platform.async(
         if (!_.isValidId(instance[idPropertyName], idPropertyName))
         {
             if (typeof instance[idPropertyName] === 'string' && instance[idPropertyName] !== '') {
-                throw _.format(Platform.getResourceString("Validate_InvalidId"), idPropertyName);
+                throw new Error('Invalid ID: ' + idPropertyName);
             } else {
                 callback(null, instance);
             }
