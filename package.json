@@ -3,34 +3,28 @@
   "description": "Javascript client for Azure Mobile Apps. For more details visit http://azure.microsoft.com/en-us/develop/mobile",
   "version": "2.0.0-beta6",
   "devDependencies": {
-    "azure-odata-sql": "~0.0.3",
-    "azure-query-js": "~0.0.3",
     "browserify": "~11.1.0",
     "browserify-derequire": "~0.9.4",
     "es6-promise": "^3.1.2",
-    "esprima": "~2.6.0",
     "fs-sync": "~1.0.2",
     "grunt": "~0.4.5",
     "grunt-browserify": "~4.0.1",
     "grunt-cli": "^0.1.13",
-    "grunt-contrib-concat": "~0.5.0",
     "grunt-contrib-copy": "~0.8.2",
-    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-contrib-jshint": "^1.0.0",
     "grunt-contrib-nodeunit": "~0.4.1",
     "grunt-contrib-uglify": "~0.6.0",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-exec": "~0.4.6",
     "http-server": "^0.9.0",
-    "node-uuid": "^1.4.7",
+    "package-json-versionify": "^1.0.2",
     "qunitjs": "^1.23.1",
-    "remapify": "~2.0.3",
     "request": "^2.69.0",
     "rimraf": "^2.5.2",
-    "verror": "^1.6.1",
     "wd": "^0.4.0"
   },
   "license": "Apache-2.0",
-  "main": "dist/MobileServices.Web.min.js",
+  "main": "sdk/src/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/azure/azure-mobile-apps-js-client.git"
@@ -47,5 +41,11 @@
     "browserut": "http-server sdk/test/app/browser/ -p 8081 -o http://localhost:8081/index.html -c-1",
     "hostandroidut": "http-server sdk/test/app/cordova/platforms/android/assets/www/ -p 8080 -c-1",
     "testsetup": "node e2etest/scripts/setup.js"
+  },
+  "dependencies": {
+    "azure-odata-sql": "^0.1.0",
+    "azure-query-js": "^0.1.0",
+    "node-uuid": "^1.4.7",
+    "verror": "^1.8.1"
   }
 }

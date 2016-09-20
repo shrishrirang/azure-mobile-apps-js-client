@@ -6,11 +6,11 @@
  * @file unit tests for the 'operations' module
  */
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../../src/Platform'),
     Query = require('azure-query-js').Query,
     operations = require('../../../../src/sync/operations'),
     tableConstants = require('../../../../src/constants').table,
-    MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore'),
+    MobileServiceSqliteStore = require('../../../../src/Platform/cordova/MobileServiceSqliteStore'),
     storeTestHelper = require('./storeTestHelper');
     
 var createOperationTableManager = operations.createOperationTableManager,

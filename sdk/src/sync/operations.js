@@ -8,7 +8,7 @@
  */
 
 var Validate = require('../Utilities/Validate'),
-    Platform = require('Platforms/Platform'),
+    Platform = require('../Platform'),
     ColumnType = require('./ColumnType'),
     taskRunner = require('../Utilities/taskRunner'),
     tableConstants = require('../constants').table,

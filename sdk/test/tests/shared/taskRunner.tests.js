@@ -7,7 +7,7 @@
  */
 
 var taskRunner = require('../../../src/Utilities/taskRunner'),
-    Platform = require('Platforms/Platform');
+    Platform = require('../../../src/Platform');
 
 var asyncTaskDuration = 100; // milliseconds
 

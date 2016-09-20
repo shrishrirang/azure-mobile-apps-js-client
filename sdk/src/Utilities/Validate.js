@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 
 var _ = require('./Extensions');
-var Platform = require('Platforms/Platform');
+var Platform = require('../Platform');
 
 exports.notNull = function (value, name) {
     /// <summary>

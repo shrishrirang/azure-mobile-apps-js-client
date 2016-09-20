@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 
 var Query = require('azure-query-js').Query,
-    Platform = require('Platforms/Platform');
+    Platform = require('./Platform');
 
 // Copy select Query operators to the table so queries can be created
 // compactly.  We'll just add them to the table prototype and then

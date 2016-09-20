@@ -6,7 +6,7 @@ var Validate = require('../Utilities/Validate'),
     Query = require('azure-query-js').Query,
     _ = require('../Utilities/Extensions'),
     tableHelper = require('../tableHelper'),
-    Platform = require('Platforms/Platform');
+    Platform = require('../Platform');
 
 /**
  * Creates an instance of MobileServiceSyncTable

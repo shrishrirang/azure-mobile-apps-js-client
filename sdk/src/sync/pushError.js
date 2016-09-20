@@ -6,7 +6,7 @@
  * @file Table push error handling implementation. Defines various methods for resolving conflicts
  */
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../Platform'),
     _ = require('../Utilities/Extensions'),
     tableConstants = require('../constants').table;
     

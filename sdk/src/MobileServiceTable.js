@@ -4,7 +4,7 @@
 
 var _ = require('./Utilities/Extensions');
 var Validate = require('./Utilities/Validate');
-var Platform = require('Platforms/Platform');
+var Platform = require('./Platform');
 var Query = require('azure-query-js').Query;
 var constants = require('./constants');
 var tableHelper = require('./tableHelper');

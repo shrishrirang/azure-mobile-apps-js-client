@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 var Validate = require('../Utilities/Validate'),
-    Platform = require('Platforms/Platform'),
+    Platform = require('../Platform'),
     constants = require('../constants'),
     _ = require('../Utilities/Extensions');
 

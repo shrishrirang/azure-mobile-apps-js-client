@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-var Platform = require('Platforms/Platform');
+var Platform = require('../../src/Platform');
 
 // This file allows our JavaScript client tests to be run in a browser via QUnit     
     

@@ -5,11 +5,12 @@
 /// <reference path="..\Generated\MobileServices.DevIntellisense.js" />
 /*global $__fileVersion__:false, $__version__:false */
 
-var _ = require('../../Utilities/Extensions');
-var Validate = require('../../Utilities/Validate');
-var Promises = require('../../Utilities/Promises');
-var Constants = require('../../Generated/Constants');
-var inMemorySettingStore = {};
+var _ = require('../../Utilities/Extensions'),
+    Validate = require('../../Utilities/Validate'),
+    Promises = require('../../Utilities/Promises'),
+    version = require('../../../../package.json').version,
+    resources = require('../../resources.json'),
+    inMemorySettingStore = {};
 
 try {
     var key = '___z';
@@ -144,7 +145,7 @@ exports.getSdkInfo = function () {
 
     return {
         language: isCordovaEnvironment ? "Cordova" : "Web",
-        fileVersion: Constants.FileVersion
+        fileVersion: version
     };
 };
 
@@ -224,8 +225,7 @@ exports.tryParseIsoDateString = function (text) {
 };
 
 exports.getResourceString = function (resourceName) {
-    // For now, we'll just always use English
-    return Constants.Resources["en-US"][resourceName];
+    return resources[resourceName];
 };
 
 
@@ -234,6 +234,8 @@ exports.allowPlatformToMutateOriginal = function (original, updated) {
     // This is the more typical arrangement for most JavaScript data access.
     return updated;
 };
+
+exports.sdkExports = require('./sdkExports');
 
 function getBestTransport() {
     // We cache this just because it gets called such a lot

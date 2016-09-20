@@ -7,7 +7,7 @@
  * 
  */
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../../src/Platform'),
     Query = require('azure-query-js').Query,
     createPurgeManager = require('../../../../src/sync/purge').createPurgeManager,
     tableConstants = require('../../../../src/constants').table,
@@ -16,7 +16,7 @@ var Platform = require('Platforms/Platform'),
     testHelper = require('../../shared/testHelper'),
     runner = require('../../../../src/Utilities/taskRunner'),
     createOperationTableManager = require('../../../../src/sync/operations').createOperationTableManager,
-    MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore'),
+    MobileServiceSqliteStore = require('../../../../src/Platform/cordova/MobileServiceSqliteStore'),
     store,
     client,
     syncContext,

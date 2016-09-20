@@ -8,11 +8,13 @@
  * just reuse the browser definitions.
  */
 
-var browserExports = require('../web/Platform');
+var browserExports = require('../web');
 
 // Add each export individually to module.exports instead of 
 // simply returning browserExports to work around a limitation / bug
 // in browserify's cyclic dependency handling 
 for (var i in browserExports) {
-    module.exports[i] = browserExports[i];
+    exports[i] = browserExports[i];
 }
+
+exports.sdkExports = require('./sdkExports');

@@ -6,14 +6,14 @@
  * @file unit tests for the 'pushError' module
  */
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../../src/Platform'),
     Query = require('azure-query-js').Query,
     tableConstants = require('../../../../src/constants').table,
     storeTestHelper = require('./storeTestHelper'),
     runner = require('../../../../src/Utilities/taskRunner'),
     createOperationTableManager = require('../../../../src/sync/operations').createOperationTableManager,
     createPushError = require('../../../../src/sync/pushError').createPushError,
-    MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore');
+    MobileServiceSqliteStore = require('../../../../src/Platform/cordova/MobileServiceSqliteStore');
 
 var operationTableName = tableConstants.operationTableName,
     store,

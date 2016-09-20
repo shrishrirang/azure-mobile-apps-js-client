@@ -6,11 +6,11 @@
  * @file Miscellaneous MobileServiceSqliteStore unit tests
  */
 
-var Platform = require('Platforms/Platform'),
+var Platform = require('../../../../src/Platform'),
     Query = require('azure-query-js').Query,
     storeTestHelper = require('./storeTestHelper'),
     testHelper = require('../../shared/testHelper'),
-    MobileServiceSqliteStore = require('Platforms/MobileServiceSqliteStore'),
+    MobileServiceSqliteStore = require('../../../../src/Platform/cordova/MobileServiceSqliteStore'),
     store;
 
 $testGroup('SQLiteStore - miscellaneous tests')
