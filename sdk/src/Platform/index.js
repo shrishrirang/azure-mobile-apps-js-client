@@ -2,9 +2,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
+var target = require('./environment').getTarget();
 
-if (window && window.cordova && window.cordova.version) {
+if (environment.getTarget() === 'Cordova') {
     module.exports = require('./cordova');
-} else {
+} else if (environment.getTarget() === 'Web') {
     module.exports = require('./web');
+} else {
+    throw new Error('Unsupported target');
 }
