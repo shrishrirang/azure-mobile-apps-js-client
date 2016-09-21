@@ -10,6 +10,7 @@ var _ = require('../../Utilities/Extensions'),
     Promises = require('../../Utilities/Promises'),
     version = require('../../../../package.json').version,
     resources = require('../../resources.json'),
+    environment = require('../environment'),
     inMemorySettingStore = {};
 
 try {
@@ -141,10 +142,8 @@ exports.getOperatingSystemInfo = function () {
 };
 
 exports.getSdkInfo = function () {
-    var isCordovaEnvironment = window && window.cordova && window.cordova.version;
-
     return {
-        language: isCordovaEnvironment ? "Cordova" : "Web",
+        language: environment.getTarget(),
         fileVersion: version
     };
 };
