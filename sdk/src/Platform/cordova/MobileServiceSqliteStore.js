@@ -5,6 +5,7 @@
 /**
  * @file SQLite implementation of the local store.
  * This uses the https://www.npmjs.com/package/cordova-sqlite-storage Cordova plugin.
+ * @private
  */
  
 var Platform = require('.'),
@@ -20,7 +21,14 @@ var Platform = require('.'),
     defaultDbName = 'mobileapps.db';
 
 /**
- * Initializes a new instance of MobileServiceSqliteStore
+ * @class
+ * @classdesc A SQLite based implementation of {@link MobileServiceStore}.
+ *            **Note** that this class is available **_only_** as part of the Cordova SDK.
+ *       
+ * @implements {MobileServiceStore}
+ * @description Initializes a new instance of MobileServiceSqliteStore.
+ * 
+ * @param {string} [dbName] Name of the SQLite store file. If no name is specified, the default name will be used.
  */
 var MobileServiceSqliteStore = function (dbName) {
 
@@ -38,10 +46,14 @@ var MobileServiceSqliteStore = function (dbName) {
         runner = taskRunner();
 
     /**
-     * Initializes the store
+     * Initializes the store.
      * A handle to the underlying sqlite store will be opened as part of initialization.
      * 
-     * @returns A promise that is resolved when the initialization is complete OR rejected if it fails
+     * @function
+     * @instance
+     * @memberof MobileServiceSqliteStore
+     * 
+     * @returns A promise that is resolved when the initialization is complete OR rejected if it fails.
      */
     this.init = function() {
         return runner.run(function() {
@@ -70,6 +82,10 @@ var MobileServiceSqliteStore = function (dbName) {
     /**
      * Closes the handle to the underlying sqlite store.
      * 
+     * @function
+     * @instance
+     * @memberof MobileServiceSqliteStore
+     * 
      * @returns A promise that is resolved when the sqlite store is closed successfully OR rejected if it fails.
      */
     this.close = function() {
@@ -90,23 +106,7 @@ var MobileServiceSqliteStore = function (dbName) {
     };
 
     /**
-     * Defines the schema of the SQLite table
-     * @param tableDefinition An object that defines the table, i.e. the table name and columns
-     * 
-     * Example of a valid tableDefinition object:
-     * name: "todoItemTable",
-     * columnDefinitions : {
-     *      id : "string",
-     *      metadata : MobileServiceSqliteStore.ColumnType.Object,
-     *      description : "string",
-     *      purchaseDate : "date",
-     *      price : MobileServiceSqliteStore.ColumnType.Real
-     * }
-     *
-     * If a table with the same name already exists, the newly defined columns in the table definition will be added to the table.
-     * If no table with the same name exists, a table with the specified schema will be created.  
-     *
-     * @returns A promise that is resolved when the operation is completed successfully OR rejected with the error if it fails.
+     * @inheritdoc
      */
     this.defineTable = function (tableDefinition) {
         var self = this;
@@ -160,13 +160,7 @@ var MobileServiceSqliteStore = function (dbName) {
     };
 
     /**
-     * Updates or inserts one or more objects in the local table
-     * If a property does not have a corresponding definition in tableDefinition, it will not be upserted into the table.
-     * 
-     * @param tableName Name of the local table in which data is to be upserted.
-     * @param data A single object OR an array of objects to be inserted/updated in the table
-     * 
-     * @returns A promise that is resolved when the operation is completed successfully OR rejected with the error if it fails.
+     * @inheritdoc
      */
     this.upsert = function (tableName, data) {
         var self = this;
@@ -286,18 +280,8 @@ var MobileServiceSqliteStore = function (dbName) {
         }
     };
 
-    /**
-     * Perform a record lookup in the local table
-     * 
-     * @param tableName Name of the local table in which lookup is to be performed
-     * @param id ID of the object to be looked up
-     * @param {boolean} [suppressRecordNotFoundError] If set to true, lookup will return an undefined object if the record is not found.
-     *                                                Otherwise, lookup will fail. 
-     *                                                This flag is useful to distinguish between a lookup failure due to the record not being present in the table
-     *                                                versus a genuine failure in performing the lookup operation
-     * 
-     * @returns Promise that will be resolved with the looked up object when the operation completes successfully OR 
-     * rejected with the error if it fials. 
+    /** 
+     * @inheritdoc
      */
     this.lookup = function (tableName, id, suppressRecordNotFoundError) {
         var self = this;
@@ -345,14 +329,7 @@ var MobileServiceSqliteStore = function (dbName) {
     };
 
     /**
-     * Deletes one or more records from the local table
-     * 
-     * @param tableNameOrQuery Either the name of the local table in which delete is to be performed,
-     *                         Or a QueryJS object defining records to be deleted.
-     * @param ids A single ID or an array of IDs of records to be deleted
-     *            This argument is expected only if the first argument is table name and not a QueryJS object.
-     * 
-     * @returns Promise that is resolved when the operation completes successfully or rejected with the error if it fails.
+     * @inheritdoc
      */
     this.del = function (tableNameOrQuery, ids) {
         var self = this;
@@ -454,11 +431,7 @@ var MobileServiceSqliteStore = function (dbName) {
     };
 
     /**
-     * Read a local table
-     * 
-     * @param query A QueryJS object representing the query to use while reading the table
-     * @returns A promise that is resolved with the read results when the operation is completed successfully or rejected with
-     *          the error if it fails.
+     * @inheritdoc
      */
     this.read = function (query) {
         return runner.run(function() {
@@ -521,24 +494,7 @@ var MobileServiceSqliteStore = function (dbName) {
     };
     
     /**
-     * Executes the specified operations as part of a single SQL transaction.
-     * 
-     * @param operations Array of operations to be performed. Each operation in the array is an object of the following form:
-     * {
-     *      action: 'upsert',
-     *      tableName: name of the table,
-     *      data: record / object to be upserted
-     * }
-     * 
-     * OR
-     * 
-     * {
-     *      action: 'delete',
-     *      tableName: name of the table,
-     *      id: ID of the record to be deleted
-     * }
-     * 
-     * @returns A promise that is resolved when the operations are completed successfully OR rejected with the error if they fail.
+     * @inheritdoc
      */
     this.executeBatch = function (operations) {
         var self = this;

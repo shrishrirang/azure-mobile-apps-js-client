@@ -50,13 +50,14 @@ Object.defineProperties(MobileServiceClient.prototype, {
     }
 });
 
+/**
+ * @class
+ * @classdesc Client for connecting to the Azure Mobile Apps backend.
+ * @protected
+ * 
+ * @param {string} applicationUrl The URL of the Azure Mobile backend.
+ */
 function MobileServiceClient(applicationUrl) {
-    /// <summary>
-    /// Initializes a new instance of the MobileServiceClient class.
-    /// </summary>
-    /// <param name="applicationUrl" type="string" mayBeNull="false">
-    /// The URL to the Mobile Services application.
-    /// </param>
 
     Validate.isString(applicationUrl, 'applicationUrl');
     Validate.notNullOrEmpty(applicationUrl, 'applicationUrl');
@@ -77,32 +78,37 @@ function MobileServiceClient(applicationUrl) {
 
     var _syncContext = new MobileServiceSyncContext(this);
 
+    /**
+     * Get the associated {@link MobileServiceSyncContext} instance.
+     * 
+     * @returns {MobileServiceSyncContext} The associated {@link MobileServiceSyncContext}.
+     */
     this.getSyncContext = function() {
-        /// <summary>
-        /// Returns the associated MobileServiceSyncContext
-        /// </summary>
-
         return _syncContext;
     };
 
+    /**
+     * Gets a reference to the specified backend table.
+     * 
+     * @param {string} tableName The name of the backend table. 
+     * 
+     * @returns {MobileServiceTable} A reference to the specified table in the backend.
+     */
     this.getTable = function (tableName) {
-        /// <summary>
-        /// Gets a reference to a table and its data operations.
-        /// </summary>
-        /// <param name="tableName">The name of the table.</param>
-        /// <returns>A reference to the table.</returns>
 
         Validate.isString(tableName, 'tableName');
         Validate.notNullOrEmpty(tableName, 'tableName');
         return new MobileServiceTable(tableName, this);
     };
 
+    /**
+     * Gets a reference to the specified local table.
+     * 
+     * @param {string} tableName The name of the table in the local store. 
+     * 
+     * @returns {MobileServiceSyncTable} A refence to the specified table in the local store.
+     */
     this.getSyncTable = function (tableName) {
-        /// <summary>
-        /// Gets a reference to a sync table and its data operations.
-        /// </summary>
-        /// <param name="tableName">The name of the table.</param>
-        /// <returns>A reference to the sync table.</returns>
 
         Validate.isString(tableName, 'tableName');
         Validate.notNullOrEmpty(tableName, 'tableName');
@@ -111,54 +117,73 @@ function MobileServiceClient(applicationUrl) {
     };
 
     if (Push) {
+        /**
+         * @member {Push} push Push registration manager.
+         * @instance
+         * @memberof MobileServiceClient
+         */
         this.push = new Push(this, MobileServiceClient._applicationInstallationId);
     }
     
 }
 
+/**
+ * @callback MobileServiceClient.Next
+ * @param {Request} request The outgoing request.
+ * @param {MobileServiceClient.Completion} callback Completion callback.
+ */
+
+/**
+ * @callback MobileServiceClient.Completion
+ * @param {Error} error Error object.
+ * @param {Response} response Server response.
+ */
+
+/**
+ * @callback MobileServiceClient.Filter
+ * @param {Request} request The outgoing request.
+ * @param {MobileServiceClient.Next} next Next {@link MobileServiceClient.Filter} in the chain of filters.
+ * @param {MobileServiceClient.Completion} callback Completion callback.
+ */
+
+/**
+ * Create a new {@link MobileServiceClient} with a filter used to process all
+ * of its network requests and responses.
+ * 
+ * @param {MobileServiceClient.Filter} serviceFilter The filter to use on the
+ * {@link MobileServiceClient} instance's network requests and responses.
+ * 
+ * The Mobile Services HTTP pipeline is a chain of filters composed
+ * together by giving each the next operation which it can invoke
+ * (zero, one, or many times as necessary).
+ * 
+ * Filters are composed just like standard function composition.  If
+ * we had the following:
+ * 
+ *     new MobileServiceClient().withFilter(F1).withFilter(F2),withFilter(F3),
+ * 
+ * it is conceptually equivalent to saying:
+ * 
+ *     var response = F3(F2(F1(next(request)));
+ * 
+ * @returns {MobileServiceClient} A client whose HTTP requests and responses will be
+ * filtered as desired.
+ * 
+ * Here's a sample filter that will automatically retry request that fails with status code >= 400.
+ * 
+ * @example
+ * function(req, next, callback) {
+ *     next(req, function(err, rsp) {
+ *         if (rsp.statusCode >= 400) {
+ *             next(req, callback);
+ *         } else {
+ *             callback(err, rsp);
+ *         }
+ *     });
+ * }
+ *
+ */
 MobileServiceClient.prototype.withFilter = function (serviceFilter) {
-    /// <summary>
-    /// Create a new MobileServiceClient with a filter used to process all
-    /// of its HTTP requests and responses.
-    /// </summary>
-    /// <param name="serviceFilter" type="Function">
-    /// The filter to use on the service.  The signature of a serviceFilter is
-    ///    function(request, next, callback)
-    ///  where
-    ///    next := function(request, callback)
-    ///    callback := function(error, response)
-    /// </param>
-    /// <returns type="MobileServiceClient">
-    /// A new MobileServiceClient whose HTTP requests and responses will be
-    /// filtered as desired.
-    /// </returns>
-    /// <remarks>
-    /// The Mobile Services HTTP pipeline is a chain of filters composed
-    /// together by giving each the next operation which it can invoke
-    /// (zero, one, or many times as necessary).  The default continuation
-    /// of a brand new MobileServiceClient will just get the HTTP response
-    /// for the corresponding request.  Here's an example of a Handle
-    /// implementation that will automatically retry a request that times
-    /// out.
-    ///     function(req, next, callback) {
-    ///         next(req, function(err, rsp) {
-    ///           if (rsp.statusCode >= 400) {
-    ///               next(req, callback);
-    ///           } else {
-    ///               callback(err, rsp);
-    ///           }
-    ///         });
-    ///     }
-    /// Note that because these operations are asynchronous, this sample
-    /// filter could end up actually making two HTTP requests before
-    /// returning a response to the developer without the developer writing
-    /// any special code to handle the situation.
-    /// -
-    /// Filters are composed just like standard function composition.  If
-    /// we had new MobileServiceClient().withFilter(F1).withFilter(F2)
-    /// .withFilter(F3), it's conceptually equivalent to saying:
-    ///     var response = F3(F2(F1(next(request)));
-    /// </remarks>
 
     Validate.notNull(serviceFilter, 'serviceFilter');
 
@@ -302,92 +327,80 @@ MobileServiceClient.prototype._request = function (method, uriFragment, content,
     }
 };
 
+/**
+ * Log a user into an Azure Mobile Apps backend.
+ * 
+ * @function
+ * 
+ * @param {string} provider Name of the authentication provider to use; one of _'facebook'_, _'twitter'_, _'google'_,
+ *                          _'aad'_ (equivalent to _'windowsazureactivedirectory'_) or _'microsoftaccount'_.
+ * @param {object} options Contains additional parameter information.
+ * @param {object} options.token provider specific object with existing OAuth token to log in with.
+ * @param {boolean} options.useSingleSignOn Indicates if single sign-on should be used. This parameter only applies to Windows clients 
+ *                                  and is ignored on other platforms. Single sign-on requires that the 
+ *                                  application's Package SID be registered with the Microsoft Azure Mobile Apps backend,
+ *                                  but it provides a better experience as HTTP cookies are supported so that users 
+ *                                  do not have to login in everytime the application is launched.
+ * @param {object} options.parameters Any additional provider specific query string parameters.
+ * @returns {Promise} A promise that is either resolved with the logged in user or rejected with the error.
+ */
 MobileServiceClient.prototype.loginWithOptions = Platform.async(
      function (provider, options, callback) {
-         /// <summary>
-         /// Log a user into a Mobile Services application given a provider name with
-         /// given options.
-         /// </summary>
-         /// <param name="provider" type="String" mayBeNull="false">
-         /// Name of the authentication provider to use; one of 'facebook', 'twitter', 'google', 
-         /// 'windowsazureactivedirectory' (can also use 'aad')
-         /// or 'microsoftaccount'.
-         /// </param>
-         /// <param name="options" type="Object" mayBeNull="true">
-         /// Contains additional parameter information, valid values are:
-         ///    token: provider specific object with existing OAuth token to log in with
-         ///    useSingleSignOn: Only applies to Windows 8 clients.  Will be ignored on other platforms.
-         /// Indicates if single sign-on should be used. Single sign-on requires that the 
-         /// application's Package SID be registered with the Microsoft Azure Mobile Service, 
-         /// but it provides a better experience as HTTP cookies are supported so that users 
-         /// do not have to login in everytime the application is launched.
-         ///    parameters: Any additional provider specific query string parameters.
-         /// </param>
-         /// <param name="callback" type="Function" mayBeNull="true">
-         /// Optional callback accepting (error, user) parameters.
-         /// </param>
          this._login.loginWithOptions(provider, options, callback);
      });
 
+/**
+ * Log a user into an Azure Mobile Apps backend.
+ * 
+ * @function
+ * 
+ * @param {string} provider Name of the authentication provider to use; one of _'facebook'_, _'twitter'_, _'google'_,
+ *                          _'aad'_ (equivalent to _'windowsazureactivedirectory'_) or _'microsoftaccount'_. If no
+ *                          provider is specified, the 'token' parameter is considered a Microsoft Account
+ *                          authentication token. If a provider is specified, the 'token' parameter is 
+ *                          considered a provider-specific authentication token.
+ * @param {object} token provider specific object with existing OAuth token to log in with.  
+ * @param {boolean} useSingleSignOn Indicates if single sign-on should be used. This parameter only applies to Windows clients 
+ *                                  and is ignored on other platforms. Single sign-on requires that the 
+ *                                  application's Package SID be registered with the Microsoft Azure Mobile Apps backend,
+ *                                  but it provides a better experience as HTTP cookies are supported so that users 
+ *                                  do not have to login in everytime the application is launched.
+ * @returns {Promise} A promise that is either resolved with the logged in user or rejected with the error.
+ */
 MobileServiceClient.prototype.login = Platform.async(
     function (provider, token, useSingleSignOn, callback) {
-        /// <summary>
-        /// Log a user into a Mobile Services application given a provider name and optional 
-        /// authentication token.
-        /// </summary>
-        /// <param name="provider" type="String" mayBeNull="true">
-        /// Name of the authentication provider to use; one of 'facebook', 'twitter', 'google', 
-        /// 'windowsazureactivedirectory' (can also use 'aad')
-        /// or 'microsoftaccount'. If no provider is specified, the 'token' parameter
-        /// is considered a Microsoft Account authentication token. If a provider is specified, 
-        /// the 'token' parameter is considered a provider-specific authentication token.
-        /// </param>
-        /// <param name="token" type="Object" mayBeNull="true">
-        /// Optional, provider specific object with existing OAuth token to log in with.
-        /// </param>
-        /// <param name="useSingleSignOn" type="Boolean" mayBeNull="true">
-        /// Only applies to Windows 8 clients.  Will be ignored on other platforms.
-        /// Indicates if single sign-on should be used. Single sign-on requires that the 
-        /// application's Package SID be registered with the Microsoft Azure Mobile Service, 
-        /// but it provides a better experience as HTTP cookies are supported so that users 
-        /// do not have to login in everytime the application is launched.
-        /// </param>
-        /// <param name="callback" type="Function" mayBeNull="true">
-        /// Optional callback accepting (error, user) parameters.
-        /// </param>
         this._login.login(provider, token, useSingleSignOn, callback);
     });
 
+/**
+ * Log a user out of the Mobile Apps backend.
+ * 
+ * @function
+ * 
+ * @returns {Promise} A promise that is either resolved or rejected with the error. 
+ */
 MobileServiceClient.prototype.logout = Platform.async(function(callback) {
-    /// <summary>
-    /// Log a user out of a Mobile Services application.
-    /// <param name="callback" type="Function" mayBeNull="true">
-    /// Optional callback accepting error as a parameter.
-    /// </param>
-    /// </summary>
-    
     this.currentUser = null;
     callback();
 });
 
+/**
+ * Invokes the specified custom api and returns a response object.
+ * 
+ * @function
+ * 
+ * @param {string} apiName The custom api to invoke.
+ * @param {object} options Additional parameter information.
+ * @param {object} options.body The body of the HTTP request.
+ * @param {string} options.method The HTTP method to use in the request, with the default being 'POST'.
+ * @param {object} options.parameters Additional query string parameters, if any, with property names and
+ *                                    values as property keys and values respectively. 
+ * @param {object} options.headers HTTP request headers.
+ * 
+ * @returns {Promise} A promise that is either resolved with the API's result or rejected with the error.
+ */
 MobileServiceClient.prototype.invokeApi = Platform.async(
     function (apiName, options, callback) {
-        /// <summary>
-        /// Invokes the specified custom api and returns a response object.
-        /// </summary>
-        /// <param name="apiName">
-        /// The custom api to invoke.
-        /// </param>
-        /// <param name="options" mayBeNull="true">
-        /// Contains additional parameter information, valid values are:
-        /// body: The body of the HTTP request.
-        /// method: The HTTP method to use in the request, with the default being POST,
-        /// parameters: Any additional query string parameters, 
-        /// headers: HTTP request headers, specified as an object.
-        /// </param>
-        /// <param name="callback" type="Function" mayBeNull="true">
-        /// Optional callback accepting (error, results) parameters.
-        /// </param>
 
         Validate.isString(apiName, 'apiName');
 

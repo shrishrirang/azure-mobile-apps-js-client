@@ -4,6 +4,7 @@
 
 /**
  * @file Table push error handling implementation. Defines various methods for resolving conflicts
+ * @private
  */
 
 var Platform = require('../Platform'),
@@ -16,11 +17,26 @@ var operationTableName = tableConstants.operationTableName,
 /**
  * Creates a pushError object that wraps the low level error encountered while pushing
  * and adds other useful methods for error handling.
+ * @private
  */
 function createPushError(store, operationTableManager, storeTaskRunner, pushOperation, operationError) {
     
+    /**
+     * @class PushError
+     * @classdesc A conflict / error encountered while pushing a change to the server. This wraps the underlying error
+     * and provides additional helper methods for handling the conflict / error. 
+     * @protected
+     */
     return {
+        /**
+         * @member {boolean} isHandled When set to true, the push logic will consider the conflict / error to be handled.
+         *                             In such a case, an attempt would be made to push the change to the server again.
+         *                             By default, `isHandled` is set to false.
+         * @instance
+         * @memberof PushError
+         */
         isHandled: false,
+
         getError: getError,
         
         // Helper methods
@@ -31,7 +47,7 @@ function createPushError(store, operationTableManager, storeTaskRunner, pushOper
         getAction: getAction,
         getServerRecord: getServerRecord,
         getClientRecord: getClientRecord,
-        
+
         // Error handling methods
         cancelAndUpdate: cancelAndUpdate,
         cancelAndDiscard: cancelAndDiscard,
@@ -39,51 +55,87 @@ function createPushError(store, operationTableManager, storeTaskRunner, pushOper
         update: update,
         changeAction: changeAction
     };
-    
+
     /**
-     * Get the name of the table for which push was performed
+     * Gets the name of the table for which conflict / error occurred.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @returns {string} The name of the table for which conflict / error occurred. 
      */
     function getTableName() {
         return makeCopy(pushOperation.logRecord.tableName);
     }
     
     /**
-     * Gets the action that was pushed to the server.
-     * Action can be one of 'insert', 'update' or 'delete'.
+     * Gets the action for which conflict / error occurred.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError 
+     * 
+     * @returns {string} The action for which conflict / error occurred. Valid action values
+     *                   are _'insert'_, _'update'_ or _'delete'_.
      */
     function getAction() {
         return makeCopy(pushOperation.logRecord.action);
     }
     
     /**
-     * Gets the value of the server record, if available.
-     * **NOTE** Value of the server record may not be available always.
-     * Example: If the push failed due to a connection error, the value of server
-     * record won't be available.
+     * Gets the value of the record on the server, if available, when the conflict / error occurred.
+     * This is useful while handling conflicts. However, **note** that in the event of
+     * a conflict / error, the server may not always respond with the server record's value.
+     * Example: If the push failed even before the client value reaches the server, we won't have the server value.
+     * Also, there are some scenarios where the server does not respond with the server value.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @returns {object} Server record value.
      */
     function getServerRecord() {
         return makeCopy(operationError.serverInstance);
     }
     
     /**
-     * Gets the value of the client record that was sent to the server.
-     * Note that this may not be the latest value.
+     * Gets the value of the record that was pushed to the server when the conflict /error occurred.
+     * Note that this may not be the latest value as local tables could have changed after we
+     * started the push operation. 
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @returns {object} Client record value.
      */
     function getClientRecord() {
         return makeCopy(pushOperation.data);
     }
     
     /**
-     * Gets the underlying error.
-     * This contains grannular details about the failure. Egs: server response, etc
+     * Gets the underlying error encountered while performing the push operation. This contains
+     * grannular details of the failure like server response, error code, etc.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * @returns {Error} The underlying error object.
      */
     function getError() {
         return makeCopy(operationError);
     }
     
     /**
-     * Checks if the current error is a conflict error.
-     * @returns true - if the current error is a conflict error. false - otherwise.
+     * Checks if the error is a conflict.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @returns {boolean} true if the error is a conflict. False, otherwise.
      */
     function isConflict() {
         return operationError.request.status === 409 || operationError.request.status === 412;
@@ -91,10 +143,16 @@ function createPushError(store, operationTableManager, storeTaskRunner, pushOper
     
     /**
      * Cancels the push operation for the current record and updates the record in the local store.
+     * This will also set {@link PushError#isHandled} to true.
      * 
-     * @param newValue New value of the client record that will be updated in the local store.
+     * @function
+     * @instance
+     * @memberof PushError
      * 
-     * @returns A promise that is fulfilled when the operation is cancelled and the client record is updated.
+     * @param {object} newValue New value of the client record that will be updated in the local store.
+     * 
+     * @returns {Promise} A promise that is fulfilled when the operation is cancelled and the client record is updated.
+     *                    The promise is rejected with the error if `cancelAndUpdate` fails.
      */
     function cancelAndUpdate(newValue) {
         var self = this;
@@ -140,8 +198,14 @@ function createPushError(store, operationTableManager, storeTaskRunner, pushOper
     
     /**
      * Cancels the push operation for the current record and discards the record from the local store.
+     * This will also set {@link PushError#isHandled} to true.
      * 
-     * @returns A promise that is fulfilled when the operation is cancelled and the client record is discarded.
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @returns {Promise} A promise that is fulfilled when the operation is cancelled and the client record is discarded
+     *                    and rejected with the error if `cancelAndDiscard` fails.
      */
     function cancelAndDiscard() {
         var self = this;
@@ -172,10 +236,15 @@ function createPushError(store, operationTableManager, storeTaskRunner, pushOper
     /**
      * Updates the client data record associated with the current operation.
      * If required, the metadata in the log record will also be associated.
+     * This will also set {@link PushError#isHandled} to true.
      *
-     * @param newValue New value of the data record. 
+     * @function
+     * @instance
+     * @memberof PushError
      * 
-     * @returns A promise that is fulfilled when the data record is updated in the localstore.
+     * @param {object} newValue New value of the data record. 
+     * 
+     * @returns {Promise} A promise that is fulfilled when the data record is updated in the localstore.
      */
     function update(newValue) {
         var self = this;
@@ -224,19 +293,28 @@ function createPushError(store, operationTableManager, storeTaskRunner, pushOper
      * Changes the type of operation that will be pushed to the server.
      * This is useful for handling conflicts where you might need to change the type of the 
      * operation to be able to push the changes to the server.
+     * This will also set {@link PushError#isHandled} to true.
      *
-     * Example: You might need to change 'insert' to 'update' to be able to push a record that 
+     * Example: You might need to change _'insert'_ to _'update'_ to be able to push a record that 
      * was already inserted on the server.
      * 
-     * Note: Changing the action to delete will automatically remove the associated record from the 
+     * Note: Changing the action to _'delete'_' will automatically remove the associated record from the 
      * data table in the local store.
      * 
-     * @param newAction New type of the operation. Valid values are 'insert', 'update' and 'delete'
-     * @param [newClientRecord] New value of the client record. The new record ID should match the original record ID.
-     *                          If newAction is 'delete', only the version property will be read from newClientRecord. This is useful if
-     *                          the conflict handler changes an insert/update action to delete and wants to udpate the version.
+     * @function
+     * @instance
+     * @memberof PushError
      * 
-     * @returns A promise that is fulfilled when the action is changed and, optionally, the data record is updated / deleted.
+     * @param {string} newAction New type of the operation. Valid values are _'insert'_, _'update'_ and _'delete'_.
+     * @param {object} [newClientRecord] New value of the client record. 
+     *                          The `id` property of the new record should match the `id` property of the original record.
+     *                          If `newAction` is _'delete'_, only the `id` and `version` properties will be read from `newClientRecord`.
+     *                          Reading the `version` property while deleting is useful if
+     *                          the conflict handler changes an _'insert'_  /_'update'_ action to _'delete'_' and also updated the version
+     *                          to reflect the server version.
+     * 
+     * @returns {Promise} A promise that is fulfilled when the action is changed and, optionally, the data record is updated / deleted.
+     *                    If this fails, the promsie is rejected with the error.
      */
     function changeAction(newAction, newClientRecord) {
         var self = this;
@@ -314,10 +392,18 @@ function createPushError(store, operationTableManager, storeTaskRunner, pushOper
     
     /**
      * Cancels pushing the current operation to the server permanently.
+     * This will also set {@link PushError#isHandled} to true.
      * 
      * This method simply removes the pending operation from the operation table, thereby 
-     * permanently skipping the associated change. A future change done to the same record
-     * will not be affected and such changes will continue to be pushed. 
+     * permanently skipping the associated change from being pushed to the server. A future change 
+     * done to the same record will not be affected and such changes will continue to be pushed.
+     *  
+     * @function
+     * @instance
+     * @memberof PushError
+     *
+     * @returns {Promise} A promise that is fulfilled when the operation is cancelled OR rejected
+     *                    with the error if it fails to cancel it.
      */
     function cancel() {
         var self = this;
@@ -338,6 +424,7 @@ function makeCopy(value) {
 
 /**
  * Attempts error handling by delegating it to the user, if a push handler is provided
+ * @private
  */
 function handlePushError(pushError, pushHandler) {
     return Platform.async(function(callback) {

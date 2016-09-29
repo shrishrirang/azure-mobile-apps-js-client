@@ -3,7 +3,8 @@
 // ----------------------------------------------------------------------------
 
 /**
- * Table purge logic implementation
+ * @file Table purge logic implementation
+ * @private
  */
 
 var Validate = require('../Utilities/Validate'),

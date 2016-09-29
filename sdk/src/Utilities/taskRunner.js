@@ -3,7 +3,8 @@
 // ----------------------------------------------------------------------------
 
 /**
- * Implements a task runner that runs synchronous / asynchronous tasks one after the other.
+ * @file Implements a task runner that runs synchronous / asynchronous tasks one after the other.
+ * @private
  */
 
 var Validate = require('./Validate'),

@@ -8,26 +8,28 @@ var Validate = require('../Utilities/Validate'),
 
 exports.Push = Push;
 
+/**
+ * @class
+ * @classdesc Push registration manager.
+ * @protected
+ */
 function Push(client, installationId) {
     this.client = client;
     this.installationId = installationId;
 }
 
-/// <summary>
-/// Register a push channel with the Mobile Apps backend to start receiving notifications.
-/// </summary>
-/// <param name="platform" type="string">
-/// The device platform being used - wns, gcm or apns.
-/// </param>
-/// <param name="pushChannel" type="string">
-/// The push channel identifier or URI.
-/// </param>
-/// <param name="templates" type="string">
-/// An object containing template definitions. Template objects should contain body, headers and tags properties.
-/// </param>
-/// <param name="secondaryTiles" type="string">
-/// An object containing template definitions to be used with secondary tiles when using WNS.
-/// </param>
+/**
+ * Register a push channel with the Azure Mobile Apps backend to start receiving notifications.
+ *
+ * @function
+ * 
+ * @param {string} platform The device platform being used - _'wns'_, _'gcm'_ or _'apns'_.
+ * @param {string} pushChannel The push channel identifier or URI.
+ * @param {string} templates An object containing template definitions. Template objects should contain body, headers and tags properties.
+ * @param {string} secondaryTiles An object containing template definitions to be used with secondary tiles when using WNS.
+ * 
+ * @returns {Promise} A promise that is resolved when registration is successful OR rejected with the error if it fails.
+ */
 Push.prototype.register = Platform.async(
     function (platform, pushChannel, templates, secondaryTiles, callback) {
         Validate.isString(platform, 'platform');
@@ -56,12 +58,15 @@ Push.prototype.register = Platform.async(
     }
 );
 
-/// <summary>
-/// Unregister a push channel with the Mobile Apps backend to stop receiving notifications.
-/// </summary>
-/// <param name="pushChannel" type="string">
-/// The push channel identifier or URI.
-/// </param>
+/**
+ * Unregister a push channel with the Azure Mobile Apps backend to stop receiving notifications.
+ * 
+ * @function
+ * 
+ * @param {string} pushChannel The push channel identifier or URI.
+ * 
+ * @returns {Promise} A promise that is resolved if unregister is successful and rejected with the error if it fails.
+ */
 Push.prototype.unregister = Platform.async(
     function (pushChannel, callback) {
         executeRequest(this.client, 'DELETE', pushChannel, null, this.installationId, callback);

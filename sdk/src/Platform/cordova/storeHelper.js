@@ -4,6 +4,7 @@
 
 /**
  * @file Helper functions for performing store related operations
+ * @private
  */
 
 var idPropertyName = require('../../constants').table.idPropertyName,
@@ -11,6 +12,7 @@ var idPropertyName = require('../../constants').table.idPropertyName,
 
 /**
  * Validates the table definition
+ * @private
  */
 function validateTableDefinition(tableDefinition) {
     // Do basic table name validation and leave the rest to the store
@@ -42,6 +44,7 @@ function validateTableDefinition(tableDefinition) {
 
 /**
  * Adds a tableDefinition to the tableDefinitions object
+ * @private
  */
 function addTableDefinition(tableDefinitions, tableDefinition) {
     Validate.isObject(tableDefinitions);
@@ -53,6 +56,7 @@ function addTableDefinition(tableDefinitions, tableDefinition) {
 
 /**
  * Gets the table definition for the specified table name from the tableDefinitions object
+ * @private
  */
 function getTableDefinition(tableDefinitions, tableName) {
     Validate.isObject(tableDefinitions);
@@ -65,6 +69,7 @@ function getTableDefinition(tableDefinitions, tableName) {
 
 /**
  * Gets the type of the specified column
+ * @private
  */
 function getColumnType(columnDefinitions, columnName) {
     Validate.isObject(columnDefinitions);
@@ -81,6 +86,7 @@ function getColumnType(columnDefinitions, columnName) {
 
 /**
  * Returns the column name in the column definitions that matches the specified property
+ * @private
  */
 function getColumnName(columnDefinitions, property) {
     Validate.isObject(columnDefinitions);
@@ -99,6 +105,7 @@ function getColumnName(columnDefinitions, property) {
 
 /**
  * Returns the Id property value OR undefined if none exists
+ * @private
  */
 function getId(record) {
     Validate.isObject(record);
@@ -113,6 +120,7 @@ function getId(record) {
 
 /**
  * Checks if property is an ID property.
+ * @private
  */
 function isId(property) {
     Validate.isString(property);
