@@ -429,10 +429,15 @@ MobileServiceClient.prototype.invokeApi = Platform.async(
         }
 
         // Construct the URL
-        var urlFragment = _.url.combinePathSegments("api", apiName);
+        var url;
+        if (_.url.isAbsoluteUrl(apiName)) {
+            url = apiName;
+        } else {
+            url = _.url.combinePathSegments("api", apiName);
+        }
         if (!_.isNull(parameters)) {
             var queryString = _.url.getQueryString(parameters);
-            urlFragment = _.url.combinePathAndQuery(urlFragment, queryString);
+            url = _.url.combinePathAndQuery(url, queryString);
         }
 
         var features = [];
@@ -449,7 +454,7 @@ MobileServiceClient.prototype.invokeApi = Platform.async(
         // Make the request
         this._request(
             method,
-            urlFragment,
+            url,
             body,
             null,
             headers,
