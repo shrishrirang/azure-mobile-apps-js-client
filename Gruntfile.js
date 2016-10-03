@@ -41,15 +41,15 @@ module.exports = function(grunt) {
         uglify: {
             options: {
                 banner: '//! Copyright (c) Microsoft Corporation. All rights reserved. <%= pkg.name %> v<%= pkg.version %>\n',
-                mangle: false
+                mangle: true
             },
             web: {
-                src: 'sdk/src/generated/MobileServices.Web.js',
-                dest: 'sdk/src/generated/MobileServices.Web.min.js'
+                src: 'sdk/src/generated/azure-mobile-apps-client.js',
+                dest: 'sdk/src/generated/azure-mobile-apps-client.min.js'
             },
             cordova: {
-                src: 'sdk/src/generated/MobileServices.Cordova.js',
-                dest: 'sdk/src/generated/MobileServices.Cordova.min.js'
+                src: 'sdk/src/generated/azure-mobile-apps-client-cordova.js',
+                dest: 'sdk/src/generated/azure-mobile-apps-client-cordova.min.js'
             }
         },
         browserify: {
@@ -65,11 +65,11 @@ module.exports = function(grunt) {
             },
             web: {
                 src: '<%= files.web %>',
-                dest: './sdk/src/generated/MobileServices.Web.js'
+                dest: './sdk/src/generated/azure-mobile-apps-client.js'
             },
             cordova: {
                 src: '<%= files.cordova %>',
-                dest: './sdk/src/generated/MobileServices.Cordova.js'
+                dest: './sdk/src/generated/azure-mobile-apps-client-cordova.js'
             },
             webTest: {
                 src: [
@@ -89,13 +89,13 @@ module.exports = function(grunt) {
         },
         copy: {
             web: {
-                src: 'MobileServices.Web.*js',
+                src: 'azure-mobile-apps-client.*js',
                 dest: 'dist/',
                 expand: true,
                 cwd: 'sdk/src/generated/'
             },
             cordova: {
-                src: 'MobileServices.Cordova.*js',
+                src: 'azure-mobile-apps-client-cordova.*js',
                 dest: 'dist/',
                 expand: true,
                 cwd: 'sdk/src/generated/'
@@ -138,18 +138,21 @@ module.exports = function(grunt) {
         }
     });
 
-    // Load the plugin that provides the "uglify" task.
+    // Load the plugins
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
         
-    // Default task(s).
-    grunt.registerTask('build', ['buildbrowser', 'buildcordova', 'jshint']);
-    grunt.registerTask('buildbrowser', ['browserify:web', 'browserify:webTest', 'copy:web', 'copy:webTest']);
-    grunt.registerTask('buildcordova', ['browserify:cordova', 'browserify:cordovaTest', 'copy:cordova', 'copy:cordovaTest']);
+    // Define build tasks
+    grunt.registerTask('build', ['buildbrowserfull', 'buildcordovafull', 'jshint']);
+    grunt.registerTask('buildbrowsermin', ['browserify:web', 'browserify:webTest', 'copy:web', 'copy:webTest']);
+    grunt.registerTask('buildcordovamin', ['browserify:cordova', 'browserify:cordovaTest', 'copy:cordova', 'copy:cordovaTest']);
+    grunt.registerTask('buildbrowserfull', ['browserify:web', 'browserify:webTest', 'uglify:web', 'copy:web', 'copy:webTest']);
+    grunt.registerTask('buildcordovafull', ['browserify:cordova', 'browserify:cordovaTest', 'uglify:cordova', 'copy:cordova', 'copy:cordovaTest']);
 
+    // Define the default task
     grunt.registerTask('default', ['build']);
 };
 
