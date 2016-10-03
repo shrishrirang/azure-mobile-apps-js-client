@@ -441,6 +441,42 @@ $testGroup('MobileServiceClient.js',
         });
     }),
 
+    $test('CustomAPI - absolute http:// URI ')
+    .description('Verify the custom API url formatting')
+    .check(function () {
+        var client = new MobileServiceClient("https://abc");
+        client = client.withFilter(function (req, next, callback) {
+            $assert.areEqual(req.type, 'POST');
+            $assert.areEqual(req.url, 'http://www.test.com/api/checkins/post');
+            $assert.areEqual(req.headers['ZUMO-API-VERSION'], "2.0.0");
+            callback(null, { status: 200, responseText: '{"result":3 }', getResponseHeader: function () { return 'application/json'; } });
+        });
+        client.invokeApi("http://www.test.com/api/checkins/post").done(function (response) {
+            $assert.areEqual(response.result.result, 3);
+        },
+        function (error) {
+            $assert.fail("api call failed");
+        });
+    }),
+
+    $test('CustomAPI - absolute https:// URI ')
+    .description('Verify the custom API url formatting')
+    .check(function () {
+        var client = new MobileServiceClient("http://abc");
+        client = client.withFilter(function (req, next, callback) {
+            $assert.areEqual(req.type, 'POST');
+            $assert.areEqual(req.url, 'https://www.test.com/api/checkins/post');
+            $assert.areEqual(req.headers['ZUMO-API-VERSION'], "2.0.0");
+            callback(null, { status: 200, responseText: '{"result":3 }', getResponseHeader: function () { return 'application/json'; } });
+        });
+        client.invokeApi("https://www.test.com/api/checkins/post").done(function (response) {
+            $assert.areEqual(response.result.result, 3);
+        },
+        function (error) {
+            $assert.fail("api call failed");
+        });
+    }),
+
     $test('CustomAPI - name and content')
     .description('Verify the custom API url formatting')
     .check(function () {
@@ -546,6 +582,74 @@ $testGroup('MobileServiceClient.js',
             callback(null, { status: 200, responseText: '{"result":3 }', getResponseHeader: function () { return 'application/json'; } });
         });
         client.invokeApi("calculator/add", { method: "GET", parameters: { 'a': 1, 'b': 2 } }).done(function (response) {
+            $assert.areEqual(response.result.result, 3);
+        },
+        function (error) {
+            $assert.fail("api call failed");
+        });
+    }),
+
+    $test('CustomAPI - http:// URI with query string, method and param')
+    .description('Verify the custom API url formatting')
+    .check(function () {
+        var client = new MobileServiceClient("https://abc");
+        client = client.withFilter(function (req, next, callback) {
+            $assert.areEqual(req.type, 'GET');
+            $assert.areEqual(req.url, 'http://www.test.com/api/calculator/add?q=1&a=1&b=2');
+            callback(null, { status: 200, responseText: '{"result":3 }', getResponseHeader: function () { return 'application/json'; } });
+        });
+        client.invokeApi("http://www.test.com/api/calculator/add?q=1", { method: "GET", parameters: { 'a': 1, 'b': 2 } }).done(function (response) {
+            $assert.areEqual(response.result.result, 3);
+        },
+        function (error) {
+            $assert.fail("api call failed");
+        });
+    }),
+
+    $test('CustomAPI - http:// URI without query string, method and param')
+    .description('Verify the custom API url formatting')
+    .check(function () {
+        var client = new MobileServiceClient("https://abc");
+        client = client.withFilter(function (req, next, callback) {
+            $assert.areEqual(req.type, 'GET');
+            $assert.areEqual(req.url, 'http://www.test.com/api/calculator/add?a=1&b=2');
+            callback(null, { status: 200, responseText: '{"result":3 }', getResponseHeader: function () { return 'application/json'; } });
+        });
+        client.invokeApi("http://www.test.com/api/calculator/add", { method: "GET", parameters: { 'a': 1, 'b': 2 } }).done(function (response) {
+            $assert.areEqual(response.result.result, 3);
+        },
+        function (error) {
+            $assert.fail("api call failed");
+        });
+    }),
+
+    $test('CustomAPI - https:// URI with query string, method and param')
+    .description('Verify the custom API url formatting')
+    .check(function () {
+        var client = new MobileServiceClient("http://abc");
+        client = client.withFilter(function (req, next, callback) {
+            $assert.areEqual(req.type, 'GET');
+            $assert.areEqual(req.url, 'https://www.test.com/api/calculator/add?q=1&a=1&b=2');
+            callback(null, { status: 200, responseText: '{"result":3 }', getResponseHeader: function () { return 'application/json'; } });
+        });
+        client.invokeApi("https://www.test.com/api/calculator/add?q=1", { method: "GET", parameters: { 'a': 1, 'b': 2 } }).done(function (response) {
+            $assert.areEqual(response.result.result, 3);
+        },
+        function (error) {
+            $assert.fail("api call failed");
+        });
+    }),
+
+    $test('CustomAPI - https:// URI without query string, method and param')
+    .description('Verify the custom API url formatting')
+    .check(function () {
+        var client = new MobileServiceClient("http://abc");
+        client = client.withFilter(function (req, next, callback) {
+            $assert.areEqual(req.type, 'GET');
+            $assert.areEqual(req.url, 'https://www.test.com/api/calculator/add?a=1&b=2');
+            callback(null, { status: 200, responseText: '{"result":3 }', getResponseHeader: function () { return 'application/json'; } });
+        });
+        client.invokeApi("https://www.test.com/api/calculator/add", { method: "GET", parameters: { 'a': 1, 'b': 2 } }).done(function (response) {
             $assert.areEqual(response.result.result, 3);
         },
         function (error) {
