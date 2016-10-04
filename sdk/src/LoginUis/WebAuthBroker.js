@@ -47,7 +47,7 @@ exports.login = function (startUri, endUri, callback) {
             else {
                 i = callbackEndUri.indexOf('#error=');
                 if (i > 0) {
-                    error = decodeURIComponent(callbackEndUri.substring(i + 7));
+                    error = new Error(decodeURIComponent(callbackEndUri.substring(i + 7)));
                 }
             }
 
