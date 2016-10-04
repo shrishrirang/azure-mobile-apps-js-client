@@ -46,7 +46,7 @@
     "testsetup": "node e2etest/scripts/setup.js"
   },
   "dependencies": {
-    "azure-odata-sql": "^0.1.0",
+    "azure-odata-sql": "^0.2.0",
     "azure-query-js": "^0.1.0",
     "node-uuid": "^1.4.7",
     "verror": "^1.8.1"
