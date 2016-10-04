@@ -1,0 +1,2665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>MobileServiceSyncContext - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="MobileServiceClient.html">MobileServiceClient</a><ul class='methods'><li data-type='method'><a href="MobileServiceClient.html#getSyncContext">getSyncContext</a></li><li data-type='method'><a href="MobileServiceClient.html#getSyncTable">getSyncTable</a></li><li data-type='method'><a href="MobileServiceClient.html#getTable">getTable</a></li><li data-type='method'><a href="MobileServiceClient.html#invokeApi">invokeApi</a></li><li data-type='method'><a href="MobileServiceClient.html#login">login</a></li><li data-type='method'><a href="MobileServiceClient.html#loginWithOptions">loginWithOptions</a></li><li data-type='method'><a href="MobileServiceClient.html#logout">logout</a></li><li data-type='method'><a href="MobileServiceClient.html#withFilter">withFilter</a></li></ul></li><li><a href="MobileServiceSqliteStore.html">MobileServiceSqliteStore</a><ul class='methods'><li data-type='method'><a href="MobileServiceSqliteStore.html#defineTable">defineTable</a></li><li data-type='method'><a href="MobileServiceSqliteStore.html#del">del</a></li><li data-type='method'><a href="MobileServiceSqliteStore.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceSqliteStore.html#read">read</a></li><li data-type='method'><a href="MobileServiceSqliteStore.html#upsert">upsert</a></li></ul></li><li><a href="MobileServiceSyncContext.html">MobileServiceSyncContext</a><ul class='methods'><li data-type='method'><a href="MobileServiceSyncContext.html#del">del</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#initialize">initialize</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#insert">insert</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#pull">pull</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#purge">purge</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#push">push</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#read">read</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#update">update</a></li></ul></li><li><a href="MobileServiceSyncTable.html">MobileServiceSyncTable</a><ul class='methods'><li data-type='method'><a href="MobileServiceSyncTable.html#del">del</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#getMobileServiceClient">getMobileServiceClient</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#getTableName">getTableName</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#insert">insert</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#pull">pull</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#purge">purge</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#read">read</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#update">update</a></li></ul></li><li><a href="MobileServiceTable.html">MobileServiceTable</a><ul class='methods'><li data-type='method'><a href="MobileServiceTable.html#del">del</a></li><li data-type='method'><a href="MobileServiceTable.html#getMobileServiceClient">getMobileServiceClient</a></li><li data-type='method'><a href="MobileServiceTable.html#getTableName">getTableName</a></li><li data-type='method'><a href="MobileServiceTable.html#insert">insert</a></li><li data-type='method'><a href="MobileServiceTable.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceTable.html#read">read</a></li><li data-type='method'><a href="MobileServiceTable.html#update">update</a></li></ul></li><li><a href="Push.html">Push</a><ul class='methods'><li data-type='method'><a href="Push.html#register">register</a></li><li data-type='method'><a href="Push.html#unregister">unregister</a></li></ul></li><li><a href="PushError.html">PushError</a><ul class='methods'><li data-type='method'><a href="PushError.html#cancel">cancel</a></li><li data-type='method'><a href="PushError.html#cancelAndDiscard">cancelAndDiscard</a></li><li data-type='method'><a href="PushError.html#cancelAndUpdate">cancelAndUpdate</a></li><li data-type='method'><a href="PushError.html#changeAction">changeAction</a></li><li data-type='method'><a href="PushError.html#getAction">getAction</a></li><li data-type='method'><a href="PushError.html#getClientRecord">getClientRecord</a></li><li data-type='method'><a href="PushError.html#getError">getError</a></li><li data-type='method'><a href="PushError.html#getServerRecord">getServerRecord</a></li><li data-type='method'><a href="PushError.html#getTableName">getTableName</a></li><li data-type='method'><a href="PushError.html#isConflict">isConflict</a></li><li data-type='method'><a href="PushError.html#update">update</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-azure-mobile-apps-client.html">azure-mobile-apps-client</a></li></ul><h3>Interfaces</h3><ul><li><a href="MobileServiceStore.html">MobileServiceStore</a><ul class='methods'><li data-type='method'><a href="MobileServiceStore.html#defineTable">defineTable</a></li><li data-type='method'><a href="MobileServiceStore.html#del">del</a></li><li data-type='method'><a href="MobileServiceStore.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceStore.html#read">read</a></li><li data-type='method'><a href="MobileServiceStore.html#upsert">upsert</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">MobileServiceSyncContext</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        MobileServiceSyncContext
+        </h2>
+        
+            <div class="class-description"><p>Context for local store operations.</p></div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="MobileServiceSyncContext"><span class="type-signature">(protected) </span>new MobileServiceSyncContext<span class="signature">(client)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>client</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="MobileServiceClient.html">MobileServiceClient</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The <a href="MobileServiceClient.html"><code>MobileServiceClient</code></a> instance to be used to make 
+                                    requests to the backend (server).</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line63">line 63</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="pushHandler"><span class="type-signature"></span>pushHandler<span class="type-signature"></span></h4>
+
+
+
+
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>pushHandler</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="MobileServiceSyncContext.html#.PushHandler">MobileServiceSyncContext.PushHandler</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Defines push handler.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line320">line 320</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="del"><span class="type-signature"></span>del<span class="signature">(tableName, instance)</span><span class="type-signature"> &rarr; {<a href="global.html#Promise">Promise</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Deletes an object / record from the specified local table.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>tableName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the local table to delete the object from.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>instance</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The object to delete from the local table.</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>id of the record to be deleted.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line223">line 223</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that is resolved when the delete operation completes successfully.
+                   If the operation fails, the promise is rejected with the error.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Promise">Promise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="initialize"><span class="type-signature"></span>initialize<span class="signature">(localStore)</span><span class="type-signature"> &rarr; {<a href="global.html#Promise">Promise</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Initializes the <a href="MobileServiceSyncContext.html"><code>MobileServiceSyncContext</code></a> instance. Initailizing an initialized instance of 
+<a href="MobileServiceSyncContext.html"><code>MobileServiceSyncContext</code></a> will have no effect.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>localStore</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="MobileServiceStore.html">MobileServiceStore</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>An intitialized instance of the <a href="MobileServiceStore.html"><code>local store</code></a> to be associated 
+                                       with the <a href="MobileServiceSyncContext.html"><code>MobileServiceSyncContext</code></a> instance.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line86">line 86</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that is resolved when the initialization is completed successfully.
+                   If initialization fails, the promise is rejected with the error.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Promise">Promise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="insert"><span class="type-signature"></span>insert<span class="signature">(tableName, instance)</span><span class="type-signature"> &rarr; {<a href="global.html#Promise">Promise</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Inserts a new object / record into the specified local table.
+If the inserted object does not specify an id, a GUID will be used as the id.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>tableName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the local table in which the object / record is to be inserted.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>instance</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The object / record to be inserted into the local table.</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The id of the record. If this is null / undefined, a GUID string
+                            will be used as the id.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line121">line 121</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that is resolved with the inserted object when the insert operation is completed successfully.
+                   If the operation fails, the promise is rejected with the error.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Promise">Promise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="lookup"><span class="type-signature"></span>lookup<span class="signature">(tableName, id, suppressRecordNotFoundError<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#Promise">Promise</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Looks up an object / record from the specified local table using the object id.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>tableName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Name of the local table in which to look up the object / record.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>id of the object to be looked up in the local table.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>suppressRecordNotFoundError</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>If set to true, lookup will return an undefined object
+                                               if the record is not found. Otherwise, lookup will fail.
+                                               This flag is useful to distinguish between a lookup
+                                               failure due to the record not being present in the table
+                                               versus a genuine failure in performing the lookup operation.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line169">line 169</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that is resolved with the looked up object when the lookup is completed successfully.
+                   If the operation fails, the promise is rejected with the error.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Promise">Promise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="pull"><span class="type-signature"></span>pull<span class="signature">(query, queryId, settings<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#Promise">Promise</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Pulls changes from server table into the local store.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>query</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#QueryJs">QueryJs</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Query specifying which records to pull.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>queryId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>A unique string id for an incremental pull query. A null / undefined queryId 
+                        will perform a vanilla pull, i.e. will pull all the records specified by the table
+                        from the server</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>settings</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="MobileServiceSyncContext.html#.PullSettings">MobileServiceSyncContext.PullSettings</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>An object that defines various pull settings.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line262">line 262</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that is fulfilled when all records are pulled OR is rejected if the pull fails or is cancelled.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Promise">Promise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="purge"><span class="type-signature"></span>purge<span class="signature">(query, forcePurge)</span><span class="type-signature"> &rarr; {<a href="global.html#Promise">Promise</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Purges data from the local table as well as pending operations and any incremental sync state 
+associated with the table.</p>
+<p>A <em>regular purge</em>, would fail if there are any pending operations for the table being purged.</p>
+<p>A <em>forced purge</em> will proceed even if pending operations for the table being purged exist in the operation table. In addition,
+it will also delete the table's pending operations.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>query</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#QueryJs">QueryJs</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A <a href="global.html#QueryJs"><code>QueryJs</code></a> object representing the query that specifies what records are to be purged.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>forcePurge</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>If set to true, the method will perform a forced purge.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line303">line 303</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that is fulfilled when purge is complete OR is rejected if it fails.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Promise">Promise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="push"><span class="type-signature"></span>push<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Promise">Promise</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Pushes local changes to the corresponding tables on the server.</p>
+<p>Conflict and error handling are delegated to <a href="MobileServiceSyncContext.html#pushHandler"><code>MobileServiceSyncContext#pushHandler</code></a>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line281">line 281</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that is fulfilled with an array of encountered conflicts when all changes
+                   are pushed to the server without errors. Note that a conflict is not treated as an error.
+                   The returned promise is rejected if the push fails.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Promise">Promise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="read"><span class="type-signature"></span>read<span class="signature">(query)</span><span class="type-signature"> &rarr; {<a href="global.html#Promise">Promise</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Reads records from the specified local table.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>query</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#QueryJs">QueryJs</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A <a href="global.html#QueryJs"><code>QueryJs</code></a> object representing the query to use while
+                       reading the local table</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line198">line 198</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that is resolved with an array of records read from the table, if the read is successful.
+                   If read fails, the promise is rejected with the error.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Promise">Promise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">(tableName, instance)</span><span class="type-signature"> &rarr; {<a href="global.html#Promise">Promise</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Update an object / record in the specified local table.
+The id of the object / record identifies the record that will be updated in the table.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>tableName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the local table in which the object / record is to be updated.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>instance</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>New value of the object / record to be updated.</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The id of the object / record identifies the record that will be updated in the table.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line146">line 146</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that is resolved when the operation is completed successfully. 
+                   If the operation fails, the promise is rejected.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Promise">Promise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
+
+        
+                
+
+    
+
+    <h4 class="name" id=".ConflictHandler"><span class="type-signature"></span>ConflictHandler<span class="signature">(pushConflict)</span><span class="type-signature"> &rarr; {<a href="global.html#Promise">Promise</a>|undefined}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Callback to delegate conflict handling to the user while pushing changes to the server. The conflict handler should
+update the isHandled property of the pushConflict parameter appropriately on completion. If a conflict is marked as handled,
+the push logic will attempt to push the change again. If not, the push logic will note the conflict, <strong>skip</strong> the change and
+proceed to push the next change.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>pushConflict</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="PushError.html">PushError</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Push conflict.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line26">line 26</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>This method can either return synchronously or can return a promise that is resolved 
+                          or rejected when conflict handling completes / fails.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Promise">Promise</a></span>
+|
+
+<span class="param-type">undefined</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id=".ErrorHandler"><span class="type-signature"></span>ErrorHandler<span class="signature">(pushError)</span><span class="type-signature"> &rarr; {<a href="global.html#Promise">Promise</a>|undefined}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Callback to delegate error handling to the user while pushing changes to the server. Note that an error is a failure other
+than a conflict. The error handler should update the isHandled property of the pushError parameter appropriately on completion.
+If a conflict is marked as handled, the push logic will attempt to push the change again.
+If not, the push logic will <strong>abort</strong> the push operation without attempting to push the remaining changes.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>pushError</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="PushError.html">PushError</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Push Error.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line37">line 37</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>This method can either return synchronously or can return a promise that is resolved 
+                          or rejected when conflict handling completes / fails.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Promise">Promise</a></span>
+|
+
+<span class="param-type">undefined</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+            
+                
+<h4 class="name" id=".PullSettings">PullSettings</h4>
+
+
+
+
+<div class="description">
+    <p>Settings for configuring the pull behavior</p>
+</div>
+
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>pageSize</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Specifies the number of records to request as part of a page pulled from the server tables.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line20">line 20</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id=".PushHandler">PushHandler</h4>
+
+
+
+
+<div class="description">
+    <p>Defines callbacks for performing conflict and error handling.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>onConflict</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="MobileServiceSyncContext.html#.ConflictHandler">MobileServiceSyncContext.ConflictHandler</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Callback for delegating conflict handling to the user.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onError</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="MobileServiceSyncContext.html#.ErrorHandler">MobileServiceSyncContext.ErrorHandler</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Callback for delegating error handling to the user.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="sdk_src_sync_MobileServiceSyncContext.js.html">sdk/src/sync/MobileServiceSyncContext.js</a>, <a href="sdk_src_sync_MobileServiceSyncContext.js.html#line48">line 48</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Tue Oct 04 2016 14:18:03 GMT-0700 (Pacific Daylight Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

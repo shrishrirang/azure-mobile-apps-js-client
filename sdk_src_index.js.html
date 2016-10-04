@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>sdk/src/index.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="MobileServiceClient.html">MobileServiceClient</a><ul class='methods'><li data-type='method'><a href="MobileServiceClient.html#getSyncContext">getSyncContext</a></li><li data-type='method'><a href="MobileServiceClient.html#getSyncTable">getSyncTable</a></li><li data-type='method'><a href="MobileServiceClient.html#getTable">getTable</a></li><li data-type='method'><a href="MobileServiceClient.html#invokeApi">invokeApi</a></li><li data-type='method'><a href="MobileServiceClient.html#login">login</a></li><li data-type='method'><a href="MobileServiceClient.html#loginWithOptions">loginWithOptions</a></li><li data-type='method'><a href="MobileServiceClient.html#logout">logout</a></li><li data-type='method'><a href="MobileServiceClient.html#withFilter">withFilter</a></li></ul></li><li><a href="MobileServiceSqliteStore.html">MobileServiceSqliteStore</a><ul class='methods'><li data-type='method'><a href="MobileServiceSqliteStore.html#defineTable">defineTable</a></li><li data-type='method'><a href="MobileServiceSqliteStore.html#del">del</a></li><li data-type='method'><a href="MobileServiceSqliteStore.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceSqliteStore.html#read">read</a></li><li data-type='method'><a href="MobileServiceSqliteStore.html#upsert">upsert</a></li></ul></li><li><a href="MobileServiceSyncContext.html">MobileServiceSyncContext</a><ul class='methods'><li data-type='method'><a href="MobileServiceSyncContext.html#del">del</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#initialize">initialize</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#insert">insert</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#pull">pull</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#purge">purge</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#push">push</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#read">read</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#update">update</a></li></ul></li><li><a href="MobileServiceSyncTable.html">MobileServiceSyncTable</a><ul class='methods'><li data-type='method'><a href="MobileServiceSyncTable.html#del">del</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#getMobileServiceClient">getMobileServiceClient</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#getTableName">getTableName</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#insert">insert</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#pull">pull</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#purge">purge</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#read">read</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#update">update</a></li></ul></li><li><a href="MobileServiceTable.html">MobileServiceTable</a><ul class='methods'><li data-type='method'><a href="MobileServiceTable.html#del">del</a></li><li data-type='method'><a href="MobileServiceTable.html#getMobileServiceClient">getMobileServiceClient</a></li><li data-type='method'><a href="MobileServiceTable.html#getTableName">getTableName</a></li><li data-type='method'><a href="MobileServiceTable.html#insert">insert</a></li><li data-type='method'><a href="MobileServiceTable.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceTable.html#read">read</a></li><li data-type='method'><a href="MobileServiceTable.html#update">update</a></li></ul></li><li><a href="Push.html">Push</a><ul class='methods'><li data-type='method'><a href="Push.html#register">register</a></li><li data-type='method'><a href="Push.html#unregister">unregister</a></li></ul></li><li><a href="PushError.html">PushError</a><ul class='methods'><li data-type='method'><a href="PushError.html#cancel">cancel</a></li><li data-type='method'><a href="PushError.html#cancelAndDiscard">cancelAndDiscard</a></li><li data-type='method'><a href="PushError.html#cancelAndUpdate">cancelAndUpdate</a></li><li data-type='method'><a href="PushError.html#changeAction">changeAction</a></li><li data-type='method'><a href="PushError.html#getAction">getAction</a></li><li data-type='method'><a href="PushError.html#getClientRecord">getClientRecord</a></li><li data-type='method'><a href="PushError.html#getError">getError</a></li><li data-type='method'><a href="PushError.html#getServerRecord">getServerRecord</a></li><li data-type='method'><a href="PushError.html#getTableName">getTableName</a></li><li data-type='method'><a href="PushError.html#isConflict">isConflict</a></li><li data-type='method'><a href="PushError.html#update">update</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-azure-mobile-apps-client.html">azure-mobile-apps-client</a></li></ul><h3>Interfaces</h3><ul><li><a href="MobileServiceStore.html">MobileServiceStore</a><ul class='methods'><li data-type='method'><a href="MobileServiceStore.html#defineTable">defineTable</a></li><li data-type='method'><a href="MobileServiceStore.html#del">del</a></li><li data-type='method'><a href="MobileServiceStore.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceStore.html#read">read</a></li><li data-type='method'><a href="MobileServiceStore.html#upsert">upsert</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">sdk/src/index.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// ----------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// ----------------------------------------------------------------------------
+
+var _ = require('./Utilities/Extensions');
+
+/**
+ * This module is the entry point for the _Azure Mobile Apps Javascript client SDK_. 
+ *
+ * The SDK can be consumed in multiple ways:
+ * - In the form of [Cordova SDK](https://github.com/Azure/azure-mobile-apps-cordova-client) for use in a Cordova app.
+ * - As a standalone Javascript bundle for use in web apps.
+ * - As an npm package for use in web apps. 
+ *
+ * When used in the form of either Cordova SDK or a standalone Javascript bundle, the module's exports are added to the 
+ * _WindowsAzure_ namespace. Here's an example of how to use it:
+ * ```
+ * var client = new WindowsAzure.MobileServiceClient('http://azure-mobile-apps-backend-url');
+ * var table = client.getTable('mytable');
+ * ```
+ * 
+ * When used as an npm package, here is how to use it:
+ * ```
+ * var AzureMobileApps = require('azure-mobile-apps-client');
+ * var client = new AzureMobileApps.MobileServiceClient('http://azure-mobile-apps-backend-url');
+ * var table = client.getTable('mytable');
+ * ```
+ * 
+ * @exports azure-mobile-apps-client
+ */
+var api = { // Modules that need to be exposed outside the SDK for all targets
+    /**
+     * @type {MobileServiceClient} 
+     */
+    MobileServiceClient: require('./MobileServiceClient'),
+    MobileServiceLogin: require('./MobileServiceLogin'),
+    MobileServiceSyncTable: require('./sync/MobileServiceSyncTable'),
+    MobileServiceTable: require('./MobileServiceTable'),
+
+    /** 
+     * @type {QueryJs}
+     */
+    Query: require('azure-query-js').Query
+};
+
+// Target (i.e. Cordova / Browser / etc) specific definitions that need to be exposed outside the SDK
+var targetExports = require('./Platform').sdkExports;
+
+// Export shared as well as target specific APIs
+for (var i in targetExports) {
+    if ( _.isNull(api[i]) ) {
+        api[i] = targetExports[i];
+    } else {
+        throw new Error('Cannot export definition ' + i + ' outside the SDK. Multiple definitions with the same name exist');
+    }
+}
+
+/** 
+ * @type {MobileServiceSqliteStore}
+ * @name MobileServiceSqliteStore
+ * @description **Note** that this class is available **_only_** as part of the Cordova SDK.
+ */
+
+module.exports = api;
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Tue Oct 04 2016 14:18:03 GMT-0700 (Pacific Daylight Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

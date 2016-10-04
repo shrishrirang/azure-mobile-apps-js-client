@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>sdk/src/sync/pushError.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="MobileServiceClient.html">MobileServiceClient</a><ul class='methods'><li data-type='method'><a href="MobileServiceClient.html#getSyncContext">getSyncContext</a></li><li data-type='method'><a href="MobileServiceClient.html#getSyncTable">getSyncTable</a></li><li data-type='method'><a href="MobileServiceClient.html#getTable">getTable</a></li><li data-type='method'><a href="MobileServiceClient.html#invokeApi">invokeApi</a></li><li data-type='method'><a href="MobileServiceClient.html#login">login</a></li><li data-type='method'><a href="MobileServiceClient.html#loginWithOptions">loginWithOptions</a></li><li data-type='method'><a href="MobileServiceClient.html#logout">logout</a></li><li data-type='method'><a href="MobileServiceClient.html#withFilter">withFilter</a></li></ul></li><li><a href="MobileServiceSqliteStore.html">MobileServiceSqliteStore</a><ul class='methods'><li data-type='method'><a href="MobileServiceSqliteStore.html#defineTable">defineTable</a></li><li data-type='method'><a href="MobileServiceSqliteStore.html#del">del</a></li><li data-type='method'><a href="MobileServiceSqliteStore.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceSqliteStore.html#read">read</a></li><li data-type='method'><a href="MobileServiceSqliteStore.html#upsert">upsert</a></li></ul></li><li><a href="MobileServiceSyncContext.html">MobileServiceSyncContext</a><ul class='methods'><li data-type='method'><a href="MobileServiceSyncContext.html#del">del</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#initialize">initialize</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#insert">insert</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#pull">pull</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#purge">purge</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#push">push</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#read">read</a></li><li data-type='method'><a href="MobileServiceSyncContext.html#update">update</a></li></ul></li><li><a href="MobileServiceSyncTable.html">MobileServiceSyncTable</a><ul class='methods'><li data-type='method'><a href="MobileServiceSyncTable.html#del">del</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#getMobileServiceClient">getMobileServiceClient</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#getTableName">getTableName</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#insert">insert</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#pull">pull</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#purge">purge</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#read">read</a></li><li data-type='method'><a href="MobileServiceSyncTable.html#update">update</a></li></ul></li><li><a href="MobileServiceTable.html">MobileServiceTable</a><ul class='methods'><li data-type='method'><a href="MobileServiceTable.html#del">del</a></li><li data-type='method'><a href="MobileServiceTable.html#getMobileServiceClient">getMobileServiceClient</a></li><li data-type='method'><a href="MobileServiceTable.html#getTableName">getTableName</a></li><li data-type='method'><a href="MobileServiceTable.html#insert">insert</a></li><li data-type='method'><a href="MobileServiceTable.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceTable.html#read">read</a></li><li data-type='method'><a href="MobileServiceTable.html#update">update</a></li></ul></li><li><a href="Push.html">Push</a><ul class='methods'><li data-type='method'><a href="Push.html#register">register</a></li><li data-type='method'><a href="Push.html#unregister">unregister</a></li></ul></li><li><a href="PushError.html">PushError</a><ul class='methods'><li data-type='method'><a href="PushError.html#cancel">cancel</a></li><li data-type='method'><a href="PushError.html#cancelAndDiscard">cancelAndDiscard</a></li><li data-type='method'><a href="PushError.html#cancelAndUpdate">cancelAndUpdate</a></li><li data-type='method'><a href="PushError.html#changeAction">changeAction</a></li><li data-type='method'><a href="PushError.html#getAction">getAction</a></li><li data-type='method'><a href="PushError.html#getClientRecord">getClientRecord</a></li><li data-type='method'><a href="PushError.html#getError">getError</a></li><li data-type='method'><a href="PushError.html#getServerRecord">getServerRecord</a></li><li data-type='method'><a href="PushError.html#getTableName">getTableName</a></li><li data-type='method'><a href="PushError.html#isConflict">isConflict</a></li><li data-type='method'><a href="PushError.html#update">update</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-azure-mobile-apps-client.html">azure-mobile-apps-client</a></li></ul><h3>Interfaces</h3><ul><li><a href="MobileServiceStore.html">MobileServiceStore</a><ul class='methods'><li data-type='method'><a href="MobileServiceStore.html#defineTable">defineTable</a></li><li data-type='method'><a href="MobileServiceStore.html#del">del</a></li><li data-type='method'><a href="MobileServiceStore.html#lookup">lookup</a></li><li data-type='method'><a href="MobileServiceStore.html#read">read</a></li><li data-type='method'><a href="MobileServiceStore.html#upsert">upsert</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">sdk/src/sync/pushError.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// ----------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// ----------------------------------------------------------------------------
+
+/**
+ * @file Table push error handling implementation. Defines various methods for resolving conflicts
+ * @private
+ */
+
+var Platform = require('../Platform'),
+    _ = require('../Utilities/Extensions'),
+    tableConstants = require('../constants').table;
+    
+var operationTableName = tableConstants.operationTableName,
+    deletedColumnName = tableConstants.sysProps.deletedColumnName;
+
+/**
+ * Creates a pushError object that wraps the low level error encountered while pushing
+ * and adds other useful methods for error handling.
+ * @private
+ */
+function createPushError(store, operationTableManager, storeTaskRunner, pushOperation, operationError) {
+    
+    /**
+     * @class PushError
+     * @classdesc A conflict / error encountered while pushing a change to the server. This wraps the underlying error
+     * and provides additional helper methods for handling the conflict / error. 
+     * @protected
+     */
+    return {
+        /**
+         * @member {boolean} isHandled When set to true, the push logic will consider the conflict / error to be handled.
+         *                             In such a case, an attempt would be made to push the change to the server again.
+         *                             By default, `isHandled` is set to false.
+         * @instance
+         * @memberof PushError
+         */
+        isHandled: false,
+
+        getError: getError,
+        
+        // Helper methods
+        isConflict: isConflict,
+        
+        // Data query methods
+        getTableName: getTableName,
+        getAction: getAction,
+        getServerRecord: getServerRecord,
+        getClientRecord: getClientRecord,
+
+        // Error handling methods
+        cancelAndUpdate: cancelAndUpdate,
+        cancelAndDiscard: cancelAndDiscard,
+        cancel: cancel,
+        update: update,
+        changeAction: changeAction
+    };
+
+    /**
+     * Gets the name of the table for which conflict / error occurred.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @returns {string} The name of the table for which conflict / error occurred. 
+     */
+    function getTableName() {
+        return makeCopy(pushOperation.logRecord.tableName);
+    }
+    
+    /**
+     * Gets the action for which conflict / error occurred.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError 
+     * 
+     * @returns {string} The action for which conflict / error occurred. Valid action values
+     *                   are _'insert'_, _'update'_ or _'delete'_.
+     */
+    function getAction() {
+        return makeCopy(pushOperation.logRecord.action);
+    }
+    
+    /**
+     * Gets the value of the record on the server, if available, when the conflict / error occurred.
+     * This is useful while handling conflicts. However, **note** that in the event of
+     * a conflict / error, the server may not always respond with the server record's value.
+     * Example: If the push failed even before the client value reaches the server, we won't have the server value.
+     * Also, there are some scenarios where the server does not respond with the server value.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @returns {object} Server record value.
+     */
+    function getServerRecord() {
+        return makeCopy(operationError.serverInstance);
+    }
+    
+    /**
+     * Gets the value of the record that was pushed to the server when the conflict /error occurred.
+     * Note that this may not be the latest value as local tables could have changed after we
+     * started the push operation. 
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @returns {object} Client record value.
+     */
+    function getClientRecord() {
+        return makeCopy(pushOperation.data);
+    }
+    
+    /**
+     * Gets the underlying error encountered while performing the push operation. This contains
+     * grannular details of the failure like server response, error code, etc.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * @returns {Error} The underlying error object.
+     */
+    function getError() {
+        return makeCopy(operationError);
+    }
+    
+    /**
+     * Checks if the error is a conflict.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @returns {boolean} true if the error is a conflict. False, otherwise.
+     */
+    function isConflict() {
+        return operationError.request.status === 409 || operationError.request.status === 412;
+    }
+    
+    /**
+     * Cancels the push operation for the current record and updates the record in the local store.
+     * This will also set {@link PushError#isHandled} to true.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @param {object} newValue New value of the client record that will be updated in the local store.
+     * 
+     * @returns {Promise} A promise that is fulfilled when the operation is cancelled and the client record is updated.
+     *                    The promise is rejected with the error if `cancelAndUpdate` fails.
+     */
+    function cancelAndUpdate(newValue) {
+        var self = this;
+        return storeTaskRunner.run(function() {
+
+            if (pushOperation.logRecord.action === 'delete') {
+                throw new Error('Cannot update a deleted record');
+            }
+            
+            if (_.isNull(newValue)) {
+                throw new Error('Need a valid object to update the record');
+            }
+            
+            if (!_.isValidId(newValue.id)) {
+                throw new Error('Invalid ID: ' + newValue.id);
+            }
+            
+            if (newValue.id !== pushOperation.data.id) {
+                throw new Error('Only updating the record being pushed is allowed');
+            }
+            
+            // Operation to update the data record
+            var dataUpdateOperation = {
+                tableName: pushOperation.logRecord.tableName,
+                action: 'upsert',
+                data: newValue
+            };
+            
+            // Operation to delete the log record
+            var logDeleteOperation = {
+                tableName: operationTableName,
+                action: 'delete',
+                id: pushOperation.logRecord.id
+            };
+            
+            // Execute the log and data operations
+            var operations = [dataUpdateOperation, logDeleteOperation];
+            return store.executeBatch(operations).then(function() {
+                self.isHandled = true;
+            });
+        });
+    }
+    
+    /**
+     * Cancels the push operation for the current record and discards the record from the local store.
+     * This will also set {@link PushError#isHandled} to true.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @returns {Promise} A promise that is fulfilled when the operation is cancelled and the client record is discarded
+     *                    and rejected with the error if `cancelAndDiscard` fails.
+     */
+    function cancelAndDiscard() {
+        var self = this;
+        return storeTaskRunner.run(function() {
+            
+            // Operation to delete the data record
+            var dataDeleteOperation = {
+                tableName: pushOperation.logRecord.tableName,
+                action: 'delete',
+                id: pushOperation.logRecord.itemId
+            };
+            
+            // Operation to delete the log record
+            var logDeleteOperation = {
+                tableName: operationTableName,
+                action: 'delete',
+                id: pushOperation.logRecord.id
+            };
+            
+            // Execute the log and data operations
+            var operations = [dataDeleteOperation, logDeleteOperation];
+            return store.executeBatch(operations).then(function() {
+                self.isHandled = true;
+            });
+        });
+    }
+    
+    /**
+     * Updates the client data record associated with the current operation.
+     * If required, the metadata in the log record will also be associated.
+     * This will also set {@link PushError#isHandled} to true.
+     *
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @param {object} newValue New value of the data record. 
+     * 
+     * @returns {Promise} A promise that is fulfilled when the data record is updated in the localstore.
+     */
+    function update(newValue) {
+        var self = this;
+        return storeTaskRunner.run(function() {
+            if (pushOperation.logRecord.action === 'delete') {
+                throw new Error('Cannot update a deleted record');
+            }
+            
+            if (_.isNull(newValue)) {
+                throw new Error('Need a valid object to update the record');
+            }
+            
+            if (!_.isValidId(newValue.id)) {
+                throw new Error('Invalid ID: ' + newValue.id);
+            }
+            
+            if (newValue.id !== pushOperation.data.id) {
+                throw new Error('Only updating the record being pushed is allowed');
+            }
+
+            //TODO: Do we need to disallow updating record if the record has been deleted after
+            //we attempted push?
+
+            return operationTableManager.getMetadata(pushOperation.logRecord.tableName, 'upsert', newValue).then(function(metadata) {
+                pushOperation.logRecord.metadata = metadata;
+                return store.executeBatch([
+                    { // Update the log record
+                        tableName: operationTableName,
+                        action: 'upsert',
+                        data: pushOperation.logRecord
+                    },
+                    { // Update the record in the local table
+                        tableName: pushOperation.logRecord.tableName,
+                        action: 'upsert',
+                        data: newValue
+                    }
+                ]).then(function() {
+                    self.isHandled = this;
+                });
+            });
+
+        });
+    }
+    
+    /**
+     * Changes the type of operation that will be pushed to the server.
+     * This is useful for handling conflicts where you might need to change the type of the 
+     * operation to be able to push the changes to the server.
+     * This will also set {@link PushError#isHandled} to true.
+     *
+     * Example: You might need to change _'insert'_ to _'update'_ to be able to push a record that 
+     * was already inserted on the server.
+     * 
+     * Note: Changing the action to _'delete'_' will automatically remove the associated record from the 
+     * data table in the local store.
+     * 
+     * @function
+     * @instance
+     * @memberof PushError
+     * 
+     * @param {string} newAction New type of the operation. Valid values are _'insert'_, _'update'_ and _'delete'_.
+     * @param {object} [newClientRecord] New value of the client record. 
+     *                          The `id` property of the new record should match the `id` property of the original record.
+     *                          If `newAction` is _'delete'_, only the `id` and `version` properties will be read from `newClientRecord`.
+     *                          Reading the `version` property while deleting is useful if
+     *                          the conflict handler changes an _'insert'_  /_'update'_ action to _'delete'_' and also updated the version
+     *                          to reflect the server version.
+     * 
+     * @returns {Promise} A promise that is fulfilled when the action is changed and, optionally, the data record is updated / deleted.
+     *                    If this fails, the promsie is rejected with the error.
+     */
+    function changeAction(newAction, newClientRecord) {
+        var self = this;
+        return storeTaskRunner.run(function() {
+            var dataOperation, // operation to edit the data record
+                logOperation = { // operation to edit the log record 
+                    tableName: operationTableName,
+                    action: 'upsert',
+                    data: makeCopy(pushOperation.logRecord)
+                };
+
+            // If a new value for the record is specified, use the version property to update the metadata
+            // If not, there is nothing that needs to be changed in the metadata. Just use the metadata we already have.
+            if (newClientRecord) {
+                if (!newClientRecord.id) {
+                    throw new Error('New client record value must specify the record ID');
+                }
+                    
+                if (newClientRecord.id !== pushOperation.logRecord.itemId) {
+                    throw new Error('New client record value cannot change the record ID. Original ID: ' +
+                                    pushOperation.logRecord.id + ' New ID: ' + newClientRecord.id);
+                }
+
+                // FYI: logOperation.data and pushOperation.data are not the same thing!
+                logOperation.data.metadata = logOperation.data.metadata || {};
+                logOperation.data.metadata[tableConstants.sysProps.versionColumnName] = newClientRecord[tableConstants.sysProps.versionColumnName];
+            }
+
+            if (newAction === 'insert' || newAction === 'update') {
+                
+                // Change the action as specified
+                var oldAction = logOperation.data.action;
+                logOperation.data.action = newAction;
+
+                // Update the client record, if a new value is specified
+                if (newClientRecord) {
+                    
+                    dataOperation = {
+                        tableName: pushOperation.logRecord.tableName,
+                        action: 'upsert',
+                        data: newClientRecord
+                    };
+                    
+                } else if (oldAction !== 'insert' &amp;&amp; oldAction !== 'update') {
+
+                    // If we are here, it means we are changing the action from delete to insert / update. 
+                    // In such a case we expect newClientRecord to be non-null as we won't otherwise know what to insert / update.
+                    // Example: changing delete to insert without specifying a newClientRecord is meaningless.
+                    throw new Error('Changing action from ' + oldAction + ' to ' + newAction +
+                                    ' without specifying a value for the associated record is not allowed!');
+                }
+                
+            } else if (newAction === 'delete' || newAction === 'del') {
+
+                // Change the action to 'delete'
+                logOperation.data.action = 'delete';
+
+                // Delete the client record as the new action is 'delete'
+                dataOperation = {
+                    tableName: pushOperation.logRecord.tableName,
+                    action: 'delete',
+                    id: pushOperation.logRecord.id
+                };
+
+            } else {
+                throw new Error('Action ' + newAction + ' not supported.');
+            }
+            
+            // Execute the log and data operations
+            return store.executeBatch([logOperation, dataOperation]).then(function() {
+                self.isHandled = true;
+            });
+        });
+    }
+    
+    /**
+     * Cancels pushing the current operation to the server permanently.
+     * This will also set {@link PushError#isHandled} to true.
+     * 
+     * This method simply removes the pending operation from the operation table, thereby 
+     * permanently skipping the associated change from being pushed to the server. A future change 
+     * done to the same record will not be affected and such changes will continue to be pushed.
+     *  
+     * @function
+     * @instance
+     * @memberof PushError
+     *
+     * @returns {Promise} A promise that is fulfilled when the operation is cancelled OR rejected
+     *                    with the error if it fails to cancel it.
+     */
+    function cancel() {
+        var self = this;
+        return storeTaskRunner.run(function() {
+            return store.del(operationTableName, pushOperation.logRecord.id).then(function() {
+                self.isHandled = true;
+            });
+        });
+    }
+}
+
+function makeCopy(value) {
+    if (!_.isNull(value)) {
+        value = JSON.parse( JSON.stringify(value) );
+    }
+    return value;
+}
+
+/**
+ * Attempts error handling by delegating it to the user, if a push handler is provided
+ * @private
+ */
+function handlePushError(pushError, pushHandler) {
+    return Platform.async(function(callback) {
+        callback();
+    })().then(function() {
+        
+        if (pushError.isConflict()) {
+            if (pushHandler &amp;&amp; pushHandler.onConflict) {
+                // NOTE: value of server record will not be available in case of 409.
+                return pushHandler.onConflict(pushError);
+            }
+        } else if (pushHandler &amp;&amp; pushHandler.onError) {
+            return pushHandler.onError(pushError);
+        }
+
+    }).then(undefined, function(error) {
+        // Set isHandled to false even if the user has set it to handled if the onConflict / onError failed 
+        pushError.isHandled = false;
+    });
+}
+
+exports.createPushError = createPushError;
+exports.handlePushError = handlePushError;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Tue Oct 04 2016 14:18:03 GMT-0700 (Pacific Daylight Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
