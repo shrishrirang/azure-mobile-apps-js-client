@@ -25,6 +25,7 @@ dist/
 gen/
 [Gg]enerated/
 [Ee]xternal/
+jsdoc/out
 
 # VS files
 *.user

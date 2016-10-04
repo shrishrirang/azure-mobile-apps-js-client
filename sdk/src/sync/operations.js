@@ -5,6 +5,7 @@
 /**
  * @file Implements operation table management functions like defining the operation table,
  * adding log operations to the operation table, condensing operations, etc
+ * @private
  */
 
 var Validate = require('../Utilities/Validate'),

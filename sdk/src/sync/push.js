@@ -3,7 +3,8 @@
 // ----------------------------------------------------------------------------
 
 /**
- * Table push logic implementation
+ * @file Table push logic implementation
+ * @private
  */
 
 var Validate = require('../Utilities/Validate'),

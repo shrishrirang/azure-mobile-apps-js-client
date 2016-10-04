@@ -6,6 +6,7 @@
  * @file Defines functions for serializing a JS object into an object that can be used for storing in a SQLite table and
  *       for deserializing a row / object read from a SQLite table into a JS object. The target type of a serialization or
  *       a deserialization operation is determined by the specified column definition.
+ * @private
  */
 
 var Platform = require('.'),
@@ -18,6 +19,7 @@ var Platform = require('.'),
 
 /**
  * Gets the SQLite type that matches the specified ColumnType.
+ * @private
  * @param columnType - The type of values that will be stored in the SQLite table
  * @throw Will throw an error if columnType is not supported 
  */
@@ -52,6 +54,7 @@ function getSqliteType (columnType) {
 /**
  * Checks if the value can be stored in a table column of the specified type.
  * Example: Float values can be stored in column of type ColumnType.Float but not ColumnType.Integer. 
+ * @private
  */
 function isJSValueCompatibleWithColumnType(value, columnType) {
     
@@ -89,6 +92,7 @@ function isJSValueCompatibleWithColumnType(value, columnType) {
  * in the table using a column type different from columnType.
  * Example: If a non-integer numeric value is stored in a column of type ColumnType.Float and 
  * then deserialized into a column of type ColumnType.Integer, that will be an error. 
+ * @private
  */
 function isSqliteValueCompatibleWithColumnType(value, columnType) {
     
@@ -123,6 +127,7 @@ function isSqliteValueCompatibleWithColumnType(value, columnType) {
 
 /**
  * Checks if type is a supported ColumnType
+ * @private
  */
 function isColumnTypeValid(type) {
     for (var key in ColumnType) {
@@ -135,6 +140,7 @@ function isColumnTypeValid(type) {
 
 /**
  * Serializes an object into an object that can be stored in a SQLite table, as defined by columnDefinitions.
+ * @private
  */
 function serialize (value, columnDefinitions) {
 
@@ -165,6 +171,7 @@ function serialize (value, columnDefinitions) {
 
 /**
  * Deserializes a row read from a SQLite table into a Javascript object, as defined by columnDefinitions.
+ * @private
  */
 function deserialize (value, columnDefinitions) {
 
@@ -191,6 +198,7 @@ function deserialize (value, columnDefinitions) {
 
 /**
  * Serializes a property of an object into a value which can be stored in a SQLite column of type columnType. 
+ * @private
  */
 function serializeMember(value, columnType) {
     
@@ -286,6 +294,7 @@ function deserializeMember(value, columnType) {
 /**
  * Serializes a JS value to its equivalent that will be stored in the store.
  * This method is useful while querying to convert values to their store representations.
+ * @private
  */
 function serializeValue(value) {
 

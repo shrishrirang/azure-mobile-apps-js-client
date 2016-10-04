@@ -33,32 +33,31 @@ var MobileServiceSystemColumns = {
     Deleted: "deleted"
 };
 
+/**
+ * @class
+ * @classdesc Represents a table in the Azure Mobile Apps backend.
+ * @protected
+ * 
+ * @param {string} tableName Name of the table in the backend.
+ * @param {MobileServiceClient} client The {@link MobileServiceClient} instance associated with this table.
+ */
 function MobileServiceTable(tableName, client) {
-    /// <summary>
-    /// Initializes a new instance of the MobileServiceTable class.
-    /// </summary>
-    /// <param name="tableName" type="String">
-    /// Name of the table.
-    /// </param>
-    /// <param name="client" type="MobileServiceClient" mayBeNull="false">
-    /// The MobileServiceClient used to make requests.
-    /// </param>
 
+    /**
+     * Gets the name of the backend table.
+     * 
+     * @returns {string} The name of the table.
+     */
     this.getTableName = function () {
-        /// <summary>
-        /// Gets the name of the table.
-        /// </summary>
-        /// <returns type="String">The name of the table.</returns>
         return tableName;
     };
 
+    /**
+     * Gets the {@link MobileServiceClient} instance associated with this table.
+     * 
+     * @returns {MobileServiceClient} The {@link MobileServiceClient} associated with this table.
+     *///FIXME
     this.getMobileServiceClient = function () {
-        /// <summary>
-        /// Gets the MobileServiceClient associated with this table.
-        /// </summary>
-        /// <returns type="MobileServiceClient">
-        /// The MobileServiceClient associated with this table.
-        /// </returns>
         return client;
     };
 
@@ -231,22 +230,40 @@ MobileServiceTable.prototype._read = function (query, parameters, callback) {
         });
 };
 
+/**
+ * Reads records from the backend table.
+ * 
+ * @function
+ * @instance
+ * @public
+ * @memberof MobileServiceTable
+ * 
+ * @param {QueryJs} query A {@link QueryJs} object representing the query to use while
+ *                        reading the backend table
+ * @param {object} parameters An object of user-defined parameters and values to include in the request URI query string.
+ * 
+ * @returns {Promise} A promise that is resolved with an array of records read from the table, if the read is successful.
+ *                    If read fails, the promise is rejected with the error.
+ */
 MobileServiceTable.prototype.read = Platform.async(MobileServiceTable.prototype._read);
 
+/**
+ * Inserts a new object / record in the backend table.
+ * 
+ * @function
+ * @instance
+ * @public
+ * @memberof MobileServiceTable
+ * 
+ * @param {object} instance Object / record to be inserted in the backend table.
+ * @param {string | number} instance.id id of the object / record.
+ * @param {object} parameters An object of user-defined parameters and values to include in the request URI query string.
+ * 
+ * @returns {Promise} A promise that is resolved with the inserted object when the insert operation is completed successfully.
+ *                    If the operation fails, the promise is rejected with the error.
+ */
 MobileServiceTable.prototype.insert = Platform.async(
     function (instance, parameters, callback) {
-        /// <summary>
-        /// Insert a new object into a table.
-        /// </summary>
-        /// <param name="instance" type="Object">
-        /// The instance to insert into the table.
-        /// </param>
-        /// <param name="parameters" type="Object" mayBeNull="true">
-        /// An object of user-defined parameters and values to include in the request URI query string.
-        /// </param>
-        /// <param name="callback" type="Function">
-        /// The callback to invoke when the insert is complete.
-        /// </param>
 
         // Account for absent optional arguments
         if (_.isNull(callback) && (typeof parameters === 'function')) {
@@ -315,20 +332,23 @@ MobileServiceTable.prototype.insert = Platform.async(
             });
     });
 
+/**
+ * Update an object / record in the backend table.
+ * 
+ * @function
+ * @instance
+ * @public
+ * @memberof MobileServiceTable
+ * 
+ * @param {object} instance New value of the object / record.
+ * @param {string | number} instance.id The id of the object / record identifies the record that will be updated in the table.
+ * @param {object} parameters An object of user-defined parameters and values to include in the request URI query string.
+ * 
+ * @returns {Promise} A promise that is resolved when the operation is completed successfully.
+ *                    If the operation fails, the promise is rejected with the error.
+ */
 MobileServiceTable.prototype.update = Platform.async(
     function (instance, parameters, callback) {
-        /// <summary>
-        /// Update an object in a given table.
-        /// </summary>
-        /// <param name="instance" type="Object">
-        /// The instance to update in the table.
-        /// </param>
-        /// <param name="parameters" type="Object" mayBeNull="true">
-        /// An object of user-defined parameters and values to include in the request URI query string.
-        /// </param>
-        /// <param name="callback" type="Function">
-        /// The callback to invoke when the update is complete.
-        /// </param>
         var version,
             headers = {},
             features = this._features || [],
@@ -483,6 +503,20 @@ MobileServiceTable.prototype.refresh = Platform.async(
             });
     });
 
+/**
+ * Looks up an object / record in the backend table using the object id.
+ * 
+ * @function
+ * @instance
+ * @public
+ * @memberof MobileServiceTable
+ * 
+ * @param {string} id id of the object to be looked up in the backend table.
+ * @param {object} parameters An object of user-defined parameters and values to include in the request URI query string.
+ * 
+ * @returns {Promise} A promise that is resolved with the looked up object when the lookup is completed successfully.
+ *                    If the operation fails, the promise is rejected with the error.
+ */
 MobileServiceTable.prototype.lookup = Platform.async(
     function (id, parameters, callback) {
         /// <summary>
@@ -546,20 +580,23 @@ MobileServiceTable.prototype.lookup = Platform.async(
             });
     });
 
+/**
+ * Deletes an object / record from the backend table.
+ * 
+ * @function
+ * @instance
+ * @public
+ * @memberof MobileServiceTable
+ * 
+ * @param {object} instance The object to delete from the backend table. 
+ * @param {string} instance.id id of the record to be deleted.
+ * @param {object} parameters An object of user-defined parameters and values to include in the request URI query string.
+ * 
+ * @returns {Promise} A promise that is resolved when the delete operation completes successfully.
+ *                    If the operation fails, the promise is rejected with the error.
+ */
 MobileServiceTable.prototype.del = Platform.async(
     function (instance, parameters, callback) {
-        /// <summary>
-        /// Delete an object from a given table.
-        /// </summary>
-        /// <param name="instance" type="Object">
-        /// The instance to delete from the table.
-        /// </param>
-        /// <param name="parameters" type="Object" mayBeNull="true">
-        /// An object of user-defined parameters and values to include in the request URI query string.
-        /// </param>
-        /// <param name="callback" type="Function">
-        /// The callback to invoke when the delete is complete.
-        /// </param>
 
         // Account for absent optional arguments
         if (_.isNull(callback) && (typeof parameters === 'function')) {
