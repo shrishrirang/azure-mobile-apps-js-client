@@ -458,7 +458,7 @@ var MobileServiceSqliteStore = function (dbName) {
 
                 // If the query requests the result count we expect 2 SQLite statements. Else, we expect a single statement.
                 if (statements.length < 1 || statements.length > 2) {
-                    throw Platform.getResourceString("MobileServiceSqliteStore_UnexptedNumberOfStatements");
+                    throw new Error('Unexpected number of statements');
                 }
 
                 // The first statement gets the query results. Execute it.

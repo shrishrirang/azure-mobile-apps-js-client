@@ -28,7 +28,7 @@ Object.defineProperties(MobileServiceClient.prototype, {
             }else if (_.url.isAbsoluteUrl(value) && _.url.isHttps(value)) {
                 this._alternateLoginHost = value;
             } else {
-                throw _.format(Platform.getResourceString("AlternateLoginHost_Invalid"), value);
+                throw new Error(value + ' is not valid. Expected Absolute Url with https scheme');
             }
         }
     }

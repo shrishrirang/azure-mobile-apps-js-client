@@ -247,7 +247,7 @@ MobileServiceLogin.prototype.loginWithProvider = function (provider, token, useS
     if (this._loginState.inProcess) {
         var didCancel = this._loginState.cancelCallback && this._loginState.cancelCallback();
         if (!didCancel) {
-            throw Platform.getResourceString("MobileServiceLogin_LoginErrorResponse");
+            throw new Error('Cannot start a login operation because login is already in progress.');
         }
     }
 

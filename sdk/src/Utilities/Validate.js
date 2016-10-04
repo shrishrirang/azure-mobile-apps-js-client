@@ -57,7 +57,7 @@ exports.isValidId = function (value, name) {
     /// </param>
 
     if (!_.isValidId(value)) {
-        throw _.format(Platform.getResourceString("Validate_InvalidId"), name || 'id');
+        throw new Error('Invalid ID: ' + (name || 'id'));
     }
 };
 
