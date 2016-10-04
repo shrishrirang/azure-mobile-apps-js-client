@@ -397,7 +397,9 @@ MobileServiceClient.prototype.logout = Platform.async(function(callback) {
  *                                    values as property keys and values respectively. 
  * @param {object} options.headers HTTP request headers.
  * 
- * @returns {Promise} A promise that is either resolved with the API's result or rejected with the error.
+ * @returns {Promise} A promise that is resolved with an _XMLHttpRequest_ object if the API is invoked succesfully.
+ *                    If the server response is JSON, it is deserialized into _XMLHttpRequest.result_.
+ *                    If _invokeApi_ fails, the promise is rejected with the error.
  */
 MobileServiceClient.prototype.invokeApi = Platform.async(
     function (apiName, options, callback) {
