@@ -54,7 +54,7 @@ exports.login = function (startUri, endUri, callback) {
                         loginWindow.close();
                     }, 500);
                     var result = parseOAuthResultFromDoneUrl(evt.url);
-                    callback(result.error, result.oAuthToken);
+                    callback(new Error(result.error), result.oAuthToken);
                 }
             };
 
@@ -66,7 +66,7 @@ exports.login = function (startUri, endUri, callback) {
         loginWindow.addEventListener('exit', function (evt) {
             if (!flowHasFinished) {
                 flowHasFinished = true;
-                callback("UserCancelled", null);
+                callback(new Error("UserCancelled"), null);
             }
         });
     }, 500);

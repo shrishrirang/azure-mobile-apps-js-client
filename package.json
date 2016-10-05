@@ -34,8 +34,8 @@
   "scripts": {
     "build": "grunt build",
     "buildall": "grunt build",
-    "buildbrowser": "grunt buildbrowser",
-    "buildcordova": "grunt buildcordova",
+    "buildbrowser": "grunt buildbrowsermin",
+    "buildcordova": "grunt buildcordovamin",
     "jsdoc": "jsdoc -c jsdoc/config.json",
     "watch": "grunt watch:all",
     "watchall": "grunt watch:all",

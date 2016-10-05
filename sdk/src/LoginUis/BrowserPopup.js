@@ -87,7 +87,7 @@ exports.login = function (startUri, endUri, callback) {
             // We can't directly catch any "onclose" event from the popup because it's usually on a different
             // origin, but in all the mainstream browsers we can poll for changes to its "closed" property
             if (loginWindow && loginWindow.closed === true) {
-                complete("canceled", null);
+                complete(new Error("canceled"), null);
             }
         }, 250);
 
@@ -101,7 +101,7 @@ exports.login = function (startUri, endUri, callback) {
     // Permit cancellation, e.g., if the app tries to login again while the popup is still open
     return {
         cancelCallback: function () {
-            complete("canceled", null);
+            complete(new Error("canceled"), null);
             return true; // Affirm that it was cancelled
         }
     };
