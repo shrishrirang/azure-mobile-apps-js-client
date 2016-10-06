@@ -137,7 +137,7 @@ MobileServiceTable.prototype._read = function (query, parameters, callback) {
                 
                 if (tableName !== components.table) {
                     var message = _.format(Platform.getResourceString("MobileServiceTable_ReadMismatchedQueryTables"), tableName, components.table);
-                    callback(_.createError(message), null);
+                    callback(new Error(message), null);
                     return;
                 }
 
@@ -433,7 +433,7 @@ MobileServiceTable.prototype.refresh = Platform.async(
         if (!_.isValidId(instance[idPropertyName], idPropertyName))
         {
             if (typeof instance[idPropertyName] === 'string' && instance[idPropertyName] !== '') {
-                throw new Error('Invalid ID: ' + idPropertyName);
+                throw new Error(idPropertyName + ' "' + instance[idPropertyName] + '" is not valid.');
             } else {
                 callback(null, instance);
             }
@@ -490,7 +490,7 @@ MobileServiceTable.prototype.refresh = Platform.async(
                         var message =_.format(
                             Platform.getResourceString("MobileServiceTable_NotSingleObject"),
                             idPropertyName);
-                        callback(_.createError(message), null);
+                        callback(new Error(message), null);
                     }
 
                     result = Platform.allowPlatformToMutateOriginal(instance, result);

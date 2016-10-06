@@ -57,7 +57,7 @@ exports.isValidId = function (value, name) {
     /// </param>
 
     if (!_.isValidId(value)) {
-        throw new Error('Invalid ID: ' + (name || 'id'));
+        throw new Error((name || 'id') + ' "' + value + '" is not valid.');
     }
 };
 
