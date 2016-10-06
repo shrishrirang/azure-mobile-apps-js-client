@@ -44,7 +44,7 @@ var api = { // Modules that need to be exposed outside the SDK for all targets
 };
 
 // Target (i.e. Cordova / Browser / etc) specific definitions that need to be exposed outside the SDK
-var targetExports = require('./Platform').sdkExports;
+var targetExports = require('./Platform/sdkExports');
 
 // Export shared as well as target specific APIs
 for (var i in targetExports) {

@@ -11,11 +11,10 @@
 
 var browserExports = require('../web');
 
-// Add each export individually to module.exports instead of 
-// simply returning browserExports to work around a limitation / bug
-// in browserify's cyclic dependency handling 
+// Copy the browser exports into the exports object for Cordova, instead of module.exports = browserExports.
+// This way we can add more exports to module.exports (in the future) without having to worry about 
+// having an unintended side effect on the browser exports. 
 for (var i in browserExports) {
     exports[i] = browserExports[i];
 }
 
-exports.sdkExports = require('./sdkExports');
