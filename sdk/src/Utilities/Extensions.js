@@ -577,17 +577,14 @@ exports.createError = function (exceptionOrMessage, request) {
     /// </param>
     /// <returns>An object with error details</returns>
 
-    // Create an error object to return
-    var error = { message: Platform.getResourceString("Extensions_DefaultErrorMessage") };
-    error.toString = function () {
-        return error.message;
-    };
-
+    var error;
     if (request) {
+        var message = Platform.getResourceString("Extensions_DefaultErrorMessage");
+
         error.request = request;
         if (request.status === 0) {
             // Provide a more helpful message for connection failures
-            error.message = Platform.getResourceString("Extensions_ConnectionFailureMessage");
+            message = Platform.getResourceString("Extensions_ConnectionFailureMessage");
         } else {
             // Try to pull out an error message from the response before
             // defaulting to the status
@@ -602,9 +599,9 @@ exports.createError = function (exceptionOrMessage, request) {
             try {
                 var response = JSON.parse(request.responseText);
                 if (typeof response === 'string') {
-                    error.message = response;
+                    message = response;
                 } else {
-                    error.message =
+                    message =
                         response.error ||
                         response.description ||
                         request.statusText ||
@@ -612,20 +609,24 @@ exports.createError = function (exceptionOrMessage, request) {
                 }
             } catch (ex) {
                 if (isText) {
-                    error.message = request.responseText;
+                    message = request.responseText;
                 } else {
-                    error.message =
+                    message =
                         request.statusText ||
                         Platform.getResourceString("Extensions_DefaultErrorMessage");
                 }
             }
         }
+
+        error = new Error(message);
     } else if (_.isString(exceptionOrMessage) && !_.isNullOrEmpty(exceptionOrMessage)) {
-        // If it's a string, just use that as the message
-        error.message = exceptionOrMessage;
+        error = new Error(exceptionOrMessage);
+    } else if (exceptionOrMessage instanceof Error) { // If exceptionOrMessage is an Error object, use it as-is
+        error = exceptionOrMessage; 
     } else if (!_.isNull(exceptionOrMessage)) {
         // Otherwise we'll use the object as an exception and leave the
         // default error message
+        error = new Error(Platform.getResourceString("Extensions_DefaultErrorMessage"));
         error.exception = exceptionOrMessage;
     }
 
