@@ -581,7 +581,6 @@ exports.createError = function (exceptionOrMessage, request) {
     if (request) {
         var message = Platform.getResourceString("Extensions_DefaultErrorMessage");
 
-        error.request = request;
         if (request.status === 0) {
             // Provide a more helpful message for connection failures
             message = Platform.getResourceString("Extensions_ConnectionFailureMessage");
@@ -619,6 +618,7 @@ exports.createError = function (exceptionOrMessage, request) {
         }
 
         error = new Error(message);
+        error.request = request;
     } else if (_.isString(exceptionOrMessage) && !_.isNullOrEmpty(exceptionOrMessage)) {
         error = new Error(exceptionOrMessage);
     } else if (exceptionOrMessage instanceof Error) { // If exceptionOrMessage is an Error object, use it as-is

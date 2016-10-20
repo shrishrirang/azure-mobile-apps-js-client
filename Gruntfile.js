@@ -120,6 +120,21 @@ module.exports = function(grunt) {
                 dest: __dirname + '/sdk/test/app/cordova/platforms/android/assets/www/scripts/generated',
                 expand: true,
                 cwd: __dirname + '/sdk/test/app/cordova/www/scripts/generated'
+            },
+            e2etestShared: {
+                src: [
+                    'misc/**',
+                    'tests/**'
+                ],
+                //dest: refer multidest task
+                expand: true,
+                cwd: __dirname + '/e2etest'
+            },
+            e2etestDist: {
+                src: 'dist/**',
+                //dest: refer multidest task
+                expand: true,
+                cwd: __dirname
             }
         },
         watch: {
@@ -135,6 +150,21 @@ module.exports = function(grunt) {
                 files: '<%= files.all %>',
                 tasks: ['browserify:cordovaTest', 'copy:cordovaTest', 'copy:hostCordovaTest']
             }
+        },
+        multidest: {
+            e2etest: {
+                tasks: [
+                    'copy:e2etestShared',
+                    'copy:e2etestDist'
+                ],
+                dest: [
+                    'e2etest/app/browser-bundle-using-script-tag/generated',
+                    'e2etest/app/browser-bundle-as-commonjs/generated',
+                    'e2etest/app/browser-bundle-as-amd/generated',
+                    'e2etest/app/browser-package-browserify/generated',
+                    'e2etest/app/browser-package-webpack/generated'
+                ]
+            }
         }
     });
 
@@ -144,6 +174,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-multi-dest');
         
     // Define build tasks
     grunt.registerTask('build', ['buildbrowserfull', 'buildcordovafull', 'jshint']);
@@ -151,6 +182,8 @@ module.exports = function(grunt) {
     grunt.registerTask('buildcordovamin', ['browserify:cordova', 'browserify:cordovaTest', 'copy:cordova', 'copy:cordovaTest']);
     grunt.registerTask('buildbrowserfull', ['browserify:web', 'browserify:webTest', 'uglify:web', 'copy:web', 'copy:webTest']);
     grunt.registerTask('buildcordovafull', ['browserify:cordova', 'browserify:cordovaTest', 'uglify:cordova', 'copy:cordova', 'copy:cordovaTest']);
+
+    grunt.registerTask('e2esetup', ['copy:e2etestDist', 'multidest:e2etest']);
 
     // Define the default task
     grunt.registerTask('default', ['build']);

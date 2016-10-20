@@ -2,33 +2,33 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Azure Mobile Apps WinJS End To End Tests</title>
+    <title>Azure Mobile Apps End To End Tests</title>
 
-    <!-- WinJS references -->
-    <link href="//Microsoft.WinJS.2.0/css/ui-dark.css" rel="stylesheet" />
-    <script src="//Microsoft.WinJS.2.0/js/base.js"></script>
-    <script src="//Microsoft.WinJS.2.0/js/ui.js"></script>
+    <link href="generated/misc/css/default.css" rel="stylesheet" />
 
-    <!-- ZumoE2ETestAppJs references -->
-    <link href="generated/shared/css/default.css" rel="stylesheet" />
-    <script src=""></script>
-    <script src="generated/dist/MobileServices.js"></script>
-    <script src="generated/shared/thirdparty/jquery-2.1.1.js"></script>
-    <script src="generated/shared/thirdparty/wl.js"></script>
+    <!-- Default behavior is to use the locally built bundle.
+		 To use the latest published bundle, use https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.js
+	-->
+    <script src="generated/dist/azure-mobile-apps-client.js"></script>
 
-    <!-- Zumo tests; the order of the references is important -->
+    <script src="generated/misc/thirdparty/jquery-2.1.1.js"></script>
+    
+    <script src="generated/misc/target/browser/Promises.js"></script>
+    <script src="generated/misc/target/browser/platformSpecificFunctions.js"></script>
 
-    <script src="generated/shared/testframework/testFramework.js"></script>
-    <script src="generated/shared/tests/roundTripTests.js"></script>
-    <script src="generated/shared/tests/queryTestData.js"></script>
-    <script src="generated/shared/tests/mobileServiceTable.Functional.js"></script>
-    <script src="generated/shared/tests/queryTests.js"></script>
-    <script src="generated/shared/tests/updateDeleteTests.js"></script>
-    <script src="generated/shared/tests/loginTests.js"></script>
-    <script src="generated/shared/tests/miscTests.js"></script>
-    <script src="generated/shared/tests/platform/winjs/pushTests.js"></script>
-    <script src="generated/shared/tests/apiTests.js"></script>
-    <script src="generated/shared/tests/allTests.js"></script>
+    <script src="generated/misc/testframework/testFramework.js"></script>
+    <script src="generated/misc/testframework/storageFramework.js"></script>
+
+    <script src="generated/tests/shared/roundTripTests.js" type="text/javascript"></script>
+    <script src="generated/tests/shared/mobileServiceTable.Functional.js" type="text/javascript"></script>    
+    <script src="generated/tests/shared/queryTestData.js" type="text/javascript"></script>
+    <script src="generated/tests/shared/queryTests.js" type="text/javascript"></script>
+    <script src="generated/tests/shared/updateDeleteTests.js"></script>
+    <script src="generated/tests/shared/loginTests.js" type="text/javascript"></script>
+    <script src="generated/tests/shared/miscTests.js" type="text/javascript"></script>
+    <script src="generated/tests/shared/apiTests.js" type="text/javascript"></script>
+    <script src="generated/tests/shared/allTests.js" type="text/javascript"></script>
+
 </head>
 <body>
     <table id='mainTable'>
@@ -41,14 +41,13 @@
                     <tr>
                         <th id='appUrlLabelCell'>App URL:</th>
                         <th id='appUrlTextCell'>
-                            <input id='txtAppUrl' />
-                        </th>
+                            <input id='txtAppUrl' value="" /></th>
                         <th id='saveAppInfoCell'>
-                            <button id='btnSaveAppInfo'>Save App Info</button>
-                        </th>
+                            <button id='btnSaveAppInfo'>Save App Info</button></th>
                         <td>
                             <button id="btnRunAllTests">Run All Tests</button>
                         </td>
+
                     </tr>
                     <tr>
                         <th/>
@@ -74,7 +73,7 @@
                     <tbody id='tblTestsGroupBody'></tbody>
                 </table>
             </td>
-            <td id='testsTableCell' class='borderedCell' style="vertical-align: text-top;">
+            <td id='testsTableCell' class='borderedCell' style="vertical-align: text-top; height: 100%;">
                 <table id='tblTests' style="width: 100%; height: 100%;">
                     <thead id="tblTestsHead">
                         <tr>
@@ -106,9 +105,29 @@
             </td>
         </tr>
     </table>
+    
+    <script src="generated/misc/testframework/testFrameworkConnections.js"></script>
+    <script type="text/javascript">
+        if (window.navigator.userAgent.toLowerCase().indexOf("firefox") > 0) { //Firefox innerText define
+            HTMLElement.prototype.__defineGetter__("innerText", function () {
+                var anyString = "";
+                var childS = this.childNodes;
+                for (var i = 0; i < childS.length; i++) {
+                    if (childS[i].nodetype == Node.ELEMENT_NODE) {
+                        anyString += childS[i].tagname == "br" ? '\n' : childS[i].innertext;
+                    }
+                    else if (childS[i].nodeType == Node.TEXT_NODE) {
+                        anyString += childS[i].nodeValue;
+                    }
+                }
+                return anyString;
+            });
 
-    <script src="generated/shared/platform/winjs/platformSpecificFunctions.js"></script>
-    <script type="text/javascript" src="generated/shared/testframework/testFrameworkConnections.js"></script>
-    <script src="generated/shared/testframework/storageFramework.js"></script>    
+            HTMLElement.prototype.__defineSetter__("innerText", function (sText) {
+                this.textContent = sText;
+            });
+        }
+    </script>
+
 </body>
 </html>
