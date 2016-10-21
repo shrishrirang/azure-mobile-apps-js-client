@@ -33,7 +33,7 @@ Here are a few examples of how you can use the SDK.
     <script src="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-beta5.js"></script>
     <script>
         // Create a reference to the Azure App Service
-        var clientRef = new WindowsAzure.MobileServiceClient('https://YOUR-SITE-NAME.azurewebsites.net); 
+        var clientRef = new WindowsAzure.MobileServiceClient('https://YOUR-SITE-NAME.azurewebsites.net'); 
     </script>
 </head>
 </html>
@@ -51,7 +51,7 @@ You can now use it in your Javascript code as follows:
 ```
 var WindowsAzure = require('azure-mobile-apps-client');
 // Create a reference to the Azure App Service
-var clientRef = new WindowsAzure.MobileServiceClient('https://YOUR-SITE-NAME.azurewebsites.net);
+var clientRef = new WindowsAzure.MobileServiceClient('https://YOUR-SITE-NAME.azurewebsites.net');
 ```
 
 You can bundle your Javascript code using either [WebPack](https://webpack.github.io/) or [Browserify](http://browserify.org/).
