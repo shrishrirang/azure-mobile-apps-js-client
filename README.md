@@ -30,7 +30,7 @@ Here are a few examples of how you can use the SDK.
 ```
 <html>
 <head>
-    <script src="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-beta5.js"></script>
+    <script src="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-rc1.js"></script>
     <script>
         // Create a reference to the Azure App Service
         var clientRef = new WindowsAzure.MobileServiceClient('https://YOUR-SITE-NAME.azurewebsites.net'); 
@@ -66,8 +66,10 @@ Refer https://azure.github.io/azure-mobile-apps-js-client for detailed documenta
 
 ## SDK downloads
 
-- latest [unminified](https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-beta5.js) and [minified](https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-beta5.min.js)
+- latest [unminified](https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.js) and [minified](https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.min.js)
+- version 2.0.0-rc1 [unminified](https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-rc1.js) and [minified](https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-rc1.min.js)
 - version 2.0.0-beta5 [unminified](https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-beta5.js) and [minified](https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-beta5.min.js)
+- version 2.0.0-beta4 [unminified](https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-beta4.js) and [minified](https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-beta4.min.js)
 
 ## Build instructions
 
