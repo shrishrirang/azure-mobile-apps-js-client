@@ -1,12 +1,24 @@
 # Azure Mobile Apps: Javascript Client SDK
 
-With Microsoft Azure Mobile Apps you can add a scalable backend to your connected client applications in minutes. To learn more about Azure Mobile Apps, visit the [Mobile Apps documentation](https://azure.microsoft.com/en-us/documentation/learning-paths/appservice-mobileapps/). 
+With Microsoft Azure Mobile Apps you can add a scalable backend to your connected client applications in minutes. To learn more about Azure Mobile Apps, visit the [Mobile Apps documentation](https://azure.microsoft.com/en-us/documentation/learning-paths/appservice-mobileapps/).
 
 This repository contains code for the [azure-mobile-apps-client](https://www.npmjs.com/package/azure-mobile-apps-client) npm package and the [cordova-plugin-ms-azure-mobile-apps](https://www.npmjs.com/package/cordova-plugin-ms-azure-mobile-apps) Cordova plugin.
 
 The Cordova plugin is published from the [Azure/azure-mobile-apps-cordova-client](https://github.com/Azure/azure-mobile-apps-cordova-client) repository by bundling source code in this repository. Refer [Azure/azure-mobile-apps-cordova-client](https://github.com/Azure/azure-mobile-apps-cordova-client) for more details about the Cordova plugin.
 
 The following sections explain how to use the [Javascript client SDK](https://www.npmjs.com/package/azure-mobile-apps-client). You can also refer [How to Use the JavaScript Client Library for Azure Mobile Apps](https://azure.microsoft.com/en-us/documentation/articles/app-service-mobile-html-how-to-use-client-library/) for more details.
+
+## Support
+
+The JavaScript client is primarily suited to Apache Cordova uses.  Offline Sync is only supported in Apache Cordova situations.
+We test on the following platforms for Apache Cordova v6.0.0:
+
+* Android API 19-24 (KitKat through Nougat)
+* iOS versions 8.0 and later.
+* Windows Phone 8.1
+* Universal Windows Platform
+
+The JavaScript client is also usable for data access in web clients.  We support any platform that supports ECMAScript 5.1.
 
 ## Usage instructions
 
@@ -17,7 +29,7 @@ The following sections explain how to use the [Javascript client SDK](https://ww
  3. Use the SDK bundle as an AMD module
  4. Use the SDK as an npm package
 
-The _latest_ SDK bundle is available at https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.js and https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.min.js. 
+The _latest_ SDK bundle is available at https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.js and https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.min.js.
 
 To use a specific version of the SDK (recommended), use the bundle at https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.__VERSION__.js or https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.__VERSION__.min.js, where \__VERSION\__ represents a valid version.
 
@@ -33,7 +45,7 @@ Here are a few examples of how you can use the SDK.
     <script src="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-rc1.js"></script>
     <script>
         // Create a reference to the Azure App Service
-        var clientRef = new WindowsAzure.MobileServiceClient('https://YOUR-SITE-NAME.azurewebsites.net'); 
+        var clientRef = new WindowsAzure.MobileServiceClient('https://YOUR-SITE-NAME.azurewebsites.net');
     </script>
 </head>
 </html>
@@ -55,7 +67,7 @@ var clientRef = new WindowsAzure.MobileServiceClient('https://YOUR-SITE-NAME.azu
 ```
 
 You can bundle your Javascript code using either [WebPack](https://webpack.github.io/) or [Browserify](http://browserify.org/).
-    
+
 ## Offline data sync (Preview)
 
 [This page](./offline-sync.md) explains the offline data sync feature in detail.
