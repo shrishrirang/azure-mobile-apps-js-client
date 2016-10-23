@@ -1,7 +1,7 @@
 {
   "name": "azure-mobile-apps-client",
   "description": "Javascript client for Azure Mobile Apps. For more details visit http://azure.microsoft.com/en-us/develop/mobile",
-  "version": "2.0.0-beta6",
+  "version": "2.0.0-rc1",
   "devDependencies": {
     "browserify": "~11.1.0",
     "browserify-derequire": "~0.9.4",
@@ -16,6 +16,7 @@
     "grunt-contrib-uglify": "~0.6.0",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-exec": "~0.4.6",
+    "grunt-multi-dest": "^1.0.0",
     "http-server": "^0.9.0",
     "jsdoc": "^3.4.1",
     "minami": "^1.1.1",
@@ -43,7 +44,7 @@
     "watchcordova": "grunt watch:cordova",
     "browserut": "http-server sdk/test/app/browser/ -p 8081 -o http://localhost:8081/index.html -c-1",
     "hostandroidut": "http-server sdk/test/app/cordova/platforms/android/assets/www/ -p 8080 -c-1",
-    "testsetup": "node e2etest/scripts/setup.js"
+    "e2esetup": "grunt e2esetup"
   },
   "dependencies": {
     "azure-odata-sql": "^0.2.0",

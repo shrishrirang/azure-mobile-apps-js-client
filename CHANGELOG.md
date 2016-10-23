@@ -1,23 +1,27 @@
 # Azure Mobile Apps JavaScript SDK Change Log
 
-### cordova-2.0.0-rc1
+### 2.0.0-rc1  (azure-mobile-apps-client npm package)
+- [Issue #88](https://github.com/Azure/azure-mobile-apps-js-client/issues/88) and [Issue #158](https://github.com/Azure/azure-mobile-apps-js-client/issues/158) - `npm install azure-mobile-apps-client` installs the package in original source form, i.e. without bundling it [08de350](https://github.com/Azure/azure-mobile-apps-js-client/commit/08de350b858b6adafe25cd985a924769bd6cef42)
+- Miscellaneous bug fixes
+
+### cordova-2.0.0-rc1 (cordova-plugin-ms-azure-mobile-apps Cordova plugin)
 - ** __BREAKING CHANGE__ ** - `onConflict(serverRecord, clientRecord, pushError)` method of `pushError` has been changed to `onConflict(pushError)` [ f1167bc ](https://github.com/Azure/azure-mobile-apps-js-client/commit/f1167bc0f656241e13e867b3ebc7170d93492df5)
 - [Issue #145](https://github.com/Azure/azure-mobile-apps-js-client/issues/145) - Bug fix: Invalid push error handling can cause push to run endlessly [ a2287d4 ](https://github.com/Azure/azure-mobile-apps-js-client/commit/a2287d41cda16cdbd35ccc8bba83041e8cdb30a8)
 - [Issue #179](https://github.com/Azure/azure-mobile-apps-js-client/issues/179) - Fix conflict detection while pushing delete operations [ 366f055](https://github.com/Azure/azure-mobile-apps-js-client/commit/366f0551aabc1b220502727ccf46d81f1ef71469)
 
-### cordova-2.0.0-beta6
+### cordova-2.0.0-beta6 (cordova-plugin-ms-azure-mobile-apps Cordova plugin)
 - [Issue #135](https://github.com/Azure/azure-mobile-apps-js-client/issues/135) - Pull supports custom page size [ 34b9be5](https://github.com/Azure/azure-mobile-apps-js-client/commit/34b9be55a4432af78501b3028b728790aa89ca0b)
 - [Issue #131](https://github.com/Azure/azure-mobile-apps-js-client/issues/131) - Updated store to be insensitive to table and column name casing [4958927](https://github.com/Azure/azure-mobile-apps-js-client/commit/49589276c6ebdb792455d0e5dd087ac908d30c50)
 - [Issue #128](https://github.com/Azure/azure-mobile-apps-js-client/issues/128) - Added API to close underlying database connection [8347c08](https://github.com/Azure/azure-mobile-apps-js-client/commit/8347c08e3f02ed1aff57c03ac8ea0de4a7065cc7)
 - [Issue #38](https://github.com/Azure/azure-mobile-apps-js-client/issues/38) - Added API to purge store operations [66630d5](https://github.com/Azure/azure-mobile-apps-js-client/commit/66630d50ca915f9b0387def10fc0fe3017c896a1)
 
-### cordova-2.0.0-beta5 (Cordova SDK)
+### cordova-2.0.0-beta5 (cordova-plugin-ms-azure-mobile-apps Cordova plugin)
 - Added support for offline data sync (preview)
 
-### 2.0.0-beta5
+### 2.0.0-beta5 (azure-mobile-apps-client npm package)
 - Updated the SDK to be a UMD compliant npm package
 
-### 2.0.0-beta4
+### 2.0.0-beta4 (azure-mobile-apps-client npm package)
 - Fixed authentication for Apache Cordova apps based on Ionic Framework or running in browser environments
 - Updated the SDK to be an npm package
 
