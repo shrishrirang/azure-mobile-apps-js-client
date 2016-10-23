@@ -148,10 +148,9 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
                 callback();
             })();
             
-            // Process all records in the page
-            for (var i in pulledRecords) {
-                chain = processPulledRecord(chain, tableName, pulledRecords[i]); 
-            }
+            // Process all records in the page 
+            //should we remove the chain? 
+            chain = processPulledRecord(chain, tableName, pulledRecords); 
 
             return chain;
         }).then(function(pulled) {
@@ -163,30 +162,32 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
 
     // Processes the pulled record by taking an appropriate action, which can be one of:
     // inserting, updating, deleting in the local store or no action at all.
-    function processPulledRecord(chain, tableName, pulledRecord) {
-        return chain.then(function() {
+    function processPulledRecord(chain, tableName, pulledRecords) {
+        return chain.then(function () {
 
             // Update the store as per the pulled record 
-            return storeTaskRunner.run(function() {
-                if (Validate.isValidId(pulledRecord[idPropertyName])) {
-                    throw new Error('Pulled record does not have a valid ID');
-                }
-                
-                return operationTableManager.readPendingOperations(tableName, pulledRecord[idPropertyName]).then(function(pendingOperations) {
-                    // If there are pending operations for the record we just pulled, we ignore it.
-                    if (pendingOperations.length > 0) {
-                        return;
-                    }
+            if (!Array.isArray(pulledRecords))
+                pulledRecords = [pulledRecords];                
 
-                    if (pulledRecord[sysProps.deletedColumnName] === true) {
-                        return store.del(tableName, pulledRecord.id);
-                    } else if (pulledRecord[sysProps.deletedColumnName] === false) {
-                        return store.upsert(tableName, pulledRecord);
-                    } else {
-                        throw new Error("'" + sysProps.deletedColumnName + "' system property is missing. Pull cannot work without it.'");
-                    }
-                });
+            var recordsToUpdate = [];
+            var idsToDelete = [];
+            for (var i = 0; i < pulledRecords.length; i++){
+                if (Validate.isValidId(pulledRecords[i][idPropertyName]))
+                    throw new Error('Pulled record does not have a valid ID');
+
+                if (pulledRecords[i][sysProps.deletedColumnName] === true) {
+                    idsToDelete.push(pulledRecords[i].id);
+                } else if (pulledRecords[i][sysProps.deletedColumnName] === false) {
+                    recordsToUpdate.push(pulledRecords[i]);
+                } else {
+                    throw new Error("'" + sysProps.deletedColumnName + "' system property is missing. Pull cannot work without it.'");
+                }
+            }
+            var toDel = store.del(tableName, idsToDelete);
+            return toDel.then(function () {
+                return store.upsert(tableName, recordsToUpdate);
             });
+
         });
     }
 
