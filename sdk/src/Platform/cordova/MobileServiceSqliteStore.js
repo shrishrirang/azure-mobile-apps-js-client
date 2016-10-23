@@ -348,7 +348,7 @@ var MobileServiceSqliteStore = function (dbName) {
                     }
                     
                     self._db.transaction(function(transaction) {
-                        for (var i = 0; i < ids.length; i++) {
+                        for (var i in ids) {
                             if (! _.isNull(ids[i])) {
                                 Validate.isValidId(ids[i]);
                             }
