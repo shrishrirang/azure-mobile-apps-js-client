@@ -142,14 +142,14 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
         queryString = queryString.replace(new RegExp('^/' + tableName), '').replace("datetime'", "datetimeoffset'");
 
         return mobileServiceTable.read(queryString, params).then(function(result) {
-            pulledRecords = result;
+            pulledRecords = result || [];
 
             var chain = Platform.async(function(callback) {
                 callback();
             })();
             
             // Process all records in the page
-            for (var i in pulledRecords) {
+            for (var i = 0; i < pulledRecords.length; i++) {
                 chain = processPulledRecord(chain, tableName, pulledRecords[i]); 
             }
 

@@ -740,8 +740,9 @@ function performActions (actions) {
     var chain = Platform.async(function(callback) {
         callback();
     })();
-    
-    for (var i in actions) {
+
+    actions = actions || [];
+    for (var i = 0; i < actions.length; i++) {
         chain = performAction(chain, actions[i]);
     }
     

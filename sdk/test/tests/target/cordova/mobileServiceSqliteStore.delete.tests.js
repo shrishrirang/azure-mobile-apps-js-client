@@ -724,5 +724,34 @@ $testGroup('SQLiteStore - delete tests')
         }, function (error) {
             $assert.fail(error);
         });
+    }),
+
+    $test('Array of ids defines additional properties')
+    .description('Check that del works fine even if additional properties are defined on the array of ids')
+    .checkAsync(function () {
+        var row = { id: 'someid1', prop1: 100, prop2: 200 },
+            ids = [row.id];
+        
+        // Define an additional property on the Array of ids. Set the value of the property to an invalid ID value.
+        ids.prop = {};
+
+        return store.defineTable({
+            name: storeTestHelper.testTableName,
+            columnDefinitions: {
+                id: MobileServiceSqliteStore.ColumnType.String,
+                prop1: MobileServiceSqliteStore.ColumnType.Real,
+                prop2: MobileServiceSqliteStore.ColumnType.Real
+            }
+        }).then(function () {
+            return store.upsert(storeTestHelper.testTableName, [row]);
+        }).then(function () {
+            return store.del(storeTestHelper.testTableName, ids);
+        }).then(function () {
+            return store.read(new Query(storeTestHelper.testTableName));
+        }).then(function (result) {
+            $assert.areEqual(result, []);
+        }, function (error) {
+            $assert.fail(error);
+        });
     })
 );
