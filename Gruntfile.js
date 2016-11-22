@@ -162,7 +162,8 @@ module.exports = function(grunt) {
                     'e2etest/app/browser-bundle-as-commonjs/generated',
                     'e2etest/app/browser-bundle-as-amd/generated',
                     'e2etest/app/browser-package-browserify/generated',
-                    'e2etest/app/browser-package-webpack/generated'
+                    'e2etest/app/browser-package-webpack/generated',
+                    'e2etest/app/cordova/www/generated'
                 ]
             }
         }
