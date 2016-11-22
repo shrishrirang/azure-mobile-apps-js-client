@@ -160,7 +160,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
         });
     }
 
-    // Processes the pulled record by taking an appropriate action, which can be one of:
+    // Processes the pulled records by taking an appropriate action, which can be one of:
     // inserting, updating, deleting in the local store or no action at all.
     function processPulledRecord(chain, tableName, pulledRecords) {
         return chain.then(function () {
