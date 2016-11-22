@@ -15,12 +15,12 @@ var Validate = require('../Utilities/Validate'),
     constants = require('../constants'),
     tableConstants = constants.table,
     _ = require('../Utilities/Extensions');
-    
+
 var defaultPageSize = 50,
     idPropertyName = tableConstants.idPropertyName,
     pulltimeTableName = tableConstants.pulltimeTableName,
     sysProps = tableConstants.sysProps;
-    
+
 function createPullManager(client, store, storeTaskRunner, operationTableManager) {
     // Task runner for running pull tasks. We want only one pull to run at a time. 
     var pullTaskRunner = taskRunner(),
@@ -30,7 +30,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
         tablePullQuery, // the query specified by the user for pulling the table 
         pagePullQuery, // query for fetching a single page
         pullQueryId; // the query ID. if this is a non-null string, the pull will be performed incrementally.
-    
+
     return {
         initialize: initialize,
         pull: pull
@@ -39,8 +39,8 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
     /**
      * Creates and initializes the table used to store the state for performing incremental pull
      */
-    function initialize () {
-        return pullTaskRunner.run(function() {
+    function initialize() {
+        return pullTaskRunner.run(function () {
             return store.defineTable({
                 name: pulltimeTableName,
                 columnDefinitions: {
@@ -51,7 +51,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
             });
         });
     }
-    
+
     /**
      * Pulls changes from the server tables into the local store.
      * 
@@ -64,8 +64,8 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
     function pull(query, queryId, settings) {
         //TODO: support pullQueryId
         //TODO: page size should be configurable
-        
-        return pullTaskRunner.run(function() {
+
+        return pullTaskRunner.run(function () {
             validateQuery(query, 'query');
             Validate.isString(queryId, 'queryId'); // non-null string or null - both are valid
             Validate.isObject(settings, 'settings');
@@ -80,14 +80,14 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
             }
 
             // Make a copy of the query as we will be modifying it
-            tablePullQuery = copyQuery(query);            
+            tablePullQuery = copyQuery(query);
 
             mobileServiceTable = client.getTable(tablePullQuery.getComponents().table);
             mobileServiceTable._features = queryId ? [constants.features.OfflineSync, constants.features.IncrementalPull] : [constants.features.OfflineSync];
             pullQueryId = queryId;
 
             // Set up the query for initiating a pull and then pull all pages          
-            return setupQuery().then(function() {
+            return setupQuery().then(function () {
                 return pullAllPages();
             });
         });
@@ -95,7 +95,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
 
     // Setup the query to get started with pull
     function setupQuery() {
-        return getLastKnownUpdatedAt().then(function(updatedAt) {
+        return getLastKnownUpdatedAt().then(function (updatedAt) {
             buildQueryFromLastKnownUpdateAt(updatedAt);
         });
     }
@@ -107,24 +107,24 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
         // 3. If it is complete, go to 5. If not, update the query to fetch the next page.
         // 4. Go to 1
         // 5. DONE
-        return pullPage().then(function(pulledRecords) {
+        return pullPage().then(function (pulledRecords) {
             if (!isPullComplete(pulledRecords)) {
                 // update query and continue pulling the remaining pages
-                return updateQueryForNextPage(pulledRecords).then(function() {
+                return updateQueryForNextPage(pulledRecords).then(function () {
                     return pullAllPages();
                 });
             }
         });
     }
-    
+
     // Check if the pull is complete or if there are more records left to be pulled
     function isPullComplete(pulledRecords) {
-         // Pull is NOT complete when the number of fetched records is less than page size as the server's page size
-         // can cause the result set to be smaller than the requested page size.
-         // We consider the pull to be complete only when the result contains 0 records.
+        // Pull is NOT complete when the number of fetched records is less than page size as the server's page size
+        // can cause the result set to be smaller than the requested page size.
+        // We consider the pull to be complete only when the result contains 0 records.
         return pulledRecords.length === 0;
     }
-    
+
     // Pull the page as described by the query
     function pullPage() {
 
@@ -134,97 +134,108 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
         params[tableConstants.includeDeletedFlag] = true;
 
         var pulledRecords;
-        
+
         // azure-query-js does not support datatimeoffset
         // As a temporary workaround, convert the query to an odata string and replace datetime' with datetimeoffset'. 
         var queryString = pagePullQuery.toOData();
         var tableName = pagePullQuery.getComponents().table;
         queryString = queryString.replace(new RegExp('^/' + tableName), '').replace("datetime'", "datetimeoffset'");
 
-        return mobileServiceTable.read(queryString, params).then(function(result) {
+        return mobileServiceTable.read(queryString, params).then(function (result) {
             pulledRecords = result;
-
-            var chain = Platform.async(function(callback) {
-                callback();
-            })();
-            
-            // Process all records in the page 
-            //should we remove the chain? 
-            chain = processPulledRecord(chain, tableName, pulledRecords); 
-
-            return chain;
-        }).then(function(pulled) {
+            // Process all records in the page  
+            return processPulledRecords(tableName, pulledRecords);
+        }).then(function (pulled) {
             return onPagePulled();
-        }).then(function() {
+        }).then(function () {
             return pulledRecords;
         });
     }
 
     // Processes the pulled records by taking an appropriate action, which can be one of:
     // inserting, updating, deleting in the local store or no action at all.
-    function processPulledRecord(chain, tableName, pulledRecords) {
-        return chain.then(function () {
+    function processPulledRecords(tableName, pulledRecords) {
 
-            // Update the store as per the pulled record 
+        // Update the store as per the pulled record 
+        return storeTaskRunner.run(function () {
+
             if (!Array.isArray(pulledRecords))
-                pulledRecords = [pulledRecords];                
+                pulledRecords = [pulledRecords];
 
             var recordsToUpdate = [];
             var idsToDelete = [];
-            for (var i = 0; i < pulledRecords.length; i++){
-                if (Validate.isValidId(pulledRecords[i][idPropertyName]))
-                    throw new Error('Pulled record does not have a valid ID');
+            var recordsChain = Platform.async(function (callback) {
+                callback();
+            })();
 
-                if (pulledRecords[i][sysProps.deletedColumnName] === true) {
-                    idsToDelete.push(pulledRecords[i].id);
-                } else if (pulledRecords[i][sysProps.deletedColumnName] === false) {
-                    recordsToUpdate.push(pulledRecords[i]);
-                } else {
-                    throw new Error("'" + sysProps.deletedColumnName + "' system property is missing. Pull cannot work without it.'");
-                }
+            for (var i = 0; i < pulledRecords.length; i++) {
+                var record = pulledRecords[i];
+                recordsChain = processSingleRecord(recordsChain, tableName, record, idsToDelete, recordsToUpdate);
             }
-            var toDel = store.del(tableName, idsToDelete);
-            return toDel.then(function () {
-                return store.upsert(tableName, recordsToUpdate);
+
+            return recordsChain.then(function () {
+                var toDel = store.del(tableName, idsToDelete);
+                return toDel.then(function () {
+                    return store.upsert(tableName, recordsToUpdate);
+                });
             });
 
-        });
+        }); //store task runner
+    }
+    function processSingleRecord(chain, tableName, record, idsToDelete, recordsToUpdate) {
+        return chain.then(function () {
+            return operationTableManager
+                .readPendingOperations(tableName, record[idPropertyName])
+                .then(function (pendingOperations) {
+                    if (Validate.isValidId(record[idPropertyName]))
+                        throw new Error('Pulled record does not have a valid ID');
+                    if (pendingOperations.length === 0) {
+                        if ([sysProps.deletedColumnName] === true) {
+                            idsToDelete.push(record.id);
+                        } else if (record[sysProps.deletedColumnName] === false) {
+                            recordsToUpdate.push(record);
+                        } else {
+                            throw new Error("'" + sysProps.deletedColumnName + "' system property is missing. Pull cannot work without it.'");
+                        }
+                    }
+                }); // pending operations
+        });// chain
     }
 
     // Gets the last known updatedAt timestamp.
     // For incremental pull, we check if we have any information about it in the store.
     // If not we simply use 1970 to start the sync operation, just like a non-incremental / vanilla pull.
     function getLastKnownUpdatedAt() {
-        
-        return Platform.async(function(callback) {
+
+        return Platform.async(function (callback) {
             callback();
-        })().then(function() {
-            
+        })().then(function () {
+
             if (pullQueryId) { // read lastKnownUpdatedAt from the store
                 return store.lookup(pulltimeTableName, pullQueryId, true /* suppressRecordNotFoundError */);
             }
 
-        }).then(function(result) {
+        }).then(function (result) {
 
             if (result) {
                 return result.value;
             }
 
-            return new Date (1970, 0, 0);
+            return new Date(1970, 0, 0);
         });
     }
 
     // update the query to pull the next page
     function updateQueryForNextPage(pulledRecords) {
-        return Platform.async(function(callback) {
+        return Platform.async(function (callback) {
             callback();
-        })().then(function() {
+        })().then(function () {
 
             if (!pulledRecords) {
                 throw new Error('Something is wrong. pulledRecords cannot be null at this point');
             }
 
-            var lastRecord = pulledRecords[ pulledRecords.length - 1];
+            var lastRecord = pulledRecords[pulledRecords.length - 1];
 
             if (!lastRecord) {
                 throw new Error('Something is wrong. Possibly invalid response from the server. lastRecord cannot be null!');
@@ -252,7 +263,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
 
         // Make a copy of the table query and tweak it to fetch the next first page
         pagePullQuery = copyQuery(tablePullQuery);
-        pagePullQuery = pagePullQuery.where(function(lastKnownUpdatedAt) {
+        pagePullQuery = pagePullQuery.where(function (lastKnownUpdatedAt) {
             // Ideally we would have liked to set this[tableConstants.sysProps.updatedAtColumnName]
             // but this isn't supported
             return this.updatedAt >= lastKnownUpdatedAt;
@@ -280,13 +291,13 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
     function validateQuery(query) {
         Validate.isObject(query);
         Validate.notNull(query);
-        
+
         var components = query.getComponents();
-        
+
         for (var i in components.ordering) {
             throw new Error('orderBy and orderByDescending clauses are not supported in the pull query');
         }
-        
+
         if (components.skip) {
             throw new Error('skip is not supported in the pull query');
         }
