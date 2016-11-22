@@ -348,7 +348,7 @@ var MobileServiceSqliteStore = function (dbName) {
                     }
                     
                     self._db.transaction(function(transaction) {
-                        for (var i in ids) {
+                        for (var i = 0; i < ids.length; i++) {
                             if (! _.isNull(ids[i])) {
                                 Validate.isValidId(ids[i]);
                             }
@@ -503,7 +503,7 @@ var MobileServiceSqliteStore = function (dbName) {
 
             return Platform.async(function(callback) {
                 self._db.transaction(function(transaction) {
-                    for (var i in operations) {
+                    for (var i = 0; i < operations.length; i++) {
                         var operation = operations[i];
                         
                         if (_.isNull(operation)) {

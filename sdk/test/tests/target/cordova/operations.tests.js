@@ -727,7 +727,8 @@ function performActionsAndVerifyError(setupActions, errorAction) {
 // array are 'insert', 'update', 'delete', 'lock' and 'unlock'.
 function performActions(operationTableManager, item, actions) {
     var asyncChain = operationTableManager.initialize();
-    for (var i in actions) {
+    actions = actions || [];
+    for (var i = 0; i < actions.length; i++) {
         asyncChain = performAction(asyncChain, operationTableManager, item, actions[i]);
     }
     return asyncChain;
@@ -753,7 +754,8 @@ function performAction(asyncChain, operationTableManager, item, action) {
 function verifyOperations(operationTableManager, itemId, expectedOperations) {
     return operationTableManager.readPendingOperations(storeTestHelper.testTableName, itemId).then(function(operations) {
         
-        for (var i in expectedOperations) {
+        expectedOperations = expectedOperations || [];
+        for (var i = 0; i < expectedOperations.length; i++) {
             expectedOperations[i].tableName = storeTestHelper.testTableName;
             expectedOperations[i].itemId = itemId;
             expectedOperations[i].metadata = expectedOperations[i].metadata || {};

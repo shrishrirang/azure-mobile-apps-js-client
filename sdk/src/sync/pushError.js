@@ -20,6 +20,14 @@ var operationTableName = tableConstants.operationTableName,
  * @private
  */
 function createPushError(store, operationTableManager, storeTaskRunner, pushOperation, operationError) {
+
+    // Calling getError will return the operationError object to the caller without cloning it.
+    // (As operationError can have loops, our simplistic makeCopy(..) method won't be able to clone it)
+    //
+    // To guard ourselves from possible modifications to the operationError object by the caller,
+    // we make a copy of its members we may need later.
+    var serverRecord = makeCopy(operationError.serverInstance),
+        statusCode = makeCopy(operationError.request.status);
     
     /**
      * @class PushError
@@ -97,7 +105,7 @@ function createPushError(store, operationTableManager, storeTaskRunner, pushOper
      * @returns {object} Server record value.
      */
     function getServerRecord() {
-        return makeCopy(operationError.serverInstance);
+        return makeCopy(serverRecord);
     }
     
     /**
@@ -119,13 +127,18 @@ function createPushError(store, operationTableManager, storeTaskRunner, pushOper
      * Gets the underlying error encountered while performing the push operation. This contains
      * grannular details of the failure like server response, error code, etc.
      * 
+     * Note: Modifying value returned by this method will have a side effect of permanently
+     * changing the underlying error object
+     * 
      * @function
      * @instance
      * @memberof PushError
      * @returns {Error} The underlying error object.
      */
     function getError() {
-        return makeCopy(operationError);
+        // As operationError can have loops, our simplistic makeCopy(..) method won't be able to clone it. 
+        // Return without cloning.
+        return operationError;
     }
     
     /**
@@ -138,7 +151,7 @@ function createPushError(store, operationTableManager, storeTaskRunner, pushOper
      * @returns {boolean} true if the error is a conflict. False, otherwise.
      */
     function isConflict() {
-        return operationError.request.status === 409 || operationError.request.status === 412;
+        return statusCode === 409 || statusCode === 412;
     }
     
     /**

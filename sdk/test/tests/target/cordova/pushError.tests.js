@@ -29,6 +29,65 @@ $testGroup('pushError tests')
         });
     }).tests(
 
+    $test('pushError.getError()')
+    .description("verify that modifying values returned by pushError's member methods does not affect its future behavior")
+    .check(function () {
+        var testId = 'someid',
+            operationTableManager = createOperationTableManager(store),
+            pushOperation = {
+                logRecord: {
+                    id: 101,
+                    tableName: storeTestHelper.testTableName,
+                    action: 'someaction',
+                    itemId: testId,
+                    metadata: {}
+                },
+                data: {
+                    clientKey: 'clientVal'
+                }
+            },
+            operationError = {
+                request: {
+                    status: 409
+                },
+                serverInstance: {
+                    serverKey: 'serverVal'
+                }
+            },
+            pushError = createPushError(store, operationTableManager, runner(), pushOperation, operationError);
+
+            var error = pushError.getError(),
+                action = pushError.getAction(),
+                serverRecord = pushError.getServerRecord(),
+                clientRecord = pushError.getClientRecord(),
+                tableName = pushError.getTableName(),
+                isConflict = pushError.isConflict();
+
+            var actionCopy = makeCopy(action),
+                serverRecordCopy = makeCopy(serverRecord),
+                clientRecordCopy = makeCopy(clientRecord),
+                tableNameCopy = makeCopy(tableName),
+                isConflictCopy = makeCopy(isConflict);
+
+            // Modify the properties of interest
+            error.request.status.newprop1 = 'somevalue';
+            error.serverInstance.newprop2 = 'somevalue';
+            action.newprop3 = 'somevalue';
+            serverRecord.newprop4 = 'somevalue';
+            clientRecord.newprop5 = 'somevalue';
+            tableName.newprop6 = 'somevalue';
+            isConflict.newprop7 = 'somevalue';
+            error.request.status = -1;
+            error.serverInstance = {somekey: 'somevalue'};
+
+            // Verify that pushError methods still behave the same
+            $assert.areEqual(pushError.getAction(), actionCopy);
+            $assert.areEqual(pushError.getServerRecord(), serverRecordCopy);
+            $assert.areEqual(pushError.getClientRecord(), clientRecordCopy);
+            $assert.areEqual(pushError.getTableName(), tableNameCopy);
+            $assert.areEqual(pushError.isConflict(), isConflictCopy);
+    }),
+    
     $test('pushError.update()')
     .description('verify update() uses whatever metadata is returned by operationTableManager.getMetadata()')
     .checkAsync(function () {
@@ -177,4 +236,11 @@ function verifyChangeAction(oldAction, newAction, oldItemId, newItemId, oldVersi
         $assert.isNull(batchExecuted);
         $assert.isFalse(isSuccessExpected);
     });
+}
+
+function makeCopy(obj) {
+    if (obj === undefined || obj === null) {
+        return obj;
+    }
+    return JSON.parse( JSON.stringify(obj) );
 }

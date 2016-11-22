@@ -724,5 +724,35 @@ $testGroup('SQLiteStore - executeBatch tests')
         }, function (error) {
             // Failure. As expected.
         });
+    }),
+    
+    $test('Array of operations defines additional properties')
+    .description('Check that executeBatch works fine even if additional properties are defined on the array of operations')
+    .checkAsync(function () {
+        var row = { id: 101, description: 'original' },
+            operations = [
+                {
+                    action: 'upsert',
+                    tableName: storeTestHelper.testTableName,
+                    data: {id: 1, description: 'new'}
+                }
+            ];
+
+        // Define an additional property on the Array of operations. Set the value of the property to an invalid operation value
+        operations.prop = {};
+
+        return store.defineTable({
+            name: storeTestHelper.testTableName,
+            columnDefinitions: {
+                id: MobileServiceSqliteStore.ColumnType.Integer,
+                description: MobileServiceSqliteStore.ColumnType.String
+            }
+        }).then(function () {
+            return store.executeBatch(operations);
+        }).then(function (result) {
+            // Success expected
+        }, function (error) {
+            $assert.fail(error);
+        });
     })
 );
