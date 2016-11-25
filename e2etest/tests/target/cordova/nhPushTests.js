@@ -55,9 +55,15 @@ function definePushTestsNamespace() {
                 };
                 if (device.platform === 'Android') {
                     body.type = notificationServiceName;
-                    body.payload = '{"data":{"message":"android testing..."}}';
+                    body.payload = '{"data":{"message":"gcm test"}}';
+                } else if (device.platform === 'windows') {
+                    body.type = notificationServiceName;
+                    body.payload = '<?xml version="1.0"?><toast><visual><binding template="ToastText01"><text id="1">wns test</text></binding></visual></toast>';
+                } else if (device.platform === 'ios') {
+                    body.type = notificationServiceName;
+                    body.payload = '{"aps":{"alert":"apns test"}}';
                 } else {
-                    window.alert('TODO');
+                    throw new Error('Unsupported platform: ' + device.platform)
                 }
 
                 return zumo.getClient().invokeApi('push', { body: body });
@@ -73,6 +79,8 @@ function definePushTestsNamespace() {
     function getNotificationServiceName() {
         if (device.platform === 'Android') {
             return 'gcm';
+        } if (device.platform === 'windows') {
+            return 'wns';
         } else {
             window.alert('TODO');
         }
