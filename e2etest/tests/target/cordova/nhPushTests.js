@@ -59,7 +59,7 @@ function definePushTestsNamespace() {
                 } else if (device.platform === 'windows') {
                     body.type = notificationServiceName;
                     body.payload = '<?xml version="1.0"?><toast><visual><binding template="ToastText01"><text id="1">wns test</text></binding></visual></toast>';
-                } else if (device.platform === 'ios') {
+                } else if (device.platform === 'iOS') {
                     body.type = notificationServiceName;
                     body.payload = '{"aps":{"alert":"apns test"}}';
                 } else {
@@ -81,6 +81,8 @@ function definePushTestsNamespace() {
             return 'gcm';
         } if (device.platform === 'windows') {
             return 'wns';
+        } else if (device.platform === 'iOS') {
+            return 'apns';
         } else {
             window.alert('TODO');
         }
