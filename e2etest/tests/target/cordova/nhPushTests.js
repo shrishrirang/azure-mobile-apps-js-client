@@ -35,7 +35,10 @@ function definePushTestsNamespace() {
                 return done(false);
             }
 
-            zumo.getClient().push.unregister(pushRegistrationId)
+            // Set pushRegistrationId to undefined before calling unregister
+            var registrationId = pushRegistrationId;
+            pushRegistrationId = undefined;
+            zumo.getClient().push.unregister(registrationId)
                 .then(function() {
                     done(true);
                 }, function(error) {
