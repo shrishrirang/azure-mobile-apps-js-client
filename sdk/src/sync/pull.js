@@ -156,7 +156,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
     // inserting, updating, deleting in the local store or no action at all.
     function processPulledRecords(tableName, pulledRecords) {
 
-        // Update the store as per the pulled record 
+        // Update the store  
         return storeTaskRunner.run(function () {
 
             if (!Array.isArray(pulledRecords))
