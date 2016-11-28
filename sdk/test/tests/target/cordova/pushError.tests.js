@@ -22,7 +22,7 @@ var operationTableName = tableConstants.operationTableName,
         request: {
             status: 400
         }
-    }
+    },
     testId = 'someid';
     
 $testGroup('pushError tests')
