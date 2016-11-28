@@ -7,8 +7,7 @@ function defineTableGenericFunctionalTestsNamespace() {
         stringIdTableName = 'roundtriptable',
         intIdTableName = 'intidroundtriptable',
         globalTest = null,
-        globaldone = null,
-        MobileServiceTable = WindowsAzure._MobileServiceTable;
+        globaldone = null;
 
     //Helper functions
     function newLink() {
@@ -24,15 +23,15 @@ function defineTableGenericFunctionalTestsNamespace() {
 
     function getTestSystemProperties() {
         return [
-            MobileServiceTable.SystemProperties.None,
-            MobileServiceTable.SystemProperties.All,
-            MobileServiceTable.SystemProperties.CreatedAt | MobileServiceTable.SystemProperties.UpdatedAt | MobileServiceTable.SystemProperties.Version,
-            MobileServiceTable.SystemProperties.CreatedAt | MobileServiceTable.SystemProperties.UpdatedAt,
-            MobileServiceTable.SystemProperties.CreatedAt | MobileServiceTable.SystemProperties.Version,
-            MobileServiceTable.SystemProperties.CreatedAt,
-            MobileServiceTable.SystemProperties.UpdatedAt | MobileServiceTable.SystemProperties.Version,
-            MobileServiceTable.SystemProperties.UpdatedAt,
-            MobileServiceTable.SystemProperties.Version
+            WindowsAzure._MobileServiceTable.None,
+            WindowsAzure._MobileServiceTable.All,
+            WindowsAzure._MobileServiceTable.CreatedAt | WindowsAzure._MobileServiceTable.UpdatedAt | WindowsAzure._MobileServiceTable.Version,
+            WindowsAzure._MobileServiceTable.CreatedAt | WindowsAzure._MobileServiceTable.UpdatedAt,
+            WindowsAzure._MobileServiceTable.CreatedAt | WindowsAzure._MobileServiceTable.Version,
+            WindowsAzure._MobileServiceTable.CreatedAt,
+            WindowsAzure._MobileServiceTable.UpdatedAt | WindowsAzure._MobileServiceTable.Version,
+            WindowsAzure._MobileServiceTable.UpdatedAt,
+            WindowsAzure._MobileServiceTable.Version
         ];
     }
 
@@ -121,7 +120,7 @@ function defineTableGenericFunctionalTestsNamespace() {
             correctVersion,
             newItem;
 
-        table.systemProperties = MobileServiceTable.SystemProperties.All;
+        table.systemProperties = WindowsAzure._MobileServiceTable.All;
     
         emptyTable(table).then(function () {
             return table.insert({ id: 'an id', name: 'a value' });
@@ -335,7 +334,7 @@ function defineTableGenericFunctionalTestsNamespace() {
             savedItems = [],
             success = true;
 
-        table.systemProperties = MobileServiceTable.SystemProperties.All;
+        table.systemProperties = WindowsAzure._MobileServiceTable.All;
 
         emptyTable(table).then(function () {
             return table.insert({ id: '1', name: 'value' })
@@ -1050,7 +1049,7 @@ function defineTableGenericFunctionalTestsNamespace() {
                 savedVersion,
                 correctVersion;
 
-        table.systemProperties = MobileServiceTable.SystemProperties.All;
+        table.systemProperties = WindowsAzure._MobileServiceTable.All;
 
         var insertPromise = newLink();
         emptyTable(table).then(function () {
@@ -1149,7 +1148,7 @@ function defineTableGenericFunctionalTestsNamespace() {
     //        savedVersion,
     //        savedUpdatedAt;
 
-    //    table.systemProperties = MobileServiceTable.SystemProperties.All;  //All
+    //    table.systemProperties = WindowsAzure._MobileServiceTable.All;  //All
 
     //    var insertPromise = emptyTable(table).then(function () {
     //        return table.insert({ id: 'an id', Name: 'a value' });
@@ -1304,7 +1303,7 @@ function defineTableGenericFunctionalTestsNamespace() {
     //    globaldone = done;
 
     //    var table = zumo.getClient().getTable(stringIdTableName),
-    //        props = MobileServiceTable.SystemProperties;
+    //        props = WindowsAzure._MobileServiceTable;
 
     //    table.systemProperties = props.Version | props.CreatedAt | props.UpdatedAt;
 
