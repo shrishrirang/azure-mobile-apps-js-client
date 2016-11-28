@@ -33,15 +33,15 @@ var api = { // Modules that need to be exposed outside the SDK for all targets
      * @type {MobileServiceClient} 
      */
     MobileServiceClient: require('./MobileServiceClient'),
-    MobileServiceLogin: require('./MobileServiceLogin'),
-    MobileServiceSyncTable: require('./sync/MobileServiceSyncTable'),
-    MobileServiceTable: require('./MobileServiceTable'),
 
     /** 
      * @type {QueryJs}
      */
     Query: require('azure-query-js').Query
 };
+
+// Define for test purpose only
+api._MobileServiceTable = require('./MobileServiceTable');
 
 // Target (i.e. Cordova / Browser / etc) specific definitions that need to be exposed outside the SDK
 var targetExports = require('./Platform/sdkExports');
