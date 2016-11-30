@@ -61,6 +61,7 @@ function definePushTestsNamespace() {
                     body.payload = '{"data":{"message":"gcm test"}}';
                 } else if (device.platform === 'windows') {
                     body.type = notificationServiceName;
+                    body.wnsType = 'toast';
                     body.payload = '<?xml version="1.0"?><toast><visual><binding template="ToastText01"><text id="1">wns test</text></binding></visual></toast>';
                 } else if (device.platform === 'iOS') {
                     body.type = notificationServiceName;
