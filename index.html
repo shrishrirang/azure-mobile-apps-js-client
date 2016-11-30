@@ -47,10 +47,19 @@
 
 
     <section class="readme">
-        <article><h1>Azure Mobile Apps: Javascript Client SDK</h1><p>With Microsoft Azure Mobile Apps you can add a scalable backend to your connected client applications in minutes. To learn more about Azure Mobile Apps, visit the <a href="https://azure.microsoft.com/en-us/documentation/learning-paths/appservice-mobileapps/">Mobile Apps documentation</a>. </p>
+        <article><h1>Azure Mobile Apps: Javascript Client SDK</h1><p>With Microsoft Azure Mobile Apps you can add a scalable backend to your connected client applications in minutes. To learn more about Azure Mobile Apps, visit the <a href="https://azure.microsoft.com/en-us/documentation/learning-paths/appservice-mobileapps/">Mobile Apps documentation</a>.</p>
 <p>This repository contains code for the <a href="https://www.npmjs.com/package/azure-mobile-apps-client">azure-mobile-apps-client</a> npm package and the <a href="https://www.npmjs.com/package/cordova-plugin-ms-azure-mobile-apps">cordova-plugin-ms-azure-mobile-apps</a> Cordova plugin.</p>
 <p>The Cordova plugin is published from the <a href="https://github.com/Azure/azure-mobile-apps-cordova-client">Azure/azure-mobile-apps-cordova-client</a> repository by bundling source code in this repository. Refer <a href="https://github.com/Azure/azure-mobile-apps-cordova-client">Azure/azure-mobile-apps-cordova-client</a> for more details about the Cordova plugin.</p>
 <p>The following sections explain how to use the <a href="https://www.npmjs.com/package/azure-mobile-apps-client">Javascript client SDK</a>. You can also refer <a href="https://azure.microsoft.com/en-us/documentation/articles/app-service-mobile-html-how-to-use-client-library/">How to Use the JavaScript Client Library for Azure Mobile Apps</a> for more details.</p>
+<h2>Support</h2><p>The JavaScript client is primarily suited to Apache Cordova uses.  Offline Sync is only supported in Apache Cordova situations.
+We test on the following platforms for Apache Cordova v6.0.0:</p>
+<ul>
+<li>Android API 19-24 (KitKat through Nougat)</li>
+<li>iOS versions 8.0 and later.</li>
+<li>Windows Phone 8.1</li>
+<li>Universal Windows Platform</li>
+</ul>
+<p>The JavaScript client is also usable for data access in web clients.  We support any platform that supports ECMAScript 5.1.</p>
 <h2>Usage instructions</h2><p> You can consume the SDK in one of the following ways.</p>
 <ol>
 <li>Reference the SDK bundle in HTML's script tag</li>
@@ -58,15 +67,15 @@
 <li>Use the SDK bundle as an AMD module</li>
 <li>Use the SDK as an npm package</li>
 </ol>
-<p>The <em>latest</em> SDK bundle is available at https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.js and https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.min.js. </p>
+<p>The <em>latest</em> SDK bundle is available at https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.js and https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.min.js.</p>
 <p>To use a specific version of the SDK (recommended), use the bundle at https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.<strong>VERSION</strong>.js or https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.<strong>VERSION</strong>.min.js, where __VERSION__ represents a valid version.</p>
 <h3>Sample usage</h3><p>Here are a few examples of how you can use the SDK.</p>
 <h4>Use the SDK as a Javascript bundle</h4><pre class="prettyprint source"><code>&lt;html>
 &lt;head>
-    &lt;script src=&quot;https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-rc1.js&quot;>&lt;/script>
+    &lt;script src=&quot;https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0.js&quot;>&lt;/script>
     &lt;script>
         // Create a reference to the Azure App Service
-        var clientRef = new WindowsAzure.MobileServiceClient('https://YOUR-SITE-NAME.azurewebsites.net'); 
+        var clientRef = new WindowsAzure.MobileServiceClient('https://YOUR-SITE-NAME.azurewebsites.net');
     &lt;/script>
 &lt;/head>
 &lt;/html></code></pre><h4>Use the SDK as an npm package</h4><p>Install the SDK from npm: <code>npm install azure-mobile-apps-client</code></p>
@@ -76,10 +85,11 @@
 <pre class="prettyprint source"><code>var WindowsAzure = require('azure-mobile-apps-client');
 // Create a reference to the Azure App Service
 var clientRef = new WindowsAzure.MobileServiceClient('https://YOUR-SITE-NAME.azurewebsites.net');</code></pre><p>You can bundle your Javascript code using either <a href="https://webpack.github.io/">WebPack</a> or <a href="http://browserify.org/">Browserify</a>.</p>
-<h2>Offline data sync (Preview)</h2><p><a href="./offline-sync.md">This page</a> explains the offline data sync feature in detail.</p>
+<h2>Offline data sync</h2><p><a href="./offline-sync.md">This page</a> explains the offline data sync feature in detail.</p>
 <h2>API documentation</h2><p>Refer https://azure.github.io/azure-mobile-apps-js-client for detailed documentation of the APIs.</p>
 <h2>SDK downloads</h2><ul>
 <li>latest <a href="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.js">unminified</a> and <a href="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.min.js">minified</a></li>
+<li>version 2.0.0 <a href="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0.js">unminified</a> and <a href="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0.min.js">minified</a></li>
 <li>version 2.0.0-rc1 <a href="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-rc1.js">unminified</a> and <a href="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-rc1.min.js">minified</a></li>
 <li>version 2.0.0-beta5 <a href="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-beta5.js">unminified</a> and <a href="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-beta5.min.js">minified</a></li>
 <li>version 2.0.0-beta4 <a href="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-beta4.js">unminified</a> and <a href="https://zumo.blob.core.windows.net/sdk/azure-mobile-apps-client.2.0.0-beta4.min.js">minified</a></li>
@@ -121,7 +131,7 @@ npm run build</code></pre><p>The built files will be copied to the <code>/dist</
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Thu Oct 20 2016 19:23:54 GMT-0700 (Pacific Daylight Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue Nov 29 2016 23:48:10 GMT-0800 (Pacific Standard Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
