@@ -1,11 +1,5 @@
 # Azure Mobile Apps JavaScript SDK Change Log
 
-### 2.0.0 (azure-mobile-apps-client npm package)
-- Miscellaneous bug fixes
-
-### 2.0.0 (cordova-plugin-ms-azure-mobile-apps Cordova plugin)
-- Miscellaneous bug fixes
-
 ### 2.0.0-rc1  (azure-mobile-apps-client npm package)
 - [Issue #88](https://github.com/Azure/azure-mobile-apps-js-client/issues/88) and [Issue #158](https://github.com/Azure/azure-mobile-apps-js-client/issues/158) - `npm install azure-mobile-apps-client` installs the package in original source form, i.e. without bundling it [08de350](https://github.com/Azure/azure-mobile-apps-js-client/commit/08de350b858b6adafe25cd985a924769bd6cef42)
 - Miscellaneous bug fixes
