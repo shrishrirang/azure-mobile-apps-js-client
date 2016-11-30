@@ -190,7 +190,7 @@ function createPullManager(client, store, storeTaskRunner, operationTableManager
                     if (Validate.isValidId(record[idPropertyName]))
                         throw new Error('Pulled record does not have a valid ID');
                     if (pendingOperations.length === 0) {
-                        if ([sysProps.deletedColumnName] === true) {
+                        if (record[sysProps.deletedColumnName] === true) {
                             idsToDelete.push(record.id);
                         } else if (record[sysProps.deletedColumnName] === false) {
                             recordsToUpdate.push(record);
