@@ -72,9 +72,9 @@ You can bundle your Javascript code using either [WebPack](https://webpack.githu
 
 [This page](./offline-sync.md) explains the offline data sync feature in detail.
 
-## API documentation
+## API reference
 
-Refer https://azure.github.io/azure-mobile-apps-js-client for detailed documentation of the APIs.
+Refer https://azure.github.io/azure-mobile-apps-js-client for detailed API reference.
 
 ## SDK downloads
 
