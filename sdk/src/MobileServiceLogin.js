@@ -444,8 +444,13 @@ function loginWithLoginControl(login, provider, useSingleSignOn, parameters, cal
     // Call the platform to launch the login control, capturing any
     // 'cancel' callback that it returns
     var platformResult = Platform.login(
-        startUri,
-        endUri,
+        {
+            loginHost: client.alternateLoginHost || client.applicationUrl,
+            loginUriPrefix: client.loginUriPrefix || loginUrl,
+            provider: provider,
+            queryParams: queryParams,
+            useSingleSignOn: useSingleSignOn
+        },
         function (error, mobileServiceToken) {
             login._loginState = { inProcess: false, cancelCallback: null };
             onLoginComplete(error, mobileServiceToken, client, callback);

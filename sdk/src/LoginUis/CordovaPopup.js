@@ -2,10 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-// Note: Cordova is PhoneGap.
-// This login UI implementation uses the InAppBrowser plugin,
-// to install the plugin use the following command
-//   cordova plugin add org.apache.cordova.inappbrowser
+var definitions = require('../Platform/definitions');
 
 var requiredCordovaVersion = { major: 3, minor: 0 };
 
@@ -19,7 +16,18 @@ exports.supportsCurrentRuntime = function () {
     return !!currentCordovaVersion() && !isRunUnderRippleEmulator();
 };
 
-exports.login = function (startUri, endUri, callback) {
+// Optional callback accepting (error, user) parameters.
+exports.login = function (options, callback) {
+    var customDefinitions = definitions.get();
+
+    if (customDefinitions && customDefinitions.login && customDefinitions.loginWithOptions) {
+        return customDefinitions.loginWithOptions(options, callback);
+    }
+
+    callback(new Error('Cordova login implementation missing!'));
+};
+
+exports.login2 = function (startUri, endUri, callback) {
     /// <summary>
     /// Displays the login UI and calls back on completion
     /// </summary>

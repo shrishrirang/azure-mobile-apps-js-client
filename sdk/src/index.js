@@ -4,6 +4,14 @@
 
 var _ = require('./Utilities/Extensions');
 
+function configure(config) {
+    if (config.definitions) {
+        var definitions = require('./Platform/definitions');
+
+        definitions.set(config.definitions);
+    }
+}
+
 /**
  * This module is the entry point for the _Azure Mobile Apps Javascript client SDK_. 
  *
@@ -37,7 +45,12 @@ var api = { // Modules that need to be exposed outside the SDK for all targets
     /** 
      * @type {QueryJs}
      */
-    Query: require('azure-query-js').Query
+    Query: require('azure-query-js').Query,
+
+    /**
+     * 
+     */
+    configure: configure
 };
 
 // Target (i.e. Cordova / Browser / etc) specific definitions that need to be exposed outside the SDK
