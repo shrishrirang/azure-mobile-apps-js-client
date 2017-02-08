@@ -148,6 +148,7 @@ exports.getSdkInfo = function () {
     };
 };
 
+// FIXME: This function appears platform independent. Move this to MobileServiceLogin.js.
 exports.login = function (startUri, endUri, callback) {
     // Force logins to go over HTTPS because the runtime is hardcoded to redirect
     // the server flow back to HTTPS, and we need the origin to match.

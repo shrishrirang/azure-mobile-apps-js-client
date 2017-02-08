@@ -419,14 +419,14 @@ function loginWithLoginControl(login, provider, useSingleSignOn, parameters, cal
         provider);
 
     var endUri = null,
-        queryParams = {},
+        queryParameters = {},
         key;
 
     // Make a copy of the query parameters and set the session mode to token.
     for (key in parameters) {
-        queryParams[key] = parameters[key];
+        queryParameters[key] = parameters[key];
     }
-    queryParams[sessionModeKey] = sessionModeValueToken;
+    queryParameters[sessionModeKey] = sessionModeValueToken;
 
     var queryString = _.url.getQueryString(queryParams);
     startUri = _.url.combinePathAndQuery(startUri, queryString);
@@ -448,7 +448,7 @@ function loginWithLoginControl(login, provider, useSingleSignOn, parameters, cal
             loginHost: client.alternateLoginHost || client.applicationUrl,
             loginUriPrefix: client.loginUriPrefix || loginUrl,
             provider: provider,
-            queryParams: queryParams,
+            queryParameters: queryParameters,
             useSingleSignOn: useSingleSignOn
         },
         function (error, mobileServiceToken) {
