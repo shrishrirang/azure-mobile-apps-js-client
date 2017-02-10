@@ -2,17 +2,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-// Module to hold custom definitions of properties, methods, etc used by this library
-// By default, it defines nothing. Users of this library can add custom definitions.
+// Module to hold custom configuration provided by users of the library.
 
-var defs;
+var configuration;
 
-function set(definitions) {
-    defs = definitions;
+function set(config) {
+    configuration = config;
 }
 
 function get() {
-    return defs;
+    return configuration;
 }
 
 module.exports = {

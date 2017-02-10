@@ -2,13 +2,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-var _ = require('./Utilities/Extensions');
+var _ = require('./Utilities/Extensions'),
+    config = require('./config');
 
-function configure(config) {
-    if (config.definitions) {
-        var definitions = require('./Platform/definitions');
-
-        definitions.set(config.definitions);
+function configure(configuration) {
+    if (configuration) {
+        config.set(configuration);
     }
 }
 
@@ -47,9 +46,7 @@ var api = { // Modules that need to be exposed outside the SDK for all targets
      */
     Query: require('azure-query-js').Query,
 
-    /**
-     * 
-     */
+    // FIXME - comment
     configure: configure
 };
 
