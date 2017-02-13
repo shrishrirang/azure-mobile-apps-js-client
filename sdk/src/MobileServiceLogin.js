@@ -427,7 +427,7 @@ function loginWithLoginControl(login, provider, useSingleSignOn, parameters, cal
     queryParameters[sessionModeKey] = sessionModeValueToken;
 
     startUri = _.url.combinePathSegments(loginHost, loginUriPrefix, provider);
-    startUri = _.url.combinePathAndQuery(startUri, _.url.getQueryString(queryParams));
+    startUri = _.url.combinePathAndQuery(startUri, _.url.getQueryString(queryParameters));
 
     // If not single sign-on, then we need to construct a non-null end uri.
     if (!useSingleSignOn) {
