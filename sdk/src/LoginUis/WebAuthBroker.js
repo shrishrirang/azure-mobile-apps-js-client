@@ -13,7 +13,7 @@ exports.supportsCurrentRuntime = function () {
     return isWebAuthBrokerAvailable();
 };
 
-exports.login = function (startUri, endUri, callback) {
+exports.login = function (options, callback) {
     /// <summary>
     /// Displays the login UI and calls back on completion
     /// </summary>
@@ -87,24 +87,24 @@ exports.login = function (startUri, endUri, callback) {
     // be registered with the Microsoft Azure Mobile Service, but it provides a better 
     // experience as HTTP cookies are supported so that users do not have to
     // login in everytime the application is launched.
-    if (endUri) {
-        endUri = new Windows.Foundation.Uri(endUri);
+    if (options.endUri) {
+        options.endUri = new Windows.Foundation.Uri(options.endUri);
     } else {
         var ssoQueryParameter = {},
             redirectUri = windowsWebAuthBroker.getCurrentApplicationCallbackUri().absoluteUri;
 
         ssoQueryParameter[easyAuthRedirectUriKey] = redirectUri;
-        startUri = _.url.combinePathAndQuery(startUri, _.url.getQueryString(ssoQueryParameter));
+        options.startUri = _.url.combinePathAndQuery(options.startUri, _.url.getQueryString(ssoQueryParameter));
     }
     
-    startUri = new Windows.Foundation.Uri(startUri);
+    options.startUri = new Windows.Foundation.Uri(options.startUri);
     
     // If authenticateAndContinue method is available, we should use it instead of authenticateAsync.
     // In the event that it exists, but fails (which is the case with Win 10), we fallback to authenticateAsync.
     var isLoginWindowLaunched;
     try {
         WinJS.Application.addEventListener('activated', webAuthBrokerContinuationCallback, true);
-        windowsWebAuthBroker.authenticateAndContinue(startUri, endUri);
+        windowsWebAuthBroker.authenticateAndContinue(options.startUri, options.endUri);
 
         isLoginWindowLaunched = true;
     } catch (ex) {
@@ -112,7 +112,7 @@ exports.login = function (startUri, endUri, callback) {
     }
 
     if (!isLoginWindowLaunched) {
-        windowsWebAuthBroker.authenticateAsync(noneWebAuthOptions, startUri, endUri)
+        windowsWebAuthBroker.authenticateAsync(noneWebAuthOptions, options.startUri, options.endUri)
         .done(webAuthBrokerSuccessCallback, webAuthBrokerErrorCallback);
     }
 };
