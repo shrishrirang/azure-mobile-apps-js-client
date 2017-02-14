@@ -148,17 +148,17 @@ exports.getSdkInfo = function () {
     };
 };
 
-exports.login = function (startUri, endUri, callback) {
+exports.login = function (options, callback) {
     // Force logins to go over HTTPS because the runtime is hardcoded to redirect
     // the server flow back to HTTPS, and we need the origin to match.
     var findProtocol = /^[a-z]+:/,
         requiredProtocol = 'https:';
-    startUri = startUri.replace(findProtocol, requiredProtocol);
-    if (endUri) {
-        endUri = endUri.replace(findProtocol, requiredProtocol);
+    options.startUri = options.startUri.replace(findProtocol, requiredProtocol);
+    if (options.endUri) {
+        options.endUri = options.endUri.replace(findProtocol, requiredProtocol);
     }
 
-    return getBestProvider(knownLoginUis).login(startUri, endUri, callback);
+    return getBestProvider(knownLoginUis).login(options, callback);
 };
 
 exports.toJson = function (value) {

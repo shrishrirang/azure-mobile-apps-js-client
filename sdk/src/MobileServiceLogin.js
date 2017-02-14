@@ -412,24 +412,22 @@ function loginWithLoginControl(login, provider, useSingleSignOn, parameters, cal
     /// The callback to execute when the login completes: callback(error, user).
     /// </param>
 
-    var client = login.getMobileServiceClient();
-    var startUri = _.url.combinePathSegments(
-        client.alternateLoginHost || client.applicationUrl,
-        client.loginUriPrefix || loginUrl,
-        provider);
-
-    var endUri = null,
-        queryParams = {},
+    var client = login.getMobileServiceClient(),
+        loginHost = client.alternateLoginHost || client.applicationUrl,
+        loginUriPrefix = client.loginUriPrefix || loginUrl,
+        startUri,
+        endUri,
+        queryParameters = {},
         key;
 
     // Make a copy of the query parameters and set the session mode to token.
     for (key in parameters) {
-        queryParams[key] = parameters[key];
+        queryParameters[key] = parameters[key];
     }
-    queryParams[sessionModeKey] = sessionModeValueToken;
+    queryParameters[sessionModeKey] = sessionModeValueToken;
 
-    var queryString = _.url.getQueryString(queryParams);
-    startUri = _.url.combinePathAndQuery(startUri, queryString);
+    startUri = _.url.combinePathSegments(loginHost, loginUriPrefix, provider);
+    startUri = _.url.combinePathAndQuery(startUri, _.url.getQueryString(queryParameters));
 
     // If not single sign-on, then we need to construct a non-null end uri.
     if (!useSingleSignOn) {
@@ -443,10 +441,16 @@ function loginWithLoginControl(login, provider, useSingleSignOn, parameters, cal
 
     // Call the platform to launch the login control, capturing any
     // 'cancel' callback that it returns
-    var platformResult = Platform.login(
-        startUri,
-        endUri,
-        function (error, mobileServiceToken) {
+    var platformResult = Platform.login({
+            provider,
+            loginHost: loginHost,
+            loginUriPrefix: loginUriPrefix,
+            startUri,
+            endUri,
+            provider: provider,
+            queryParameters: queryParameters,
+            useSingleSignOn: useSingleSignOn
+        }, function (error, mobileServiceToken) {
             login._loginState = { inProcess: false, cancelCallback: null };
             onLoginComplete(error, mobileServiceToken, client, callback);
         });

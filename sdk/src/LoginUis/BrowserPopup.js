@@ -11,7 +11,7 @@ exports.supportsCurrentRuntime = function () {
     return true;
 };
 
-exports.login = function (startUri, endUri, callback) {
+exports.login = function (options, callback) {
     /// <summary>
     /// Displays the login UI and calls back on completion
     /// </summary>
@@ -21,15 +21,15 @@ exports.login = function (startUri, endUri, callback) {
     // is validated against whitelist on the server; we are only supplying this
     // origin to indicate *which* of the whitelisted origins to use).
     var completionOrigin = PostMessageExchange.getOriginRoot(window.location.href),
-        runtimeOrigin = PostMessageExchange.getOriginRoot(startUri),
+        runtimeOrigin = PostMessageExchange.getOriginRoot(options.startUri),
         // IE does not support popup->opener postMessage calls, so we have to
         // route the message via an iframe
         useIntermediateIframe = window.navigator.userAgent.indexOf("MSIE") >= 0 || window.navigator.userAgent.indexOf("Trident") >= 0,
         intermediateIframe = useIntermediateIframe && createIntermediateIframeForLogin(runtimeOrigin, completionOrigin),
         completionType = useIntermediateIframe ? "iframe" : "postMessage";
 
-    startUri += startUri.indexOf('?') == -1 ? '?' : '&';
-    startUri += "completion_type=" + completionType + "&completion_origin=" + encodeURIComponent(completionOrigin);
+    options.startUri += options.startUri.indexOf('?') == -1 ? '?' : '&';
+    options.startUri += "completion_type=" + completionType + "&completion_origin=" + encodeURIComponent(completionOrigin);
 
     // Browsers don't allow postMessage to a file:// URL (except by setting origin to "*", which is unacceptable)
     // so abort the process early with an explanation in that case.
@@ -39,7 +39,7 @@ exports.login = function (startUri, endUri, callback) {
         return;
     }
 
-    var loginWindow = window.open(startUri, "_blank", "location=no,resizable=yes"),
+    var loginWindow = window.open(options.startUri, "_blank", "location=no,resizable=yes"),
         complete = function(errorValue, oauthValue) {
             // Clean up event handlers, windows, frames, ...
             window.clearInterval(checkForWindowClosedInterval);
