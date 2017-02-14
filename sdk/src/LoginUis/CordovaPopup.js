@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-var config = require('../config').get();
+var config = require('../config');
 
 var requiredCordovaVersion = { major: 3, minor: 0 };
 
@@ -29,8 +29,9 @@ function currentCordovaVersion() {
 
 // Optional callback accepting (error, user) parameters.
 exports.login = function (options, callback) {
-    if (config && config.login && config.login.loginWithOptions) {
-        return config.login.loginWithOptions(options, callback);
+    var configuration = config.get();
+    if (configuration && configuration.login && configuration.login.loginWithOptions) {
+        return configuration.login.loginWithOptions(options, callback);
     }
 
     callback(new Error('Cordova login implementation not provided!'));

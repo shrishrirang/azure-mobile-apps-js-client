@@ -159,7 +159,7 @@ exports.login = function (options, callback) {
         options.endUri = options.endUri.replace(findProtocol, requiredProtocol);
     }
 
-    return getBestProvider(knownLoginUis).login(options.startUri, options.endUri, callback);
+    return getBestProvider(knownLoginUis).login(options, callback);
 };
 
 exports.toJson = function (value) {
